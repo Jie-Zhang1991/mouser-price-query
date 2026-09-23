@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>贸泽芯片价格查询</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Microsoft YaHei", sans-serif;
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+  .container {
+    width: 100%;
+    max-width: 600px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  h1 { font-size: 22px; text-align: center; margin-bottom: 24px; color: #333; }
+  .search-box { display: flex; gap: 10px; }
+  input {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+  }
+  input:focus { border-color: #007bff; }
+  button {
+    padding: 12px 28px;
+    font-size: 16px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover { background: #0056b3; }
+  button:disabled { background: #aaa; cursor: not-allowed; }
+  #result { margin-top: 24px; }
+  .loading { text-align: center; color: #888; padding: 20px; }
+  .error { color: #d32f2f; background: #ffeaea; padding: 16px; border-radius: 8px; }
+  .card { border: 1px solid #eee; border-radius: 8px; padding: 20px; }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 15px;
+  }
+  .row:last-child { border-bottom: none; }
+  .label { color: #888; }
+  .value { font-weight: 500; color: #333; text-align: right; }
+  .price-big {
+    font-size: 28px;
+    color: #d32f2f;
+    font-weight: 700;
+    text-align: center;
+    padding: 16px 0;
+  }
+  .price-note { text-align: center; color: #888; font-size: 13px; margin-bottom: 12px; }
+  table { width: 100%; margin-top: 12px; border-collapse: collapse; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+  th { background: #f9f9f9; color: #666; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>贸泽芯片价格查询</h1>
+  <div class="search-box">
+    <input type="text" id="partInput" placeholder="输入芯片型号，如 STM32F103C8T6" />
+    <button id="queryBtn" onclick="query()">查询</button>
+  </div>
+  <div id="result"></div>
+</div>
+
+<script>
+const API_URL = '/api/query';
+
+document.getElementById('partInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') query();
+});
+
+async function query() {
+  const input = document.getElementById('partInput');
+  const btn = document.getElementById('queryBtn');
+  const resultDiv = document.getElementById('result');
+  const partNumber = input.value.trim();
+
+  if (!partNumber) {
+    resultDiv.innerHTML = '<div class="error">请输入芯片型号</div>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '查询中...';
+  resultDiv.innerHTML = '<div class="loading">正在查询贸泽官网...</div>';
+
+  try {
+    const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(partNumber));
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>';
+      return;
+    }
+
+    const breaks = (data.priceBreaks || []).slice().sort(
+      (a, b) => parseInt(a.Quantity) - parseInt(b.Quantity)
+    );
+
+    let selected = null;
+    for (const pb of breaks) {
+      if (parseInt(pb.Quantity) <= 1000) selected = pb;
+      else break;
+    }
+    if (!selected && breaks.length > 0) selected = breaks[0];
+
+    let html = '<div class="card">';
+    html += '<div class="row"><span class="label">厂商料号</span><span class="value">' + (data.partNumber || '-') + '</span></div>';
+    html += '<div class="row"><span class="label">厂商</span><span class="value">' + (data.manufacturer || '-') + '</span></div>';
+    html += '<div class="row"><span class="label">描述</span><span class="value">' + (data.description || '-') + '</span></div>';
+
+    if (selected) {
+      html += '<div class="price-big">' + selected.Price + ' ' + selected.Currency + '</div>';
+      html += '<div class="price-note">对应起订量 ' + selected.Quantity + ' 片</div>';
+    } else {
+      html += '<div class="price-note">该型号暂无价格信息</div>';
+    }
+
+    if (breaks.length > 0) {
+      html += '<table><tr><th>起订量</th><th>单价</th></tr>';
+      breaks.forEach(pb => {
+        html += '<tr><td>' + pb.Quantity + '</td><td>' + pb.Price + ' ' + (pb.Currency || '') + '</td></tr>';
+      });
+      html += '</table>';
+    }
+
+    if (data.detailUrl) {
+      html += '<div style="margin-top:16px;text-align:center;"><a href="' + data.detailUrl + '" target="_blank">查看贸泽详情页</a></div>';
+    }
+
+    html += '</div>';
+    resultDiv.innerHTML = html;
+
+  } catch (e) {
+    resultDiv.innerHTML = '<div class="error">无法连接到后端，请确认服务正在运行</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '查询';
+  }
+}
+</script>
+</body>
+</html>
