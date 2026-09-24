@@ -9,18 +9,13 @@ CORS(app)
 API_KEY = os.getenv("MOUSER_API_KEY")
 BASE_URL = "https://api.mouser.com/api/v1"
 
-# 代理设置（本地可选，Render 上不需要设置，留空即可）
-PROXIES = None
-http_proxy = os.getenv("HTTP_PROXY") or os.getenv("http_proxy")
-https_proxy = os.getenv("HTTPS_PROXY") or os.getenv("https_proxy")
-if http_proxy or https_proxy:
-    PROXIES = {"http": http_proxy, "https": https_proxy or http_proxy}
-
 HEADERS = {"Content-Type": "application/json"}
+
 
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
+
 
 def keyword_search(part):
     url = f"{BASE_URL}/search/keyword"
@@ -35,8 +30,9 @@ def keyword_search(part):
         }
     }
     r = requests.post(url, params=params, headers=HEADERS,
-                      json=payload, timeout=30, proxies=PROXIES)
+                      json=payload, timeout=30)
     return (r.json().get("SearchResults") or {}).get("Parts") or []
+
 
 def partnumber_search(part):
     url = f"{BASE_URL}/search/partnumber"
@@ -48,8 +44,9 @@ def partnumber_search(part):
         }
     }
     r = requests.post(url, params=params, headers=HEADERS,
-                      json=payload, timeout=30, proxies=PROXIES)
+                      json=payload, timeout=30)
     return (r.json().get("SearchResults") or {}).get("Parts") or []
+
 
 @app.route('/api/query')
 def query():
@@ -96,6 +93,7 @@ def query():
         return jsonify({"error": f"网络错误: {str(e)}"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
