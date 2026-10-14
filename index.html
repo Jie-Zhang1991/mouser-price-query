@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ChipCost - 芯片成本查询</title>
+<script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -15,36 +16,37 @@
     padding: 40px 16px;
   }
   .container {
-    width: 100%;
-    max-width: 800px;
-    background: #fff;
-    border-radius: 16px;
-    padding: 40px;
+    width: 100%; max-width: 800px; background: #fff;
+    border-radius: 16px; padding: 40px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     height: fit-content;
   }
   h1 { font-size: 26px; text-align: center; margin-bottom: 8px; color: #2c3e50; }
   .subtitle { text-align: center; color: #7f8c8d; font-size: 14px; margin-bottom: 30px; }
-  .search-box { display: flex; gap: 12px; }
-  input {
+
+  .search-box { display: flex; gap: 12px; margin-bottom: 20px; }
+  input[type="text"] {
     flex: 1; padding: 14px 20px; font-size: 16px;
     border: 2px solid #e0e6ed; border-radius: 12px; outline: none;
     transition: border-color 0.3s;
   }
-  input:focus { border-color: #3498db; }
+  input[type="text"]:focus { border-color: #3498db; }
+
   button {
-    padding: 14px 48px;          /* 横向加宽 1.5 倍：32px -> 48px */
-    font-size: 16px;
-    background: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: bold;
+    padding: 14px 40px; font-size: 16px; background: #3498db; color: #fff;
+    border: none; border-radius: 12px; cursor: pointer; font-weight: bold;
     transition: background 0.3s;
   }
   button:hover { background: #2980b9; }
   button:disabled { background: #bdc3c7; cursor: not-allowed; }
+
+  .batch-btn {
+    background: #27ae60;
+    padding: 14px 24px;
+    font-size: 15px;
+  }
+  .batch-btn:hover { background: #219150; }
+
   #result { margin-top: 30px; }
   .loading { text-align: center; color: #7f8c8d; padding: 30px; }
   .error { color: #e74c3c; background: #fdf0ed; padding: 20px; border-radius: 12px; border-left: 4px solid #e74c3c; }
@@ -54,28 +56,19 @@
     border-radius: 16px; padding: 32px; text-align: center; color: #fff; margin-bottom: 24px;
   }
   .should-cost-label {
-    font-size: 22px;
-    font-weight: 700;
-    opacity: 0.95;
-    margin-bottom: 12px;
-    letter-spacing: 1.5px;
+    font-size: 22px; font-weight: 700; opacity: 0.95;
+    margin-bottom: 12px; letter-spacing: 1.5px;
   }
-  .should-cost-value {
-    font-size: 52px;
-    font-weight: 800;
-    margin-bottom: 6px;
-    line-height: 1.1;
-  }
-  .should-cost-tax {
-    font-size: 12px;
-    opacity: 0.75;
-    margin-top: 4px;
-  }
+  .should-cost-value { font-size: 52px; font-weight: 800; margin-bottom: 6px; line-height: 1.1; }
+  .should-cost-tax { font-size: 12px; opacity: 0.75; margin-top: 4px; }
 
   .info-card {
     border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 20px;
   }
-  .info-title { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f1f4f8; }
+  .info-title {
+    font-size: 16px; font-weight: 700; color: #2c3e50;
+    margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f1f4f8;
+  }
   .info-row { display: flex; padding: 8px 0; font-size: 14px; }
   .info-label { color: #7f8c8d; min-width: 110px; flex-shrink: 0; }
   .info-value { color: #2c3e50; font-weight: 500; }
@@ -89,22 +82,118 @@
   th { background: #f8f9fa; color: #7f8c8d; font-weight: 500; }
   .detail-link { display: block; text-align: center; margin-top: 14px; color: #3498db; text-decoration: none; font-size: 13px; }
   .detail-link:hover { text-decoration: underline; }
+
+  /* 批量上传弹窗 */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 1000;
+    justify-content: center; align-items: center; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 16px; padding: 32px;
+    max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;
+  }
+  .modal h2 { font-size: 22px; color: #2c3e50; margin-bottom: 16px; text-align: center; }
+  .notice {
+    background: #fff9e6; border-left: 4px solid #f39c12;
+    padding: 14px 18px; border-radius: 8px; font-size: 13px;
+    color: #7f5f00; line-height: 1.7; margin-bottom: 20px;
+  }
+  .notice strong { color: #d35400; }
+  .drop-zone {
+    border: 2px dashed #bdc3c7; border-radius: 12px;
+    padding: 40px 20px; text-align: center; color: #7f8c8d;
+    cursor: pointer; transition: all 0.3s; margin-bottom: 20px;
+    background: #fafbfc;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: #3498db; background: #f0f7ff; color: #3498db;
+  }
+  .drop-zone-icon { font-size: 42px; margin-bottom: 10px; }
+  .drop-zone-text { font-size: 15px; margin-bottom: 6px; }
+  .drop-zone-hint { font-size: 12px; color: #95a5a6; }
+  .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; }
+
+  /* 进度条 */
+  .progress-container {
+    border: 1px solid #e0e6ed; border-radius: 12px;
+    padding: 24px; margin-bottom: 20px;
+  }
+  .progress-title { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 12px; }
+  .progress-tip {
+    background: #eaf6ff; border-left: 4px solid #3498db;
+    padding: 12px 16px; border-radius: 8px; font-size: 13px;
+    color: #2c5282; line-height: 1.7; margin-bottom: 16px;
+  }
+  .progress-bar-bg {
+    background: #ecf0f1; border-radius: 10px; height: 20px;
+    overflow: hidden; margin-bottom: 12px;
+  }
+  .progress-bar-fill {
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    height: 100%; width: 0%; transition: width 0.3s;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 12px; font-weight: bold;
+  }
+  .progress-text { font-size: 13px; color: #7f8c8d; text-align: center; }
+  .progress-current {
+    font-size: 12px; color: #95a5a6; text-align: center;
+    margin-top: 8px; word-break: break-all;
+  }
+  .success-msg {
+    background: #d4edda; border-left: 4px solid #27ae60;
+    padding: 16px; border-radius: 8px; color: #155724;
+    font-size: 14px; margin-bottom: 16px;
+  }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>ChipCost 芯片成本查询</h1>
   <p class="subtitle">输入芯片型号，获取 AI 分析后的推荐成本</p>
+
   <div class="search-box">
     <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
-    <button id="queryBtn" onclick="query()">AI分析</button>   <!-- 按钮文字改为 AI分析 -->
+    <button id="queryBtn" onclick="query()">AI分析</button>
+    <button class="batch-btn" onclick="openBatchModal()">批量分析</button>
   </div>
+
   <div id="result"></div>
+</div>
+
+<!-- 批量上传弹窗 -->
+<div class="modal-overlay" id="batchModal">
+  <div class="modal">
+    <h2>批量分析 BOM 文件</h2>
+
+    <div class="notice">
+      <strong>📋 使用说明：</strong><br>
+      1. 文件格式：仅支持 <strong>Excel (.xlsx / .xls)</strong> 或 <strong>WPS 表格</strong>；<br>
+      2. 芯片型号必须位于 <strong>A 列</strong>；<br>
+      3. <strong>第 1 行为表头</strong>，芯片型号从<strong>第 2 行</strong>开始；<br>
+      4. 受 API 调用次数及时间间隔限制，单次上传芯片数量<strong>上限 100 个</strong>；超出部分仅分析前 100 条。
+    </div>
+
+    <div class="drop-zone" id="dropZone">
+      <div class="drop-zone-icon">📁</div>
+      <div class="drop-zone-text">点击此处选择文件，或将文件拖拽到此处</div>
+      <div class="drop-zone-hint">支持 .xlsx / .xls 格式</div>
+      <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" />
+    </div>
+
+    <div class="modal-buttons">
+      <button style="background:#95a5a6;" onclick="closeBatchModal()">取消</button>
+    </div>
+  </div>
 </div>
 
 <script>
 const API_URL = 'https://chipcost.space';
+const MAX_BATCH = 100;
+const QUERY_INTERVAL_MS = 1500; // 每个型号间隔 1.5 秒
 
+// ========== 单个查询 ==========
 document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
@@ -121,7 +210,7 @@ async function query() {
   }
 
   btn.disabled = true;
-  btn.textContent = 'AI分析中...';   // 加载状态文字同步修改
+  btn.textContent = 'AI分析中...';
   resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
 
   try {
@@ -172,9 +261,206 @@ async function query() {
     resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
   } finally {
     btn.disabled = false;
-    btn.textContent = 'AI分析';   // 恢复按钮文字
+    btn.textContent = 'AI分析';
   }
 }
+
+// ========== 批量分析 ==========
+function openBatchModal() {
+  document.getElementById('batchModal').classList.add('show');
+}
+function closeBatchModal() {
+  document.getElementById('batchModal').classList.remove('show');
+}
+
+// 拖拽上传
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropZone.classList.add('dragover');
+});
+dropZone.addEventListener('dragleave', () => {
+  dropZone.classList.remove('dragover');
+});
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    handleFile(files[0]);
+  }
+});
+
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length > 0) {
+    handleFile(e.target.files[0]);
+  }
+});
+
+// 处理上传的文件
+async function handleFile(file) {
+  // 校验文件类型
+  const name = file.name.toLowerCase();
+  if (!name.endsWith('.xlsx') && !name.endsWith('.xls')) {
+    alert('请上传 Excel (.xlsx / .xls) 格式的文件');
+    return;
+  }
+
+  closeBatchModal();
+  const resultDiv = document.getElementById('result');
+
+  // 解析Excel
+  let workbook;
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    workbook = XLSX.read(arrayBuffer, { type: 'array' });
+  } catch (e) {
+    resultDiv.innerHTML = '<div class="error">文件解析失败，请确认是有效的 Excel 文件</div>';
+    return;
+  }
+
+  const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+
+  if (rows.length < 2) {
+    resultDiv.innerHTML = '<div class="error">文件中没有找到数据（第2行开始才是芯片型号）</div>';
+    return;
+  }
+
+  // 从第2行开始提取 A 列
+  const partNumbers = [];
+  for (let i = 1; i < rows.length; i++) {
+    const val = (rows[i][0] || '').toString().trim();
+    if (val) partNumbers.push(val);
+  }
+
+  if (partNumbers.length === 0) {
+    resultDiv.innerHTML = '<div class="error">A列第2行开始未找到任何芯片型号</div>';
+    return;
+  }
+
+  const total = Math.min(partNumbers.length, MAX_BATCH);
+  const truncated = partNumbers.length > MAX_BATCH;
+  const list = partNumbers.slice(0, total);
+
+  // 显示进度条
+  resultDiv.innerHTML = `
+    <div class="progress-container">
+      <div class="progress-title">批量分析进行中</div>
+      <div class="progress-tip">
+        💡 <strong>温馨提示：</strong>批量分析需要为每个芯片型号依次调用贸泽与 AI 接口，为保证 API 稳定性，每个型号之间有约 1.5 秒的时间间隔。整个过程可能需要数分钟，请耐心等待，不要关闭或刷新页面。
+        ${truncated ? '<br><br>⚠️ 文件中共有 ' + partNumbers.length + ' 个型号，超出单次上限，本次仅分析前 ' + MAX_BATCH + ' 个。' : ''}
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%">0%</div>
+      </div>
+      <div class="progress-text" id="progressText">准备中...</div>
+      <div class="progress-current" id="progressCurrent"></div>
+    </div>
+  `;
+
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  const progressCurrent = document.getElementById('progressCurrent');
+
+  // 结果数组
+  const results = [];
+
+  // 逐个查询
+  for (let i = 0; i < list.length; i++) {
+    const pn = list[i];
+    progressText.textContent = `正在分析 ${i + 1} / ${total}`;
+    progressCurrent.textContent = `当前型号：${pn}`;
+
+    try {
+      const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn));
+      const data = await resp.json();
+
+      if (resp.ok && data.partNumber) {
+        results.push({
+          original: pn,
+          fullPart: data.partNumber || pn,
+          shouldCost: data.shouldCost || '',
+          mouser1k: data.price1k ? ('$' + data.price1k) : '未查询到'
+        });
+      } else {
+        results.push({
+          original: pn,
+          fullPart: pn,
+          shouldCost: '',
+          mouser1k: '未查询到'
+        });
+      }
+    } catch (e) {
+      results.push({
+        original: pn,
+        fullPart: pn,
+        shouldCost: '',
+        mouser1k: '未查询到'
+      });
+    }
+
+    // 更新进度
+    const pct = Math.round(((i + 1) / total) * 100);
+    progressFill.style.width = pct + '%';
+    progressFill.textContent = pct + '%';
+
+    // 间隔（最后一个不用等）
+    if (i < list.length - 1) {
+      await new Promise(r => setTimeout(r, QUERY_INTERVAL_MS));
+    }
+  }
+
+  // 生成 Excel
+  progressText.textContent = '正在生成结果文件...';
+
+  const outputData = [
+    ['原始型号', '完整型号参考', 'Should Cost（CNY）', 'Mouser报价-对应起订量1k pcs（USD）']
+  ];
+  results.forEach(r => {
+    outputData.push([r.original, r.fullPart, r.shouldCost, r.mouser1k]);
+  });
+
+  const newSheet = XLSX.utils.aoa_to_sheet(outputData);
+  const newWorkbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(newWorkbook, newSheet, '分析结果');
+
+  const outFileName = file.name.replace(/\.(xlsx|xls)$/i, '') + '_分析结果.xlsx';
+  const wbout = XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+
+  // 显示完成提示 + 自动下载
+  resultDiv.innerHTML = `
+    <div class="success-msg">
+      ✅ <strong>批量分析完成！</strong>共分析 ${total} 个型号。<br>
+      结果文件已自动开始下载，如未开始，请点击下方按钮：
+    </div>
+    <div style="text-align:center;">
+      <a href="${url}" download="${outFileName}" 
+         style="display:inline-block;padding:14px 40px;background:#27ae60;color:#fff;text-decoration:none;border-radius:12px;font-weight:bold;">
+        📥 下载分析结果
+      </a>
+    </div>
+  `;
+
+  // 自动触发下载
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = outFileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// 点击遮罩关闭弹窗
+document.getElementById('batchModal').addEventListener('click', function(e) {
+  if (e.target === this) closeBatchModal();
+});
 </script>
 </body>
 </html>
