@@ -45,11 +45,26 @@
 
   .should-cost-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 16px; padding: 28px; text-align: center; color: #fff; margin-bottom: 24px;
+    border-radius: 16px; padding: 32px; text-align: center; color: #fff; margin-bottom: 24px;
   }
-  .should-cost-label { font-size: 14px; opacity: 0.85; margin-bottom: 8px; letter-spacing: 1px; }
-  .should-cost-value { font-size: 48px; font-weight: 800; margin-bottom: 4px; }
-  .should-cost-note { font-size: 13px; opacity: 0.8; }
+  .should-cost-label {
+    font-size: 22px;
+    font-weight: 700;
+    opacity: 0.95;
+    margin-bottom: 12px;
+    letter-spacing: 1.5px;
+  }
+  .should-cost-value {
+    font-size: 52px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    line-height: 1.1;
+  }
+  .should-cost-tax {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-top: 4px;
+  }
 
   .info-card {
     border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 20px;
@@ -63,7 +78,6 @@
   .source-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .source-name { font-size: 16px; font-weight: 700; color: #2c3e50; }
   .source-badge { font-size: 12px; padding: 3px 10px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; }
-  .source-price { font-size: 18px; font-weight: 700; color: #e74c3c; margin-bottom: 12px; }
   table { width: 100%; border-collapse: collapse; }
   th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f1f4f8; font-size: 13px; }
   th { background: #f8f9fa; color: #7f8c8d; font-weight: 500; }
@@ -74,7 +88,7 @@
 <body>
 <div class="container">
   <h1>ChipCost 芯片成本查询</h1>
-  <p class="subtitle">输入芯片型号，获取 AI 分类后的推荐成本</p>
+  <p class="subtitle">输入芯片型号，获取 AI 分析后的推荐成本</p>
   <div class="search-box">
     <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
     <button id="queryBtn" onclick="query()">查询</button>
@@ -102,7 +116,7 @@ async function query() {
 
   btn.disabled = true;
   btn.textContent = '查询中...';
-  resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分类...</div>';
+  resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
 
   try {
     const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(partNumber));
@@ -115,16 +129,14 @@ async function query() {
 
     let html = '';
 
-    // Should Cost 卡片
     if (data.shouldCost) {
       html += '<div class="should-cost-card">';
-      html += '<div class="should-cost-label">SHOULD COST</div>';
-      html += '<div class="should-cost-value">$' + data.shouldCost + '</div>';
-      html += '<div class="should-cost-note">基于 1000pcs 参考价 × 分类系数</div>';
+      html += '<div class="should-cost-label">SHOULD COST 推荐值</div>';
+      html += '<div class="should-cost-value">' + data.shouldCost + ' CNY</div>';
+      html += '<div class="should-cost-tax">（不含税）</div>';
       html += '</div>';
     }
 
-    // 芯片信息
     html += '<div class="info-card">';
     html += '<div class="info-title">芯片信息</div>';
     html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + (data.partNumber || '-') + '</span></div>';
@@ -134,13 +146,9 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + (data.description || '-') + '</span></div>';
     html += '</div>';
 
-    // 贸泽价格阶梯
     if (data.priceBreaks && data.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">参考价</span></div>';
-      if (data.price1k) {
-        html += '<div class="source-price">1000pcs: $' + data.price1k + '</div>';
-      }
       html += '<table><tr><th>起订量</th><th>单价</th></tr>';
       data.priceBreaks.forEach(pb => {
         html += '<tr><td>' + pb.Quantity + '</td><td>' + pb.Price + '</td></tr>';
