@@ -33,8 +33,14 @@
   }
   input:focus { border-color: #3498db; }
   button {
-    padding: 14px 32px; font-size: 16px; background: #3498db; color: #fff;
-    border: none; border-radius: 12px; cursor: pointer; font-weight: bold;
+    padding: 14px 48px;          /* 横向加宽 1.5 倍：32px -> 48px */
+    font-size: 16px;
+    background: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
     transition: background 0.3s;
   }
   button:hover { background: #2980b9; }
@@ -91,7 +97,7 @@
   <p class="subtitle">输入芯片型号，获取 AI 分析后的推荐成本</p>
   <div class="search-box">
     <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
-    <button id="queryBtn" onclick="query()">查询</button>
+    <button id="queryBtn" onclick="query()">AI分析</button>   <!-- 按钮文字改为 AI分析 -->
   </div>
   <div id="result"></div>
 </div>
@@ -115,7 +121,7 @@ async function query() {
   }
 
   btn.disabled = true;
-  btn.textContent = '查询中...';
+  btn.textContent = 'AI分析中...';   // 加载状态文字同步修改
   resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
 
   try {
@@ -166,7 +172,7 @@ async function query() {
     resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
   } finally {
     btn.disabled = false;
-    btn.textContent = '查询';
+    btn.textContent = 'AI分析';   // 恢复按钮文字
   }
 }
 </script>
