@@ -3,85 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>贸泽芯片价格查询</title>
+<title>芯片成本查询 - ChipCost</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, "Microsoft YaHei", sans-serif;
-    background: #f5f5f5;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     padding: 40px 16px;
   }
   .container {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     background: #fff;
-    border-radius: 12px;
-    padding: 32px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    height: fit-content;
   }
-  h1 { font-size: 22px; text-align: center; margin-bottom: 24px; color: #333; }
-  .search-box { display: flex; gap: 10px; }
+  h1 { font-size: 26px; text-align: center; margin-bottom: 10px; color: #2c3e50; }
+  .subtitle { text-align: center; color: #7f8c8d; font-size: 14px; margin-bottom: 30px; }
+  .search-box { display: flex; gap: 12px; }
   input {
     flex: 1;
-    padding: 12px 16px;
+    padding: 14px 20px;
     font-size: 16px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
+    border: 2px solid #e0e6ed;
+    border-radius: 12px;
     outline: none;
+    transition: border-color 0.3s;
   }
-  input:focus { border-color: #007bff; }
+  input:focus { border-color: #3498db; }
   button {
-    padding: 12px 28px;
+    padding: 14px 32px;
     font-size: 16px;
-    background: #007bff;
+    background: #3498db;
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
+    transition: background 0.3s;
+    font-weight: bold;
   }
-  button:hover { background: #0056b3; }
-  button:disabled { background: #aaa; cursor: not-allowed; }
-  #result { margin-top: 24px; }
-  .loading { text-align: center; color: #888; padding: 20px; }
-  .error { color: #d32f2f; background: #ffeaea; padding: 16px; border-radius: 8px; }
-  .card { border: 1px solid #eee; border-radius: 8px; padding: 20px; }
+  button:hover { background: #2980b9; }
+  button:disabled { background: #bdc3c7; cursor: not-allowed; }
+  #result { margin-top: 30px; }
+  .loading { text-align: center; color: #7f8c8d; padding: 30px; }
+  .error {
+    color: #e74c3c;
+    background: #fdf0ed;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid #e74c3c;
+  }
+  .card {
+    border: 1px solid #e0e6ed;
+    border-radius: 12px;
+    padding: 24px;
+    animation: fadeIn 0.3s ease-in;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   .row {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #f5f5f5;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f4f8;
     font-size: 15px;
   }
   .row:last-child { border-bottom: none; }
-  .label { color: #888; }
-  .value { font-weight: 500; color: #333; text-align: right; }
-  .price-big {
-    font-size: 28px;
-    color: #d32f2f;
-    font-weight: 700;
+  .label { color: #7f8c8d; }
+  .value { font-weight: 500; color: #2c3e50; text-align: right; max-width: 60%; }
+  .price-highlight {
     text-align: center;
-    padding: 16px 0;
+    padding: 24px 0;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin: 20px 0;
   }
-  .price-note { text-align: center; color: #888; font-size: 13px; margin-bottom: 12px; }
-  table { width: 100%; margin-top: 12px; border-collapse: collapse; }
-  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
-  th { background: #f9f9f9; color: #666; }
+  .price-big {
+    font-size: 36px;
+    color: #e74c3c;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .price-note { color: #7f8c8d; font-size: 14px; }
+  table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+  th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f4f8; font-size: 14px; }
+  th { background: #f8f9fa; color: #7f8c8d; font-weight: 500; border-radius: 8px 8px 0 0; }
+  .detail-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #3498db;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .detail-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>贸泽芯片价格查询</h1>
+  <h1>芯片成本查询</h1>
+  <p class="subtitle">输入芯片型号，查询参考价格</p>
   <div class="search-box">
-    <input type="text" id="partInput" placeholder="输入芯片型号，如 STM32F103C8T6" />
+    <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
     <button id="queryBtn" onclick="query()">查询</button>
   </div>
   <div id="result"></div>
 </div>
 
 <script>
-const API_URL = '/api/query';
+const API_URL = 'https://chipcost.space';
 
 document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
@@ -100,7 +134,7 @@ async function query() {
 
   btn.disabled = true;
   btn.textContent = '查询中...';
-  resultDiv.innerHTML = '<div class="loading">正在查询贸泽官网...</div>';
+  resultDiv.innerHTML = '<div class="loading">正在查询云端价格...</div>';
 
   try {
     const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(partNumber));
@@ -111,6 +145,7 @@ async function query() {
       return;
     }
 
+    // 核心逻辑：计算1000片起订价格（向下取最近的价格阶梯）
     const breaks = (data.priceBreaks || []).slice().sort(
       (a, b) => parseInt(a.Quantity) - parseInt(b.Quantity)
     );
@@ -124,12 +159,14 @@ async function query() {
 
     let html = '<div class="card">';
     html += '<div class="row"><span class="label">厂商料号</span><span class="value">' + (data.partNumber || '-') + '</span></div>';
-    html += '<div class="row"><span class="label">厂商</span><span class="value">' + (data.manufacturer || '-') + '</span></div>';
+    html += '<div class="row"><span class="label">制造商</span><span class="value">' + (data.manufacturer || '-') + '</span></div>';
     html += '<div class="row"><span class="label">描述</span><span class="value">' + (data.description || '-') + '</span></div>';
 
     if (selected) {
+      html += '<div class="price-highlight">';
       html += '<div class="price-big">' + selected.Price + ' ' + selected.Currency + '</div>';
-      html += '<div class="price-note">对应起订量 ' + selected.Quantity + ' 片</div>';
+      html += '<div class="price-note">对应起订量 ' + selected.Quantity + ' 片（当前参考价）</div>';
+      html += '</div>';
     } else {
       html += '<div class="price-note">该型号暂无价格信息</div>';
     }
@@ -143,14 +180,14 @@ async function query() {
     }
 
     if (data.detailUrl) {
-      html += '<div style="margin-top:16px;text-align:center;"><a href="' + data.detailUrl + '" target="_blank">查看贸泽详情页</a></div>';
+      html += '<a class="detail-link" href="' + data.detailUrl + '" target="_blank">查看贸泽详情页 →</a>';
     }
 
     html += '</div>';
     resultDiv.innerHTML = html;
 
   } catch (e) {
-    resultDiv.innerHTML = '<div class="error">无法连接到后端，请确认服务正在运行</div>';
+    resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
   } finally {
     btn.disabled = false;
     btn.textContent = '查询';
