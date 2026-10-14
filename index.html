@@ -42,8 +42,8 @@
 
   .batch-btn {
     background: #27ae60;
-    padding: 14px 24px;
-    font-size: 15px;
+    padding: 14px 40px;   /* 与默认按钮一致 */
+    font-size: 16px;      /* 与默认按钮一致 */
   }
   .batch-btn:hover { background: #219150; }
 
@@ -418,7 +418,7 @@ async function handleFile(file) {
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
 
-  // 设置列宽，让文本显示完整
+  // 设置列宽
   newSheet['!cols'] = [
     { wch: 22 },  // 原始型号
     { wch: 28 },  // 完整型号参考
