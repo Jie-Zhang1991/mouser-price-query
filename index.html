@@ -7,7 +7,6 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: -apple-system, "Microsoft YaHei", sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -15,31 +14,13 @@
     display: flex;
     justify-content: center;
     padding: 80px 16px 40px;
-    position: relative;
   }
-
-  /* 跑车背景：白色自动透明，与浅蓝渐变融合 */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: url('car-bg.png') no-repeat center center;
-    background-size: cover;
-    mix-blend-mode: multiply;   /* 白色变透明，保留深色线条 */
-    opacity: 0.85;              /* 线条浓度，可调 0.5~1.0 */
-    pointer-events: none;       /* 不影响点击 */
-    z-index: 0;
-  }
-
   .container {
-    position: relative;
-    z-index: 1;                 /* 确保卡片在背景之上 */
     width: 100%; max-width: 800px; background: #fff;
     border-radius: 16px; padding: 40px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     height: fit-content;
   }
-
   h1 { font-size: 26px; text-align: center; margin-bottom: 8px; color: #2c3e50; }
   .subtitle { text-align: center; color: #7f8c8d; font-size: 14px; margin-bottom: 30px; }
 
@@ -263,6 +244,7 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + (data.level2 || '-') + '</span></div>';
     html += '</div>';
 
+    // 贸泽价格
     if (data.mouser && data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + (data.mouser.error || '参考价') + '</span></div>';
@@ -286,6 +268,7 @@ async function query() {
       html += '</div>';
     }
 
+    // 立创价格
     if (data.lcsc && data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + (data.lcsc.error || '参考价') + '</span></div>';
@@ -319,6 +302,7 @@ async function query() {
   }
 }
 
+// ========== 批量分析 ==========
 function openBatchModal() { document.getElementById('batchModal').classList.add('show'); }
 function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
 
