@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChipCost - 芯片成本查询</title>
+<title>ChipCost - 芯片成本</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -13,7 +13,7 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 40px 16px;
+    padding: 80px 16px 40px;   /* 顶部留白加大，让主界面整体下移，视觉更协调 */
   }
   .container {
     width: 100%; max-width: 800px; background: #fff;
@@ -33,17 +33,19 @@
   input[type="text"]:focus { border-color: #3498db; }
 
   button {
-    padding: 14px 40px; font-size: 16px; background: #3498db; color: #fff;
+    padding: 14px 32px;   /* 横向缩短为原 40px 的 0.8 倍 */
+    font-size: 16px; background: #3498db; color: #fff;
     border: none; border-radius: 12px; cursor: pointer; font-weight: bold;
     transition: background 0.3s;
+    white-space: nowrap;
   }
   button:hover { background: #2980b9; }
   button:disabled { background: #bdc3c7; cursor: not-allowed; }
 
   .batch-btn {
     background: #27ae60;
-    padding: 14px 40px;   /* 与默认按钮一致 */
-    font-size: 16px;      /* 与默认按钮一致 */
+    padding: 14px 32px;   /* 与默认按钮一致 */
+    font-size: 16px;
   }
   .batch-btn:hover { background: #219150; }
 
@@ -146,11 +148,31 @@
     padding: 16px; border-radius: 8px; color: #155724;
     font-size: 14px; margin-bottom: 16px;
   }
+
+  /* 手机端适配：让按钮在窄屏下堆叠显示，避免挤出界面框外 */
+  @media (max-width: 600px) {
+    body {
+      padding: 30px 12px 20px;
+    }
+    .container {
+      padding: 24px;
+    }
+    h1 { font-size: 22px; }
+    .search-box {
+      flex-direction: column;
+    }
+    .search-box input[type="text"],
+    .search-box button {
+      width: 100%;
+    }
+    .should-cost-value { font-size: 40px; }
+    .should-cost-label { font-size: 18px; }
+  }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>ChipCost 芯片成本查询</h1>
+  <h1>ChipCost 芯片成本</h1>
   <p class="subtitle">输入芯片型号，获取 AI 分析后的推荐成本</p>
 
   <div class="search-box">
@@ -379,14 +401,18 @@ async function handleFile(file) {
           original: pn,
           fullPart: data.partNumber || pn,
           shouldCost: data.shouldCost || '',
-          mouser1k: data.price1k ? ('$' + data.price1k) : '未查询到'
+          mouser1k: data.price1k ? ('$' + data.price1k) : '未查询到',
+          level1: data.level1 || '',
+          level2: data.level2 || ''
         });
       } else {
         results.push({
           original: pn,
           fullPart: pn,
           shouldCost: '',
-          mouser1k: '未查询到'
+          mouser1k: '未查询到',
+          level1: '',
+          level2: ''
         });
       }
     } catch (e) {
@@ -394,7 +420,9 @@ async function handleFile(file) {
         original: pn,
         fullPart: pn,
         shouldCost: '',
-        mouser1k: '未查询到'
+        mouser1k: '未查询到',
+        level1: '',
+        level2: ''
       });
     }
 
@@ -410,10 +438,10 @@ async function handleFile(file) {
   progressText.textContent = '正在生成结果文件...';
 
   const outputData = [
-    ['原始型号', '完整型号参考', 'Should Cost（CNY）', 'Mouser报价-对应起订量1k pcs（USD）']
+    ['原始型号', '完整型号参考', 'Should Cost（CNY）', 'Mouser报价-对应起订量1k pcs（USD）', '芯片一级分类', '芯片二级分类']
   ];
   results.forEach(r => {
-    outputData.push([r.original, r.fullPart, r.shouldCost, r.mouser1k]);
+    outputData.push([r.original, r.fullPart, r.shouldCost, r.mouser1k, r.level1, r.level2]);
   });
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
@@ -423,7 +451,9 @@ async function handleFile(file) {
     { wch: 22 },  // 原始型号
     { wch: 28 },  // 完整型号参考
     { wch: 22 },  // Should Cost（CNY）
-    { wch: 45 }   // Mouser报价-对应起订量1k pcs（USD）
+    { wch: 45 },  // Mouser报价-对应起订量1k pcs（USD）
+    { wch: 24 },  // 芯片一级分类
+    { wch: 32 }   // 芯片二级分类
   ];
 
   const newWorkbook = XLSX.utils.book_new();
@@ -441,7 +471,7 @@ async function handleFile(file) {
     </div>
     <div style="text-align:center;">
       <a href="${url}" download="${outFileName}" 
-         style="display:inline-block;padding:14px 40px;background:#27ae60;color:#fff;text-decoration:none;border-radius:12px;font-weight:bold;">
+         style="display:inline-block;padding:14px 32px;background:#27ae60;color:#fff;text-decoration:none;border-radius:12px;font-weight:bold;">
         📥 下载分析结果
       </a>
     </div>
