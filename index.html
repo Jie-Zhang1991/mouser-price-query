@@ -13,7 +13,7 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 80px 16px 40px;   /* 顶部留白加大，让主界面整体下移，视觉更协调 */
+    padding: 80px 16px 40px;
   }
   .container {
     width: 100%; max-width: 800px; background: #fff;
@@ -33,7 +33,7 @@
   input[type="text"]:focus { border-color: #3498db; }
 
   button {
-    padding: 14px 32px;   /* 横向缩短为原 40px 的 0.8 倍 */
+    padding: 14px 32px;
     font-size: 16px; background: #3498db; color: #fff;
     border: none; border-radius: 12px; cursor: pointer; font-weight: bold;
     transition: background 0.3s;
@@ -44,7 +44,7 @@
 
   .batch-btn {
     background: #27ae60;
-    padding: 14px 32px;   /* 与默认按钮一致 */
+    padding: 14px 32px;
     font-size: 16px;
   }
   .batch-btn:hover { background: #219150; }
@@ -149,7 +149,7 @@
     font-size: 14px; margin-bottom: 16px;
   }
 
-  /* 手机端适配：让按钮在窄屏下堆叠显示，避免挤出界面框外 */
+  /* 手机端适配 */
   @media (max-width: 600px) {
     body {
       padding: 30px 12px 20px;
@@ -213,7 +213,7 @@
 <script>
 const API_URL = 'https://chipcost.space';
 const MAX_BATCH = 100;
-const QUERY_INTERVAL_MS = 1500; // 每个型号间隔 1.5 秒
+const QUERY_INTERVAL_MS = 1500;
 
 // ========== 单个查询 ==========
 document.getElementById('partInput').addEventListener('keydown', function(e) {
@@ -295,7 +295,6 @@ function closeBatchModal() {
   document.getElementById('batchModal').classList.remove('show');
 }
 
-// 拖拽上传
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 
@@ -323,7 +322,6 @@ fileInput.addEventListener('change', (e) => {
   }
 });
 
-// 处理上传的文件
 async function handleFile(file) {
   const name = file.name.toLowerCase();
   if (!name.endsWith('.xlsx') && !name.endsWith('.xls')) {
@@ -402,6 +400,7 @@ async function handleFile(file) {
           fullPart: data.partNumber || pn,
           shouldCost: data.shouldCost || '',
           mouser1k: data.price1k ? ('$' + data.price1k) : '未查询到',
+          manufacturer: data.manufacturer || '',
           level1: data.level1 || '',
           level2: data.level2 || ''
         });
@@ -411,6 +410,7 @@ async function handleFile(file) {
           fullPart: pn,
           shouldCost: '',
           mouser1k: '未查询到',
+          manufacturer: '',
           level1: '',
           level2: ''
         });
@@ -421,6 +421,7 @@ async function handleFile(file) {
         fullPart: pn,
         shouldCost: '',
         mouser1k: '未查询到',
+        manufacturer: '',
         level1: '',
         level2: ''
       });
@@ -438,10 +439,10 @@ async function handleFile(file) {
   progressText.textContent = '正在生成结果文件...';
 
   const outputData = [
-    ['原始型号', '完整型号参考', 'Should Cost（CNY）', 'Mouser报价-对应起订量1k pcs（USD）', '芯片一级分类', '芯片二级分类']
+    ['原始型号', '完整型号参考', 'Should Cost（CNY）', 'Mouser报价-对应起订量1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类']
   ];
   results.forEach(r => {
-    outputData.push([r.original, r.fullPart, r.shouldCost, r.mouser1k, r.level1, r.level2]);
+    outputData.push([r.original, r.fullPart, r.shouldCost, r.mouser1k, r.manufacturer, r.level1, r.level2]);
   });
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
@@ -452,6 +453,7 @@ async function handleFile(file) {
     { wch: 28 },  // 完整型号参考
     { wch: 22 },  // Should Cost（CNY）
     { wch: 45 },  // Mouser报价-对应起订量1k pcs（USD）
+    { wch: 26 },  // 芯片品牌/厂商
     { wch: 24 },  // 芯片一级分类
     { wch: 32 }   // 芯片二级分类
   ];
