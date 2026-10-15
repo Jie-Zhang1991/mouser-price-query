@@ -85,7 +85,6 @@
   .detail-link { display: block; text-align: center; margin-top: 14px; color: #3498db; text-decoration: none; font-size: 13px; }
   .detail-link:hover { text-decoration: underline; }
 
-  /* 批量上传弹窗 */
   .modal-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,0.5); z-index: 1000;
@@ -117,7 +116,6 @@
   .drop-zone-hint { font-size: 12px; color: #95a5a6; }
   .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; }
 
-  /* 进度条 */
   .progress-container {
     border: 1px solid #e0e6ed; border-radius: 12px;
     padding: 24px; margin-bottom: 20px;
@@ -149,22 +147,12 @@
     font-size: 14px; margin-bottom: 16px;
   }
 
-  /* 手机端适配 */
   @media (max-width: 600px) {
-    body {
-      padding: 30px 12px 20px;
-    }
-    .container {
-      padding: 24px;
-    }
+    body { padding: 30px 12px 20px; }
+    .container { padding: 24px; }
     h1 { font-size: 22px; }
-    .search-box {
-      flex-direction: column;
-    }
-    .search-box input[type="text"],
-    .search-box button {
-      width: 100%;
-    }
+    .search-box { flex-direction: column; }
+    .search-box input[type="text"], .search-box button { width: 100%; }
     .should-cost-value { font-size: 40px; }
     .should-cost-label { font-size: 18px; }
   }
@@ -184,11 +172,9 @@
   <div id="result"></div>
 </div>
 
-<!-- 批量上传弹窗 -->
 <div class="modal-overlay" id="batchModal">
   <div class="modal">
     <h2>批量分析 BOM 文件</h2>
-
     <div class="notice">
       <strong>📋 使用说明：</strong><br>
       1. 文件格式：仅支持 <strong>Excel (.xlsx / .xls)</strong> 或 <strong>WPS 表格</strong>；<br>
@@ -196,14 +182,12 @@
       3. <strong>第 1 行为表头</strong>，芯片型号从<strong>第 2 行</strong>开始；<br>
       4. 受 API 调用次数及时间间隔限制，单次上传芯片数量<strong>上限 100 个</strong>；超出部分仅分析前 100 条。
     </div>
-
     <div class="drop-zone" id="dropZone">
       <div class="drop-zone-icon">📁</div>
       <div class="drop-zone-text">点击此处选择文件，或将文件拖拽到此处</div>
       <div class="drop-zone-hint">支持 .xlsx / .xls 格式</div>
       <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" />
     </div>
-
     <div class="modal-buttons">
       <button style="background:#95a5a6;" onclick="closeBatchModal()">取消</button>
     </div>
@@ -215,7 +199,6 @@ const API_URL = 'https://chipcost.space';
 const MAX_BATCH = 100;
 const QUERY_INTERVAL_MS = 1500;
 
-// ========== 单个查询 ==========
 document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
@@ -257,22 +240,54 @@ async function query() {
     html += '<div class="info-card">';
     html += '<div class="info-title">芯片信息</div>';
     html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + (data.partNumber || '-') + '</span></div>';
-    html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + (data.manufacturer || '-') + '</span></div>';
     html += '<div class="info-row"><span class="info-label">芯片一级分类</span><span class="info-value">' + (data.level1 || '-') + '</span></div>';
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + (data.level2 || '-') + '</span></div>';
-    html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + (data.description || '-') + '</span></div>';
     html += '</div>';
 
-    if (data.priceBreaks && data.priceBreaks.length > 0) {
+    // 贸泽价格
+    if (data.mouser && data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0) {
       html += '<div class="source-section">';
-      html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">参考价</span></div>';
+      html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + (data.mouser.error || '参考价') + '</span></div>';
+      if (data.mouser.partNumber) {
+        html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + data.mouser.partNumber + '</span></div>';
+      }
+      if (data.mouser.manufacturer) {
+        html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + data.mouser.manufacturer + '</span></div>';
+      }
+      if (data.mouser.description) {
+        html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + data.mouser.description + '</span></div>';
+      }
       html += '<table><tr><th>起订量</th><th>单价</th></tr>';
-      data.priceBreaks.forEach(pb => {
+      data.mouser.priceBreaks.forEach(pb => {
         html += '<tr><td>' + pb.Quantity + '</td><td>' + pb.Price + '</td></tr>';
       });
       html += '</table>';
-      if (data.detailUrl) {
-        html += '<a class="detail-link" href="' + data.detailUrl + '" target="_blank">查看贸泽详情页 →</a>';
+      if (data.mouser.detailUrl) {
+        html += '<a class="detail-link" href="' + data.mouser.detailUrl + '" target="_blank">查看贸泽详情页 →</a>';
+      }
+      html += '</div>';
+    }
+
+    // 立创价格
+    if (data.lcsc && data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0) {
+      html += '<div class="source-section">';
+      html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + (data.lcsc.error || '参考价') + '</span></div>';
+      if (data.lcsc.productCode) {
+        html += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + data.lcsc.productCode + '</span></div>';
+      }
+      if (data.lcsc.productModel) {
+        html += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + data.lcsc.productModel + '</span></div>';
+      }
+      if (data.lcsc.brandName) {
+        html += '<div class="info-row"><span class="info-label">品牌</span><span class="info-value">' + data.lcsc.brandName + '</span></div>';
+      }
+      html += '<table><tr><th>起订量</th><th>单价 (USD)</th></tr>';
+      data.lcsc.priceBreaks.forEach(pb => {
+        html += '<tr><td>' + pb.ladder + '</td><td>$' + (pb.usdPrice ? pb.usdPrice.toFixed(4) : '-') + '</td></tr>';
+      });
+      html += '</table>';
+      if (data.lcsc.pdfUrl) {
+        html += '<a class="detail-link" href="' + data.lcsc.pdfUrl + '" target="_blank">查看数据手册 →</a>';
       }
       html += '</div>';
     }
@@ -288,38 +303,21 @@ async function query() {
 }
 
 // ========== 批量分析 ==========
-function openBatchModal() {
-  document.getElementById('batchModal').classList.add('show');
-}
-function closeBatchModal() {
-  document.getElementById('batchModal').classList.remove('show');
-}
+function openBatchModal() { document.getElementById('batchModal').classList.add('show'); }
+function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
 
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 
 dropZone.addEventListener('click', () => fileInput.click());
-
-dropZone.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  dropZone.classList.add('dragover');
-});
-dropZone.addEventListener('dragleave', () => {
-  dropZone.classList.remove('dragover');
-});
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
 dropZone.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropZone.classList.remove('dragover');
-  const files = e.dataTransfer.files;
-  if (files.length > 0) {
-    handleFile(files[0]);
-  }
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
 });
-
 fileInput.addEventListener('change', (e) => {
-  if (e.target.files.length > 0) {
-    handleFile(e.target.files[0]);
-  }
+  if (e.target.files.length > 0) handleFile(e.target.files[0]);
 });
 
 async function handleFile(file) {
@@ -394,33 +392,26 @@ async function handleFile(file) {
       const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn));
       const data = await resp.json();
 
-      if (resp.ok && data.partNumber) {
-        results.push({
-          original: pn,
-          fullPart: data.partNumber || pn,
-          shouldCost: data.shouldCost || '',
-          mouser1k: data.price1k ? ('$' + data.price1k) : '未查询到',
-          manufacturer: data.manufacturer || '',
-          level1: data.level1 || '',
-          level2: data.level2 || ''
-        });
-      } else {
-        results.push({
-          original: pn,
-          fullPart: pn,
-          shouldCost: '',
-          mouser1k: '未查询到',
-          manufacturer: '',
-          level1: '',
-          level2: ''
-        });
-      }
+      const mouserPrice1k = (data.mouser && data.mouser.price1k) ? '$' + data.mouser.price1k : '未查询到';
+      const lcscPrice1k = (data.lcsc && data.lcsc.price1k) ? '$' + data.lcsc.price1k : '未查询到';
+
+      results.push({
+        original: pn,
+        fullPart: data.partNumber || pn,
+        shouldCost: data.shouldCost || '',
+        mouser1k: mouserPrice1k,
+        lcsc1k: lcscPrice1k,
+        manufacturer: (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
+        level1: data.level1 || '',
+        level2: data.level2 || ''
+      });
     } catch (e) {
       results.push({
         original: pn,
         fullPart: pn,
         shouldCost: '',
         mouser1k: '未查询到',
+        lcsc1k: '未查询到',
         manufacturer: '',
         level1: '',
         level2: ''
@@ -439,23 +430,16 @@ async function handleFile(file) {
   progressText.textContent = '正在生成结果文件...';
 
   const outputData = [
-    ['原始型号', '完整型号参考', 'Should Cost（CNY）', 'Mouser报价-对应起订量1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类']
+    ['原始型号', '完整型号参考', 'Should Cost（CNY）', 'Mouser报价-1k pcs（USD）', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类']
   ];
   results.forEach(r => {
-    outputData.push([r.original, r.fullPart, r.shouldCost, r.mouser1k, r.manufacturer, r.level1, r.level2]);
+    outputData.push([r.original, r.fullPart, r.shouldCost, r.mouser1k, r.lcsc1k, r.manufacturer, r.level1, r.level2]);
   });
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
-
-  // 设置列宽
   newSheet['!cols'] = [
-    { wch: 22 },  // 原始型号
-    { wch: 28 },  // 完整型号参考
-    { wch: 22 },  // Should Cost（CNY）
-    { wch: 45 },  // Mouser报价-对应起订量1k pcs（USD）
-    { wch: 26 },  // 芯片品牌/厂商
-    { wch: 24 },  // 芯片一级分类
-    { wch: 32 }   // 芯片二级分类
+    { wch: 22 }, { wch: 28 }, { wch: 22 }, { wch: 30 },
+    { wch: 28 }, { wch: 26 }, { wch: 24 }, { wch: 32 }
   ];
 
   const newWorkbook = XLSX.utils.book_new();
