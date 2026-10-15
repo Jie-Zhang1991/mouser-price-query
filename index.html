@@ -9,10 +9,12 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, "Microsoft YaHei", sans-serif;
-    /* 内联 SVG 汽车简笔画背景（淡灰色，平铺） + 原有渐变背景 */
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cpath d='M20 70 L30 50 L50 40 L80 35 L120 35 L150 40 L170 50 L180 70 Z' fill='none' stroke='%23d0d7e2' stroke-width='2'/%3E%3Ccircle cx='50' cy='75' r='10' fill='none' stroke='%23d0d7e2' stroke-width='2'/%3E%3Ccircle cx='150' cy='75' r='10' fill='none' stroke='%23d0d7e2' stroke-width='2'/%3E%3Cline x1='80' y1='40' x2='80' y2='35' stroke='%23d0d7e2' stroke-width='2'/%3E%3Cline x1='120' y1='40' x2='120' y2='35' stroke='%23d0d7e2' stroke-width='2'/%3E%3C/svg%3E") repeat,
-              linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    background-size: 200px 100px, cover;
+    /* Celestiq 简笔画 SVG 单辆居中铺满全屏 + 原有渐变背景 */
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='%23c8d0dc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M120 400 Q140 380 200 375 L280 370 Q340 320 440 300 Q580 275 720 275 Q860 275 960 300 Q1030 320 1080 355 L1090 375 L1090 400' /%3E%3Cpath d='M280 370 L320 355 L440 320 L600 305 L760 305 L900 325 L1000 350 L1080 355' /%3E%3Cpath d='M440 300 Q480 260 560 250 Q660 240 760 250 Q840 260 880 285' /%3E%3Cpath d='M500 255 Q580 220 700 218 Q800 218 860 240' /%3E%3Cpath d='M220 385 Q250 380 280 378' /%3E%3Cpath d='M1080 385 Q1060 380 1030 378' /%3E%3Cline x1='600' y1='250' x2='600' y2='305' /%3E%3Cpath d='M180 385 L200 375' /%3E%3Cpath d='M1090 375 L1110 385' /%3E%3Cpath d='M320 355 L330 385' /%3E%3Cpath d='M900 325 L920 385' /%3E%3Ccircle cx='300' cy='430' r='38' /%3E%3Ccircle cx='300' cy='430' r='22' /%3E%3Ccircle cx='300' cy='430' r='6' /%3E%3Ccircle cx='920' cy='430' r='38' /%3E%3Ccircle cx='920' cy='430' r='22' /%3E%3Ccircle cx='920' cy='430' r='6' /%3E%3Cpath d='M180 400 Q190 385 220 385' /%3E%3Cpath d='M1090 400 Q1080 385 1040 385' /%3E%3Cpath d='M240 400 L260 400' /%3E%3Cpath d='M960 400 L980 400' /%3E%3Cline x1='250' y1='400' x2='240' y2='370' /%3E%3Cline x1='980' y1='400' x2='990' y2='370' /%3E%3Cpath d='M170 375 L200 370' /%3E%3Cpath d='M1090 375 L1080 370' /%3E%3C/svg%3E") no-repeat center center,
+      linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background-size: cover, cover;
+    background-attachment: fixed, fixed;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -153,7 +155,7 @@
   @media (max-width: 600px) {
     body {
       padding: 30px 12px 20px;
-      background-size: 150px 75px, cover;
+      background-attachment: scroll, scroll;
     }
     .container { padding: 24px; }
     h1 { font-size: 22px; }
