@@ -80,7 +80,6 @@
   .info-label { color: #7f8c8d; min-width: 110px; flex-shrink: 0; }
   .info-value { color: #2c3e50; font-weight: 500; }
 
-  /* 型号匹配高亮 */
   .pn-match { color: #27ae60; font-weight: bold; }
   .pn-mismatch { color: #e74c3c; font-weight: bold; }
 
@@ -256,15 +255,19 @@ async function query() {
       return;
     }
 
+    // ===== 新增判断：如果 Should Cost 为空，说明得捷和立创都没有价格 =====
+    if (!data.shouldCost) {
+      resultDiv.innerHTML = '<div class="error">未查询到该型号的有效价格，请检查型号是否正确。</div>';
+      return;
+    }
+
     let html = '';
 
-    if (data.shouldCost) {
-      html += '<div class="should-cost-card">';
-      html += '<div class="should-cost-label">SHOULD COST 推荐值</div>';
-      html += '<div class="should-cost-value">' + data.shouldCost + ' CNY</div>';
-      html += '<div class="should-cost-tax">（不含税）</div>';
-      html += '</div>';
-    }
+    html += '<div class="should-cost-card">';
+    html += '<div class="should-cost-label">SHOULD COST 推荐值</div>';
+    html += '<div class="should-cost-value">' + data.shouldCost + ' CNY</div>';
+    html += '<div class="should-cost-tax">（不含税）</div>';
+    html += '</div>';
 
     html += '<div class="info-card">';
     html += '<div class="info-title">芯片信息</div>';
@@ -273,7 +276,7 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div>';
     html += '</div>';
 
-    // ===== 得捷（第一个展示） =====
+    // ===== 得捷 =====
     if (data.digikey && data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">得捷 DigiKey</span><span class="source-badge">' + escapeHtml(data.digikey.error || '参考价') + '</span></div>';
@@ -297,7 +300,7 @@ async function query() {
       html += '</div>';
     }
 
-    // ===== 贸泽（第二个展示） =====
+    // ===== 贸泽（仅在得捷或立创有价格时展示） =====
     if (data.mouser && data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + escapeHtml(data.mouser.error || '参考价') + '</span></div>';
@@ -321,7 +324,7 @@ async function query() {
       html += '</div>';
     }
 
-    // ===== 立创（第三个展示） =====
+    // ===== 立创 =====
     if (data.lcsc && data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + escapeHtml(data.lcsc.error || '参考价') + '</span></div>';
