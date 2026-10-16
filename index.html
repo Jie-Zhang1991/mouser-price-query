@@ -216,7 +216,6 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
-// 对比型号是否完全一致（忽略大小写和前后空格），返回带高亮的HTML
 function formatPartNumber(displayPn, searchPn) {
   if (!displayPn) return '-';
   const a = String(displayPn).trim().toLowerCase();
@@ -274,7 +273,31 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div>';
     html += '</div>';
 
-    // 贸泽
+    // ===== 得捷（第一个展示） =====
+    if (data.digikey && data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0) {
+      html += '<div class="source-section">';
+      html += '<div class="source-header"><span class="source-name">得捷 DigiKey</span><span class="source-badge">' + escapeHtml(data.digikey.error || '参考价') + '</span></div>';
+      if (data.digikey.partNumber) {
+        html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(data.digikey.partNumber, partNumber) + '</span></div>';
+      }
+      if (data.digikey.manufacturer) {
+        html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(data.digikey.manufacturer) + '</span></div>';
+      }
+      if (data.digikey.description) {
+        html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(data.digikey.description) + '</span></div>';
+      }
+      html += '<table><tr><th>起订量</th><th>单价</th></tr>';
+      data.digikey.priceBreaks.forEach(pb => {
+        html += '<tr><td>' + escapeHtml(pb.Quantity) + '</td><td>' + escapeHtml(pb.Price) + '</td></tr>';
+      });
+      html += '</table>';
+      if (data.digikey.detailUrl) {
+        html += '<a class="detail-link" href="' + escapeHtml(data.digikey.detailUrl) + '" target="_blank">查看得捷详情页 →</a>';
+      }
+      html += '</div>';
+    }
+
+    // ===== 贸泽（第二个展示） =====
     if (data.mouser && data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + escapeHtml(data.mouser.error || '参考价') + '</span></div>';
@@ -298,7 +321,7 @@ async function query() {
       html += '</div>';
     }
 
-    // 立创
+    // ===== 立创（第三个展示） =====
     if (data.lcsc && data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + escapeHtml(data.lcsc.error || '参考价') + '</span></div>';
@@ -422,6 +445,7 @@ async function handleFile(file) {
       const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn));
       const data = await resp.json();
 
+      const digikeyPrice1k = (data.digikey && data.digikey.price1k) ? '$' + data.digikey.price1k : '未查询到';
       const mouserPrice1k = (data.mouser && data.mouser.price1k) ? '$' + data.mouser.price1k : '未查询到';
       const lcscPrice1k = (data.lcsc && data.lcsc.price1k) ? '$' + data.lcsc.price1k : '未查询到';
 
@@ -429,19 +453,21 @@ async function handleFile(file) {
         original: pn,
         fullPart: data.partNumber || pn,
         shouldCost: data.shouldCost || '',
+        digikey1k: digikeyPrice1k,
         mouser1k: mouserPrice1k,
         lcsc1k: lcscPrice1k,
-        manufacturer: (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
+        manufacturer: (data.digikey && data.digikey.manufacturer) || (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
         level1: data.level1 || '',
         level2: data.level2 || '',
         chipName: data.level2 || '',
-        description: (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || ''
+        description: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || ''
       });
     } catch (e) {
       results.push({
         original: pn,
         fullPart: pn,
         shouldCost: '',
+        digikey1k: '未查询到',
         mouser1k: '未查询到',
         lcsc1k: '未查询到',
         manufacturer: '',
@@ -464,17 +490,16 @@ async function handleFile(file) {
   progressText.textContent = '正在生成结果文件...';
 
   const outputData = [
-    ['原始型号', '完整型号参考', 'Should Cost（CNY）', 'Mouser报价-1k pcs（USD）', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']
+    ['原始型号', '完整型号参考', 'Should Cost（CNY）', '得捷报价-1k pcs（USD）', 'Mouser报价-1k pcs（USD）', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']
   ];
   results.forEach(r => {
-    outputData.push([r.original, r.fullPart, r.shouldCost, r.mouser1k, r.lcsc1k, r.manufacturer, r.level1, r.level2, r.chipName, r.description]);
+    outputData.push([r.original, r.fullPart, r.shouldCost, r.digikey1k, r.mouser1k, r.lcsc1k, r.manufacturer, r.level1, r.level2, r.chipName, r.description]);
   });
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
   newSheet['!cols'] = [
-    { wch: 22 }, { wch: 28 }, { wch: 22 }, { wch: 30 },
-    { wch: 28 }, { wch: 26 }, { wch: 24 }, { wch: 32 },
-    { wch: 32 }, { wch: 50 }
+    { wch: 22 }, { wch: 28 }, { wch: 22 }, { wch: 30 }, { wch: 30 }, { wch: 30 },
+    { wch: 26 }, { wch: 24 }, { wch: 32 }, { wch: 32 }, { wch: 50 }
   ];
 
   const newWorkbook = XLSX.utils.book_new();
