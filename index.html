@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 蓝色圆角底 + 白色"芯"字 favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233498db'/%3E%3Ctext x='50' y='74' font-size='68' font-family='Microsoft YaHei,sans-serif' text-anchor='middle' fill='white' font-weight='bold'%3E%E8%8A%AF%3C/text%3E%3C/svg%3E">
 <title>ChipCost - 芯片成本</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -77,6 +79,10 @@
   .info-row { display: flex; padding: 8px 0; font-size: 14px; }
   .info-label { color: #7f8c8d; min-width: 110px; flex-shrink: 0; }
   .info-value { color: #2c3e50; font-weight: 500; }
+
+  /* 型号匹配高亮 */
+  .pn-match { color: #27ae60; font-weight: bold; }
+  .pn-mismatch { color: #e74c3c; font-weight: bold; }
 
   .source-section { border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
   .source-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -201,6 +207,28 @@ const API_URL = 'https://chipcost.space';
 const MAX_BATCH = 100;
 const QUERY_INTERVAL_MS = 1500;
 
+// ========== 工具函数 ==========
+function escapeHtml(str) {
+  return String(str == null ? "" : str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// 对比型号是否完全一致（忽略大小写和前后空格），返回带高亮的HTML
+function formatPartNumber(displayPn, searchPn) {
+  if (!displayPn) return '-';
+  const a = String(displayPn).trim().toLowerCase();
+  const b = String(searchPn || '').trim().toLowerCase();
+  if (a === b) {
+    return '<span class="pn-match">' + escapeHtml(displayPn) + '</span>';
+  } else {
+    return '<span class="pn-mismatch">' + escapeHtml(displayPn) + '（型号未完全匹配，注意甄别）</span>';
+  }
+}
+
+// ========== 单个查询 ==========
 document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
@@ -241,53 +269,55 @@ async function query() {
 
     html += '<div class="info-card">';
     html += '<div class="info-title">芯片信息</div>';
-    html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + (data.partNumber || '-') + '</span></div>';
-    html += '<div class="info-row"><span class="info-label">芯片一级分类</span><span class="info-value">' + (data.level1 || '-') + '</span></div>';
-    html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + (data.level2 || '-') + '</span></div>';
+    html += '<div class="info-row"><span class="info-label">用户输入型号</span><span class="info-value">' + escapeHtml(partNumber) + '</span></div>';
+    html += '<div class="info-row"><span class="info-label">芯片一级分类</span><span class="info-value">' + escapeHtml(data.level1 || '-') + '</span></div>';
+    html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div>';
     html += '</div>';
 
+    // 贸泽
     if (data.mouser && data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0) {
       html += '<div class="source-section">';
-      html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + (data.mouser.error || '参考价') + '</span></div>';
+      html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + escapeHtml(data.mouser.error || '参考价') + '</span></div>';
       if (data.mouser.partNumber) {
-        html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + data.mouser.partNumber + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(data.mouser.partNumber, partNumber) + '</span></div>';
       }
       if (data.mouser.manufacturer) {
-        html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + data.mouser.manufacturer + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(data.mouser.manufacturer) + '</span></div>';
       }
       if (data.mouser.description) {
-        html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + data.mouser.description + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(data.mouser.description) + '</span></div>';
       }
       html += '<table><tr><th>起订量</th><th>单价</th></tr>';
       data.mouser.priceBreaks.forEach(pb => {
-        html += '<tr><td>' + pb.Quantity + '</td><td>' + pb.Price + '</td></tr>';
+        html += '<tr><td>' + escapeHtml(pb.Quantity) + '</td><td>' + escapeHtml(pb.Price) + '</td></tr>';
       });
       html += '</table>';
       if (data.mouser.detailUrl) {
-        html += '<a class="detail-link" href="' + data.mouser.detailUrl + '" target="_blank">查看贸泽详情页 →</a>';
+        html += '<a class="detail-link" href="' + escapeHtml(data.mouser.detailUrl) + '" target="_blank">查看贸泽详情页 →</a>';
       }
       html += '</div>';
     }
 
+    // 立创
     if (data.lcsc && data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0) {
       html += '<div class="source-section">';
-      html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + (data.lcsc.error || '参考价') + '</span></div>';
+      html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + escapeHtml(data.lcsc.error || '参考价') + '</span></div>';
       if (data.lcsc.productCode) {
-        html += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + data.lcsc.productCode + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + escapeHtml(data.lcsc.productCode) + '</span></div>';
       }
       if (data.lcsc.productModel) {
-        html += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + data.lcsc.productModel + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + formatPartNumber(data.lcsc.productModel, partNumber) + '</span></div>';
       }
       if (data.lcsc.brandName) {
-        html += '<div class="info-row"><span class="info-label">品牌</span><span class="info-value">' + data.lcsc.brandName + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">品牌</span><span class="info-value">' + escapeHtml(data.lcsc.brandName) + '</span></div>';
       }
       html += '<table><tr><th>起订量</th><th>单价 (USD)</th></tr>';
       data.lcsc.priceBreaks.forEach(pb => {
-        html += '<tr><td>' + pb.ladder + '</td><td>$' + (pb.usdPrice ? pb.usdPrice.toFixed(4) : '-') + '</td></tr>';
+        html += '<tr><td>' + escapeHtml(pb.ladder) + '</td><td>$' + (pb.usdPrice ? pb.usdPrice.toFixed(4) : '-') + '</td></tr>';
       });
       html += '</table>';
       if (data.lcsc.pdfUrl) {
-        html += '<a class="detail-link" href="' + data.lcsc.pdfUrl + '" target="_blank">查看数据手册 →</a>';
+        html += '<a class="detail-link" href="' + escapeHtml(data.lcsc.pdfUrl) + '" target="_blank">查看数据手册 →</a>';
       }
       html += '</div>';
     }
@@ -302,6 +332,7 @@ async function query() {
   }
 }
 
+// ========== 批量分析 ==========
 function openBatchModal() { document.getElementById('batchModal').classList.add('show'); }
 function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
 
@@ -403,7 +434,7 @@ async function handleFile(file) {
         manufacturer: (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
         level1: data.level1 || '',
         level2: data.level2 || '',
-        chipName: data.level2 || '', // 芯片名称直接用二级分类
+        chipName: data.level2 || '',
         description: (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || ''
       });
     } catch (e) {
