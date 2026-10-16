@@ -7,6 +7,7 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
     font-family: -apple-system, "Microsoft YaHei", sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -15,12 +16,14 @@
     justify-content: center;
     padding: 80px 16px 40px;
   }
+
   .container {
     width: 100%; max-width: 800px; background: #fff;
     border-radius: 16px; padding: 40px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     height: fit-content;
   }
+
   h1 { font-size: 26px; text-align: center; margin-bottom: 8px; color: #2c3e50; }
   .subtitle { text-align: center; color: #7f8c8d; font-size: 14px; margin-bottom: 30px; }
 
@@ -178,9 +181,8 @@
     <div class="notice">
       <strong>📋 使用说明：</strong><br>
       1. 文件格式：仅支持 <strong>Excel (.xlsx / .xls)</strong> 或 <strong>WPS 表格</strong>；<br>
-      2. 芯片型号必须位于 <strong>A 列</strong>；<br>
-      3. <strong>第 1 行为表头</strong>，芯片型号从<strong>第 2 行</strong>开始；<br>
-      4. 受 API 调用次数及时间间隔限制，单次上传芯片数量<strong>上限 100 个</strong>；超出部分仅分析前 100 条。
+      2. 上传文件的 <strong>第 1 行为表头</strong>，芯片型号位于 <strong>A 列</strong>、<strong>第 2 行起</strong>；<br>
+      3. 受 API 调用次数及时间间隔限制，批量分析的芯片数量<strong>上限暂设定为 100 个</strong>，超出部分不予分析，开发者将依据后续使用情况调整限额。
     </div>
     <div class="drop-zone" id="dropZone">
       <div class="drop-zone-icon">📁</div>
@@ -244,7 +246,6 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + (data.level2 || '-') + '</span></div>';
     html += '</div>';
 
-    // 贸泽价格
     if (data.mouser && data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + (data.mouser.error || '参考价') + '</span></div>';
@@ -268,7 +269,6 @@ async function query() {
       html += '</div>';
     }
 
-    // 立创价格
     if (data.lcsc && data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + (data.lcsc.error || '参考价') + '</span></div>';
@@ -302,7 +302,6 @@ async function query() {
   }
 }
 
-// ========== 批量分析 ==========
 function openBatchModal() { document.getElementById('batchModal').classList.add('show'); }
 function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
 
@@ -403,7 +402,9 @@ async function handleFile(file) {
         lcsc1k: lcscPrice1k,
         manufacturer: (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
         level1: data.level1 || '',
-        level2: data.level2 || ''
+        level2: data.level2 || '',
+        chipName: data.level2 || '', // 芯片名称直接用二级分类
+        description: (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || ''
       });
     } catch (e) {
       results.push({
@@ -414,7 +415,9 @@ async function handleFile(file) {
         lcsc1k: '未查询到',
         manufacturer: '',
         level1: '',
-        level2: ''
+        level2: '',
+        chipName: '',
+        description: ''
       });
     }
 
@@ -430,16 +433,17 @@ async function handleFile(file) {
   progressText.textContent = '正在生成结果文件...';
 
   const outputData = [
-    ['原始型号', '完整型号参考', 'Should Cost（CNY）', 'Mouser报价-1k pcs（USD）', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类']
+    ['原始型号', '完整型号参考', 'Should Cost（CNY）', 'Mouser报价-1k pcs（USD）', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']
   ];
   results.forEach(r => {
-    outputData.push([r.original, r.fullPart, r.shouldCost, r.mouser1k, r.lcsc1k, r.manufacturer, r.level1, r.level2]);
+    outputData.push([r.original, r.fullPart, r.shouldCost, r.mouser1k, r.lcsc1k, r.manufacturer, r.level1, r.level2, r.chipName, r.description]);
   });
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
   newSheet['!cols'] = [
     { wch: 22 }, { wch: 28 }, { wch: 22 }, { wch: 30 },
-    { wch: 28 }, { wch: 26 }, { wch: 24 }, { wch: 32 }
+    { wch: 28 }, { wch: 26 }, { wch: 24 }, { wch: 32 },
+    { wch: 32 }, { wch: 50 }
   ];
 
   const newWorkbook = XLSX.utils.book_new();
