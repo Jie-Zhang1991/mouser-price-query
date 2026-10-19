@@ -36,7 +36,7 @@
   }
   input[type="text"]:focus { border-color: #3498db; }
 
-  /* ===== 修改2：搜索框清除按钮 ===== */
+  /* 搜索框清除按钮 */
   .input-wrapper { position: relative; display: flex; flex: 1 1 auto; min-width: 0; }
   .input-wrapper input[type="text"] { padding-right: 44px; }
   .clear-btn {
@@ -184,7 +184,7 @@
     h1 { font-size: 22px; }
     .search-box { flex-direction: column; }
     .search-box input[type="text"], .search-box button { width: 100%; }
-    /* ===== 修改2：移动端清除按钮容器占满宽度 ===== */
+    /* 移动端清除按钮容器占满宽度 */
     .input-wrapper { flex: none; width: 100%; }
     .should-cost-value { font-size: 40px; }
     .should-cost-label { font-size: 18px; }
@@ -197,7 +197,7 @@
   <p class="subtitle">输入芯片型号，获取 AI 分析后的推荐成本</p>
 
   <div class="search-box">
-    <!-- ===== 修改2：搜索框外层加 wrapper 和清除按钮 ===== -->
+    <!-- 搜索框外层 wrapper 和清除按钮 -->
     <div class="input-wrapper">
       <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
       <span class="clear-btn" id="clearBtn" onclick="clearInput()" title="清空">×</span>
@@ -231,7 +231,7 @@
 </div>
 
 <script>
-// ===== 修改4：兜底——如果通过根域名直接加载了页面，自动跳到 www =====
+// 兜底：如果通过根域名直接加载了页面，自动跳到 www
 if (location.hostname === 'chipcost.space') {
   location.replace('https://www.chipcost.space' + location.pathname + location.search + location.hash);
 }
@@ -260,7 +260,7 @@ function formatPartNumber(displayPn, searchPn) {
   }
 }
 
-// ========== 修改2：搜索框清除按钮逻辑 ==========
+// ========== 搜索框清除按钮逻辑 ==========
 const partInputEl = document.getElementById('partInput');
 const clearBtnEl = document.getElementById('clearBtn');
 
@@ -309,7 +309,7 @@ async function query() {
       return;
     }
 
-    // ===== 关键：没有任何价格时，不显示任何分类和价格，只显示红色提示 =====
+    // 关键：没有任何价格时，不显示任何分类和价格，只显示红色提示
     if (!data.shouldCost) {
       resultDiv.innerHTML = '<div class="error">抱歉，未检索到任何价格信息。</div>';
       return;
@@ -506,7 +506,6 @@ async function handleFile(file) {
       const mouserPrice1k = (data.mouser && data.mouser.price1k) ? '$' + data.mouser.price1k : '未查询到';
       const lcscPrice1k = (data.lcsc && data.lcsc.price1k) ? '$' + data.lcsc.price1k : '未查询到';
 
-      // ===== 修改3：收集各平台完整型号，删除 fullPart，shouldCost 空值显示"未查询到" =====
       results.push({
         original: pn,
         shouldCost: data.shouldCost || '未查询到',
@@ -519,11 +518,10 @@ async function handleFile(file) {
         manufacturer: (data.digikey && data.digikey.manufacturer) || (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
         level1: data.level1 || '',
         level2: data.level2 || '',
-        chipName: data.level2 || '',
+        chipName: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || '',
         description: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || ''
       });
     } catch (e) {
-      // ===== 修改3：catch 分支同步补齐字段 =====
       results.push({
         original: pn,
         shouldCost: '未查询到',
@@ -552,7 +550,6 @@ async function handleFile(file) {
 
   progressText.textContent = '正在生成结果文件...';
 
-  // ===== 修改3：表头与数据行按新列顺序输出 =====
   const outputData = [
     ['原始型号', 'Should Cost（CNY）', 'Digikey完整型号', '得捷报价-1k pcs（USD）', 'Mouser完整型号', 'Mouser报价-1k pcs（USD）', '立创完整型号', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']
   ];
@@ -567,7 +564,6 @@ async function handleFile(file) {
   });
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
-  // ===== 修改3：列宽同步调整为 13 列 =====
   newSheet['!cols'] = [
     { wch: 22 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 },
     { wch: 26 }, { wch: 24 }, { wch: 32 }, { wch: 32 }, { wch: 50 }
