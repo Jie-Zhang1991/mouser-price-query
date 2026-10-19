@@ -36,7 +36,6 @@
   }
   input[type="text"]:focus { border-color: #3498db; }
 
-  /* 搜索框清除按钮 */
   .input-wrapper { position: relative; display: flex; flex: 1 1 auto; min-width: 0; }
   .input-wrapper input[type="text"] { padding-right: 44px; }
   .clear-btn {
@@ -184,7 +183,6 @@
     h1 { font-size: 22px; }
     .search-box { flex-direction: column; }
     .search-box input[type="text"], .search-box button { width: 100%; }
-    /* 移动端清除按钮容器占满宽度 */
     .input-wrapper { flex: none; width: 100%; }
     .should-cost-value { font-size: 40px; }
     .should-cost-label { font-size: 18px; }
@@ -197,7 +195,6 @@
   <p class="subtitle">输入芯片型号，获取 AI 分析后的推荐成本</p>
 
   <div class="search-box">
-    <!-- 搜索框外层 wrapper 和清除按钮 -->
     <div class="input-wrapper">
       <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
       <span class="clear-btn" id="clearBtn" onclick="clearInput()" title="清空">×</span>
@@ -231,16 +228,15 @@
 </div>
 
 <script>
-// 兜底：如果通过根域名直接加载了页面，自动跳到 www
 if (location.hostname === 'chipcost.space') {
   location.replace('https://www.chipcost.space' + location.pathname + location.search + location.hash);
 }
 
 const API_URL = 'https://chipcost.space';
 const MAX_BATCH = 100;
-const QUERY_INTERVAL_MS = 1500;
+// 优化点：间隔从 1500 调至 800，配合 Worker 的缓存机制，大幅提升批量速度
+const QUERY_INTERVAL_MS = 800;
 
-// ========== 工具函数 ==========
 function escapeHtml(str) {
   return String(str == null ? "" : str)
     .replace(/&/g, "&amp;")
@@ -260,7 +256,6 @@ function formatPartNumber(displayPn, searchPn) {
   }
 }
 
-// ========== 搜索框清除按钮逻辑 ==========
 const partInputEl = document.getElementById('partInput');
 const clearBtnEl = document.getElementById('clearBtn');
 
@@ -280,7 +275,6 @@ function clearInput() {
 
 partInputEl.addEventListener('input', updateClearBtn);
 
-// ========== 单个查询 ==========
 document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
@@ -309,7 +303,6 @@ async function query() {
       return;
     }
 
-    // 关键：没有任何价格时，不显示任何分类和价格，只显示红色提示
     if (!data.shouldCost) {
       resultDiv.innerHTML = '<div class="error">抱歉，未检索到任何价格信息。</div>';
       return;
@@ -328,9 +321,13 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">用户输入型号</span><span class="info-value">' + escapeHtml(partNumber) + '</span></div>';
     html += '<div class="info-row"><span class="info-label">芯片一级分类</span><span class="info-value">' + escapeHtml(data.level1 || '-') + '</span></div>';
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div>';
+    
+    // 增加匹配日志显示
+    if (data.level1 === "未匹配" && data.debugInfo) {
+      html += '<div class="info-row"><span class="info-label">匹配日志</span><span class="info-value" style="color:#e74c3c;font-size:12px;">' + escapeHtml(data.debugInfo) + '</span></div>';
+    }
     html += '</div>';
 
-    // 得捷
     if (data.digikey && data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">得捷 DigiKey</span><span class="source-badge">' + escapeHtml(data.digikey.error || '参考价') + '</span></div>';
@@ -354,7 +351,6 @@ async function query() {
       html += '</div>';
     }
 
-    // 贸泽
     if (data.mouser && data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + escapeHtml(data.mouser.error || '参考价') + '</span></div>';
@@ -378,7 +374,6 @@ async function query() {
       html += '</div>';
     }
 
-    // 立创
     if (data.lcsc && data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + escapeHtml(data.lcsc.error || '参考价') + '</span></div>';
@@ -412,7 +407,6 @@ async function query() {
   }
 }
 
-// ========== 批量分析 ==========
 function openBatchModal() { document.getElementById('batchModal').classList.add('show'); }
 function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
 
@@ -476,7 +470,7 @@ async function handleFile(file) {
     <div class="progress-container">
       <div class="progress-title">批量分析进行中</div>
       <div class="progress-tip">
-        💡 <strong>温馨提示：</strong>批量分析需要为每个芯片型号依次调用芯片网站与AI 接口，为保证 API 稳定性，每个型号之间有约 1.5 秒的时间间隔。整个过程可能需要数分钟，请耐心等待，不要关闭或刷新页面。
+        💡 <strong>温馨提示：</strong>批量分析已开启极速模式（优化了缓存机制），每个型号之间约 0.8 秒间隔。请耐心等待，不要关闭或刷新页面。
         ${truncated ? '<br><br>⚠️ 文件中共有 ' + partNumbers.length + ' 个型号，超出单次上限，本次仅分析前 ' + MAX_BATCH + ' 个。' : ''}
       </div>
       <div class="progress-bar-bg">
@@ -518,7 +512,8 @@ async function handleFile(file) {
         manufacturer: (data.digikey && data.digikey.manufacturer) || (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
         level1: data.level1 || '',
         level2: data.level2 || '',
-        chipName: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || '',
+        // 此处优先使用 AI 识别出的具体芯片名称（如：磁珠、LDO），如果没有再用描述兜底
+        chipName: data.chipName || (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || '',
         description: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || ''
       });
     } catch (e) {
