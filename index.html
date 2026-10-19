@@ -38,6 +38,8 @@
 
   .input-wrapper { position: relative; display: flex; flex: 1 1 auto; min-width: 0; }
   .input-wrapper input[type="text"] { padding-right: 44px; }
+  
+  /* ===== 修复 X 居中问题 ===== */
   .clear-btn {
     display: none;
     position: absolute;
@@ -50,14 +52,15 @@
     background: #c0c7ce;
     color: #fff;
     font-size: 16px;
-    line-height: 22px;
-    text-align: center;
+    align-items: center;      /* 水平居中 */
+    justify-content: center;  /* 垂直居中 */
+    line-height: 1;           /* 防止字体自带行高导致偏位 */
     cursor: pointer;
     user-select: none;
     font-weight: bold;
   }
   .clear-btn:hover { background: #95a5a6; }
-  .clear-btn.show { display: block; }
+  .clear-btn.show { display: flex; } /* 显示时使用 flex */
 
   button {
     padding: 14px 32px;
@@ -504,7 +507,6 @@ async function handleFile(file) {
 
   for (let i = 0; i < list.length; i++) {
     const pn = list[i];
-    // ===== 修改点：改为已完成数量，并与进度条对齐 =====
     progressText.textContent = `已完成数量：${i} / ${total}`;
     progressCurrent.textContent = `正在分析：${pn}`;
 
