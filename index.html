@@ -36,7 +36,6 @@
   }
   input[type="text"]:focus { border-color: #3498db; }
 
-  /* ===== 输入框小叉样式 ===== */
   .input-wrapper { position: relative; display: flex; flex: 1 1 auto; min-width: 0; }
   .input-wrapper input[type="text"] { padding-right: 44px; }
   .clear-btn {
@@ -184,7 +183,6 @@
     h1 { font-size: 22px; }
     .search-box { flex-direction: column; }
     .search-box input[type="text"], .search-box button { width: 100%; }
-    /* 移动端小叉容器占满宽度 */
     .input-wrapper { flex: none; width: 100%; }
     .should-cost-value { font-size: 40px; }
     .should-cost-label { font-size: 18px; }
@@ -197,7 +195,6 @@
   <p class="subtitle">输入芯片型号，获取 AI 分析后的推荐成本</p>
 
   <div class="search-box">
-    <!-- 包含小叉的输入框包裹层 -->
     <div class="input-wrapper">
       <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
       <span class="clear-btn" id="clearBtn" onclick="clearInput()" title="清空">×</span>
@@ -231,7 +228,6 @@
 </div>
 
 <script>
-// 根域名兜底跳转
 if (location.hostname === 'chipcost.space') {
   location.replace('https://www.chipcost.space' + location.pathname + location.search + location.hash);
 }
@@ -259,7 +255,6 @@ function formatPartNumber(displayPn, searchPn) {
   }
 }
 
-// ===== 小叉逻辑 =====
 const partInputEl = document.getElementById('partInput');
 const clearBtnEl = document.getElementById('clearBtn');
 
@@ -279,7 +274,6 @@ function clearInput() {
 
 partInputEl.addEventListener('input', updateClearBtn);
 
-// 键盘回车触发查询
 document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
@@ -328,14 +322,13 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div>';
     html += '</div>';
 
-    // ===== 得捷卡片 =====
+    // 得捷卡片
     if (data.digikey) {
       if (data.digikey.error || (data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0)) {
         html += '<div class="source-section">';
         html += '<div class="source-header"><span class="source-name">得捷 DigiKey</span><span class="source-badge">' + escapeHtml(data.digikey.error ? '报错' : '参考价') + '</span></div>';
         
         if (data.digikey.error) {
-          // 得捷统一报错提示
           html += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>';
         } else if (data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0) {
           if (data.digikey.partNumber) {
@@ -360,14 +353,13 @@ async function query() {
       }
     }
 
-    // ===== 贸泽卡片 =====
+    // 贸泽卡片
     if (data.mouser) {
       if (data.mouser.error || (data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0)) {
         html += '<div class="source-section">';
         html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + escapeHtml(data.mouser.error ? '报错' : '参考价') + '</span></div>';
         
         if (data.mouser.error && (!data.mouser.priceBreaks || data.mouser.priceBreaks.length === 0)) {
-          // 贸泽统一报错提示
           html += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>';
         } else if (data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0) {
           if (data.mouser.partNumber) {
@@ -392,14 +384,13 @@ async function query() {
       }
     }
 
-    // ===== 立创卡片 =====
+    // 立创卡片
     if (data.lcsc) {
       if (data.lcsc.error || (data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0)) {
         html += '<div class="source-section">';
         html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + escapeHtml(data.lcsc.error ? '报错' : '参考价') + '</span></div>';
         
         if (data.lcsc.error) {
-          // 立创统一报错提示
           html += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>';
         } else if (data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0) {
           if (data.lcsc.productCode) {
@@ -539,7 +530,8 @@ async function handleFile(file) {
         manufacturer: (data.digikey && data.digikey.manufacturer) || (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
         level1: data.level1 || '',
         level2: data.level2 || '',
-        chipName: data.level2 || '',
+        // ===== 修改点 4：优先使用 AI 返回的 chipName，兜底使用 level2 =====
+        chipName: data.chipName || data.level2 || '', 
         description: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || ''
       });
     } catch (e) {
