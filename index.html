@@ -39,7 +39,7 @@
   .input-wrapper { position: relative; display: flex; flex: 1 1 auto; min-width: 0; }
   .input-wrapper input[type="text"] { padding-right: 44px; }
   
-  /* ===== 修复 X 居中问题 ===== */
+  /* ===== 彻底解决“X”不居中的问题，改用纯几何渲染 ===== */
   .clear-btn {
     display: none;
     position: absolute;
@@ -50,17 +50,13 @@
     height: 22px;
     border-radius: 50%;
     background: #c0c7ce;
-    color: #fff;
-    font-size: 16px;
-    align-items: center;      /* 水平居中 */
-    justify-content: center;  /* 垂直居中 */
-    line-height: 1;           /* 防止字体自带行高导致偏位 */
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     user-select: none;
-    font-weight: bold;
   }
   .clear-btn:hover { background: #95a5a6; }
-  .clear-btn.show { display: flex; } /* 显示时使用 flex */
+  .clear-btn.show { display: flex; }
 
   button {
     padding: 14px 32px;
@@ -200,7 +196,13 @@
   <div class="search-box">
     <div class="input-wrapper">
       <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
-      <span class="clear-btn" id="clearBtn" onclick="clearInput()" title="清空">×</span>
+      <!-- ===== 这里把 × 替换成了 SVG 图标，绝对几何居中 ===== -->
+      <span class="clear-btn" id="clearBtn" onclick="clearInput()" title="清空">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </span>
     </div>
     <button id="queryBtn" onclick="query()">单件查询</button>
     <button class="batch-btn" onclick="openBatchModal()">批量分析</button>
