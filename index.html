@@ -322,7 +322,6 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div>';
     html += '</div>';
 
-    // 得捷卡片
     if (data.digikey) {
       if (data.digikey.error || (data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0)) {
         html += '<div class="source-section">';
@@ -353,7 +352,6 @@ async function query() {
       }
     }
 
-    // 贸泽卡片
     if (data.mouser) {
       if (data.mouser.error || (data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0)) {
         html += '<div class="source-section">';
@@ -384,7 +382,6 @@ async function query() {
       }
     }
 
-    // 立创卡片
     if (data.lcsc) {
       if (data.lcsc.error || (data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0)) {
         html += '<div class="source-section">';
@@ -488,7 +485,7 @@ async function handleFile(file) {
     <div class="progress-container">
       <div class="progress-title">批量分析进行中</div>
       <div class="progress-tip">
-        💡 <strong>温馨提示：</strong>批量分析需要为每个芯片型号依次调用芯片网站与AI 接口，为保证 API 稳定性，每个型号之间有约 1.5 秒的时间间隔。整个过程可能需要数分钟，请耐心等待，不要关闭或刷新页面。
+        💡 <strong>温馨提示：</strong>批量分析需要为每个芯片型号依次调用芯片网站与AI 接口，为保证 API 稳定性，每个型号之间至少有 1.5 秒以上的时间间隔。整个过程可能需要数分钟，请耐心等待，不要关闭或刷新页面。
         ${truncated ? '<br><br>⚠️ 文件中共有 ' + partNumbers.length + ' 个型号，超出单次上限，本次仅分析前 ' + MAX_BATCH + ' 个。' : ''}
       </div>
       <div class="progress-bar-bg">
@@ -507,8 +504,9 @@ async function handleFile(file) {
 
   for (let i = 0; i < list.length; i++) {
     const pn = list[i];
-    progressText.textContent = `正在分析 ${i + 1} / ${total}`;
-    progressCurrent.textContent = `当前型号：${pn}`;
+    // ===== 修改点：改为已完成数量，并与进度条对齐 =====
+    progressText.textContent = `已完成数量：${i} / ${total}`;
+    progressCurrent.textContent = `正在分析：${pn}`;
 
     try {
       const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn));
@@ -530,7 +528,6 @@ async function handleFile(file) {
         manufacturer: (data.digikey && data.digikey.manufacturer) || (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
         level1: data.level1 || '',
         level2: data.level2 || '',
-        // ===== 修改点 4：优先使用 AI 返回的 chipName，兜底使用 level2 =====
         chipName: data.chipName || data.level2 || '', 
         description: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || ''
       });
