@@ -36,6 +36,29 @@
   }
   input[type="text"]:focus { border-color: #3498db; }
 
+  .input-wrapper { position: relative; display: flex; flex: 1 1 auto; min-width: 0; }
+  .input-wrapper input[type="text"] { padding-right: 44px; }
+  .clear-btn {
+    display: none;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #c0c7ce;
+    color: #fff;
+    font-size: 16px;
+    line-height: 22px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+  }
+  .clear-btn:hover { background: #95a5a6; }
+  .clear-btn.show { display: block; }
+
   button {
     padding: 14px 32px;
     font-size: 16px; background: #3498db; color: #fff;
@@ -160,6 +183,7 @@
     h1 { font-size: 22px; }
     .search-box { flex-direction: column; }
     .search-box input[type="text"], .search-box button { width: 100%; }
+    .input-wrapper { flex: none; width: 100%; }
     .should-cost-value { font-size: 40px; }
     .should-cost-label { font-size: 18px; }
   }
@@ -171,7 +195,10 @@
   <p class="subtitle">输入芯片型号，获取 AI 分析后的推荐成本</p>
 
   <div class="search-box">
-    <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
+    <div class="input-wrapper">
+      <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
+      <span class="clear-btn" id="clearBtn" onclick="clearInput()" title="清空">×</span>
+    </div>
     <button id="queryBtn" onclick="query()">单件查询</button>
     <button class="batch-btn" onclick="openBatchModal()">批量分析</button>
   </div>
@@ -205,7 +232,6 @@ const API_URL = 'https://chipcost.space';
 const MAX_BATCH = 100;
 const QUERY_INTERVAL_MS = 1500;
 
-// ========== 工具函数 ==========
 function escapeHtml(str) {
   return String(str == null ? "" : str)
     .replace(/&/g, "&amp;")
@@ -225,7 +251,25 @@ function formatPartNumber(displayPn, searchPn) {
   }
 }
 
-// ========== 单个查询 ==========
+const partInputEl = document.getElementById('partInput');
+const clearBtnEl = document.getElementById('clearBtn');
+
+function updateClearBtn() {
+  if (partInputEl.value.length > 0) {
+    clearBtnEl.classList.add('show');
+  } else {
+    clearBtnEl.classList.remove('show');
+  }
+}
+
+function clearInput() {
+  partInputEl.value = '';
+  updateClearBtn();
+  partInputEl.focus();
+}
+
+partInputEl.addEventListener('input', updateClearBtn);
+
 document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
@@ -254,7 +298,6 @@ async function query() {
       return;
     }
 
-    // ===== 关键：没有任何价格时，不显示任何分类和价格，只显示红色提示 =====
     if (!data.shouldCost) {
       resultDiv.innerHTML = '<div class="error">抱歉，未检索到任何价格信息。</div>';
       return;
@@ -275,55 +318,68 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div>';
     html += '</div>';
 
-    // 得捷
-    if (data.digikey && data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0) {
-      html += '<div class="source-section">';
-      html += '<div class="source-header"><span class="source-name">得捷 DigiKey</span><span class="source-badge">' + escapeHtml(data.digikey.error || '参考价') + '</span></div>';
-      if (data.digikey.partNumber) {
-        html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(data.digikey.partNumber, partNumber) + '</span></div>';
+    // ===== 修改点 3：得捷卡片渲染，暴露错误 =====
+    if (data.digikey) {
+      if (data.digikey.error || (data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0)) {
+        html += '<div class="source-section">';
+        html += '<div class="source-header"><span class="source-name">得捷 DigiKey</span><span class="source-badge">' + escapeHtml(data.digikey.error || '参考价') + '</span></div>';
+        
+        if (data.digikey.error) {
+          html += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">' + escapeHtml(data.digikey.error) + '</div>';
+        } else if (data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0) {
+          if (data.digikey.partNumber) {
+            html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(data.digikey.partNumber, partNumber) + '</span></div>';
+          }
+          if (data.digikey.manufacturer) {
+            html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(data.digikey.manufacturer) + '</span></div>';
+          }
+          if (data.digikey.description) {
+            html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(data.digikey.description) + '</span></div>';
+          }
+          html += '<table><tr><th>起订量</th><th>单价</th></tr>';
+          data.digikey.priceBreaks.forEach(pb => {
+            html += '<tr><td>' + escapeHtml(pb.Quantity) + '</td><td>' + escapeHtml(pb.Price) + '</td></tr>';
+          });
+          html += '</table>';
+          if (data.digikey.detailUrl) {
+            html += '<a class="detail-link" href="' + escapeHtml(data.digikey.detailUrl) + '" target="_blank">查看得捷详情页 →</a>';
+          }
+        }
+        html += '</div>';
       }
-      if (data.digikey.manufacturer) {
-        html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(data.digikey.manufacturer) + '</span></div>';
-      }
-      if (data.digikey.description) {
-        html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(data.digikey.description) + '</span></div>';
-      }
-      html += '<table><tr><th>起订量</th><th>单价</th></tr>';
-      data.digikey.priceBreaks.forEach(pb => {
-        html += '<tr><td>' + escapeHtml(pb.Quantity) + '</td><td>' + escapeHtml(pb.Price) + '</td></tr>';
-      });
-      html += '</table>';
-      if (data.digikey.detailUrl) {
-        html += '<a class="detail-link" href="' + escapeHtml(data.digikey.detailUrl) + '" target="_blank">查看得捷详情页 →</a>';
-      }
-      html += '</div>';
     }
 
-    // 贸泽
-    if (data.mouser && data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0) {
-      html += '<div class="source-section">';
-      html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + escapeHtml(data.mouser.error || '参考价') + '</span></div>';
-      if (data.mouser.partNumber) {
-        html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(data.mouser.partNumber, partNumber) + '</span></div>';
+    // ===== 修改点 3：贸泽卡片渲染，暴露错误 =====
+    if (data.mouser) {
+      if (data.mouser.error || (data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0)) {
+        html += '<div class="source-section">';
+        html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + escapeHtml(data.mouser.error || '参考价') + '</span></div>';
+        
+        if (data.mouser.error && (!data.mouser.priceBreaks || data.mouser.priceBreaks.length === 0)) {
+          html += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">' + escapeHtml(data.mouser.error) + '</div>';
+        } else if (data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0) {
+          if (data.mouser.partNumber) {
+            html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(data.mouser.partNumber, partNumber) + '</span></div>';
+          }
+          if (data.mouser.manufacturer) {
+            html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(data.mouser.manufacturer) + '</span></div>';
+          }
+          if (data.mouser.description) {
+            html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(data.mouser.description) + '</span></div>';
+          }
+          html += '<table><tr><th>起订量</th><th>单价</th></tr>';
+          data.mouser.priceBreaks.forEach(pb => {
+            html += '<tr><td>' + escapeHtml(pb.Quantity) + '</td><td>' + escapeHtml(pb.Price) + '</td></tr>';
+          });
+          html += '</table>';
+          if (data.mouser.detailUrl) {
+            html += '<a class="detail-link" href="' + escapeHtml(data.mouser.detailUrl) + '" target="_blank">查看贸泽详情页 →</a>';
+          }
+        }
+        html += '</div>';
       }
-      if (data.mouser.manufacturer) {
-        html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(data.mouser.manufacturer) + '</span></div>';
-      }
-      if (data.mouser.description) {
-        html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(data.mouser.description) + '</span></div>';
-      }
-      html += '<table><tr><th>起订量</th><th>单价</th></tr>';
-      data.mouser.priceBreaks.forEach(pb => {
-        html += '<tr><td>' + escapeHtml(pb.Quantity) + '</td><td>' + escapeHtml(pb.Price) + '</td></tr>';
-      });
-      html += '</table>';
-      if (data.mouser.detailUrl) {
-        html += '<a class="detail-link" href="' + escapeHtml(data.mouser.detailUrl) + '" target="_blank">查看贸泽详情页 →</a>';
-      }
-      html += '</div>';
     }
 
-    // 立创
     if (data.lcsc && data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0) {
       html += '<div class="source-section">';
       html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + escapeHtml(data.lcsc.error || '参考价') + '</span></div>';
@@ -357,7 +413,6 @@ async function query() {
   }
 }
 
-// ========== 批量分析 ==========
 function openBatchModal() { document.getElementById('batchModal').classList.add('show'); }
 function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
 
@@ -453,8 +508,10 @@ async function handleFile(file) {
 
       results.push({
         original: pn,
-        fullPart: data.partNumber || pn,
-        shouldCost: data.shouldCost || '',
+        shouldCost: data.shouldCost || '未查询到',
+        digikeyPartNumber: (data.digikey && data.digikey.partNumber) || '',
+        mouserPartNumber: (data.mouser && data.mouser.partNumber) || '',
+        lcscPartNumber: (data.lcsc && data.lcsc.productModel) || '',
         digikey1k: digikeyPrice1k,
         mouser1k: mouserPrice1k,
         lcsc1k: lcscPrice1k,
@@ -467,8 +524,10 @@ async function handleFile(file) {
     } catch (e) {
       results.push({
         original: pn,
-        fullPart: pn,
-        shouldCost: '',
+        shouldCost: '未查询到',
+        digikeyPartNumber: '',
+        mouserPartNumber: '',
+        lcscPartNumber: '',
         digikey1k: '未查询到',
         mouser1k: '未查询到',
         lcsc1k: '未查询到',
@@ -492,15 +551,21 @@ async function handleFile(file) {
   progressText.textContent = '正在生成结果文件...';
 
   const outputData = [
-    ['原始型号', '完整型号参考', 'Should Cost（CNY）', '得捷报价-1k pcs（USD）', 'Mouser报价-1k pcs（USD）', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']
+    ['原始型号', 'Should Cost（CNY）', 'Digikey完整型号', '得捷报价-1k pcs（USD）', 'Mouser完整型号', 'Mouser报价-1k pcs（USD）', '立创完整型号', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']
   ];
   results.forEach(r => {
-    outputData.push([r.original, r.fullPart, r.shouldCost, r.digikey1k, r.mouser1k, r.lcsc1k, r.manufacturer, r.level1, r.level2, r.chipName, r.description]);
+    outputData.push([
+      r.original, r.shouldCost,
+      r.digikeyPartNumber, r.digikey1k,
+      r.mouserPartNumber, r.mouser1k,
+      r.lcscPartNumber, r.lcsc1k,
+      r.manufacturer, r.level1, r.level2, r.chipName, r.description
+    ]);
   });
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
   newSheet['!cols'] = [
-    { wch: 22 }, { wch: 28 }, { wch: 22 }, { wch: 30 }, { wch: 30 }, { wch: 30 },
+    { wch: 22 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 },
     { wch: 26 }, { wch: 24 }, { wch: 32 }, { wch: 32 }, { wch: 50 }
   ];
 
