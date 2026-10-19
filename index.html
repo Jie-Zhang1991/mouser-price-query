@@ -29,12 +29,49 @@
   .subtitle { text-align: center; color: #7f8c8d; font-size: 14px; margin-bottom: 30px; }
 
   .search-box { display: flex; gap: 12px; margin-bottom: 20px; }
+  
+  /* 新增包裹层样式 */
+  .search-input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+  
   input[type="text"] {
     flex: 1; padding: 14px 20px; font-size: 16px;
     border: 2px solid #e0e6ed; border-radius: 12px; outline: none;
     transition: border-color 0.3s;
+    width: 100%;
+  }
+  .search-input-wrapper input[type="text"] {
+    padding-right: 40px; /* 给右侧的小叉留出空间 */
   }
   input[type="text"]:focus { border-color: #3498db; }
+
+  /* 一键清空小叉的样式 */
+  .clear-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 22px;
+    color: #bdc3c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    line-height: 1;
+    border-radius: 50%;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .clear-icon:hover {
+    color: #e74c3c;
+    background-color: #fdf0ed;
+  }
 
   button {
     padding: 14px 32px;
@@ -159,6 +196,7 @@
     .container { padding: 24px; }
     h1 { font-size: 22px; }
     .search-box { flex-direction: column; }
+    .search-input-wrapper { width: 100%; }
     .search-box input[type="text"], .search-box button { width: 100%; }
     .should-cost-value { font-size: 40px; }
     .should-cost-label { font-size: 18px; }
@@ -171,7 +209,11 @@
   <p class="subtitle">输入芯片型号，获取 AI 分析后的推荐成本</p>
 
   <div class="search-box">
-    <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
+    <!-- 修改了这里：加入了包裹层和小叉 -->
+    <div class="search-input-wrapper">
+      <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" oninput="toggleClearBtn()" />
+      <span id="clearInputBtn" class="clear-icon" onclick="clearInput()" style="display: none;">&times;</span>
+    </div>
     <button id="queryBtn" onclick="query()">单件查询</button>
     <button class="batch-btn" onclick="openBatchModal()">批量分析</button>
   </div>
@@ -204,6 +246,26 @@
 const API_URL = 'https://chipcost.space';
 const MAX_BATCH = 100;
 const QUERY_INTERVAL_MS = 1500;
+
+// ========== 新增：搜索框一键清空逻辑 ==========
+function toggleClearBtn() {
+  const input = document.getElementById('partInput');
+  const clearBtn = document.getElementById('clearInputBtn');
+  if (input.value.length > 0) {
+    clearBtn.style.display = 'flex';
+  } else {
+    clearBtn.style.display = 'none';
+  }
+}
+
+function clearInput() {
+  const input = document.getElementById('partInput');
+  const clearBtn = document.getElementById('clearInputBtn');
+  input.value = '';
+  clearBtn.style.display = 'none';
+  input.focus(); // 清空后保持光标在输入框内
+}
+// ==========================================
 
 // ========== 工具函数 ==========
 function escapeHtml(str) {
