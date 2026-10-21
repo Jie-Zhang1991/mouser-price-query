@@ -18,8 +18,9 @@
     padding: 10px 16px 40px; 
   }
 
+  /* 修改点：整体界面加宽到 1200px */
   .container {
-    width: 100%; max-width: 1000px; 
+    width: 100%; max-width: 1200px; 
     background: #fff;
     border-radius: 16px; padding: 40px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -80,7 +81,8 @@
   .sub-btn:hover { background: #732d91; }
 
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px;}
-  .compare-table { table-layout: fixed; min-width: 800px; width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+  /* 修改点：表格也放宽到 900px */
+  .compare-table { table-layout: fixed; min-width: 900px; width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
   .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
   .compare-table th { background: #f8f9fa; color: #2c3e50; font-weight: 600; text-align: center; vertical-align: middle; }
   .compare-table tr:last-child td { border-bottom: none; }
@@ -507,7 +509,7 @@ async function query() {
   }
 }
 
-// ===== 修改点：换一批的覆盖层UI逻辑 =====
+// ===== 修改点：换一批的覆盖层UI逻辑与换一批按钮加长 =====
 async function querySubstitute(isRefresh = false) {
   const input = document.getElementById('partInput');
   const btn = document.getElementById('subBtn');
@@ -530,12 +532,11 @@ async function querySubstitute(isRefresh = false) {
     btn.textContent = '检索中...';
     currentAlternatives = [];
   } else {
-    // 换一批时：追加绝对定位的纯白遮罩层
+    // 修改点：白色背景框缩短，左右各留 20px（与 info-card 的 padding 相同），保证刚好对齐
     subDiv.style.position = 'relative';
     refreshOverlay = document.createElement('div');
     refreshOverlay.id = 'refresh-overlay';
-    // 样式：绝对定位居中、白底、大号灰字、阴影
-    refreshOverlay.style.cssText = 'position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); background: #fff; padding: 24px 0; text-align: center; font-size: 24px; font-weight: bold; color: #7f8c8d; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.08); letter-spacing: 2px;';
+    refreshOverlay.style.cssText = 'position: absolute; top: 50%; left: 20px; right: 20px; transform: translateY(-50%); background: #fff; padding: 24px 0; text-align: center; font-size: 24px; font-weight: bold; color: #7f8c8d; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.08); letter-spacing: 2px; border-radius: 8px;';
     refreshOverlay.innerText = '正在更新替换料号，请稍后...';
     subDiv.appendChild(refreshOverlay);
   }
@@ -633,21 +634,21 @@ async function querySubstitute(isRefresh = false) {
         });
       }
 
+      // 修改点：删除橙色标签，仅保留推荐理由文本
       html += '<tr>';
       html += '<td>推荐理由</td>';
       html += '<td>-</td>';
       data.alternatives.forEach(alt => {
-        let mType = alt.match_type || "性能相当";
-        if (mType.includes("参数相近")) mType = "参数相近（需改板）"; 
-        html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + ' <span style="color:#e65100;">(' + escapeHtml(mType) + ')</span></td>';
+        html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + '</td>';
       });
       html += '</tr>';
 
       html += '</tbody></table>';
       html += '</div>'; 
 
+      // 修改点：按钮 padding 从 20px 变为了 28px，加长约 40%
       html += '<div style="text-align: right; margin-top: 10px;">';
-      html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 20px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button>';
+      html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 28px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button>';
       html += '</div>';
 
       html += '</div>'; 
