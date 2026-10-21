@@ -18,7 +18,6 @@
     padding: 10px 16px 40px; 
   }
 
-  /* 修改点：整体界面加宽到 1200px */
   .container {
     width: 100%; max-width: 1200px; 
     background: #fff;
@@ -81,7 +80,6 @@
   .sub-btn:hover { background: #732d91; }
 
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px;}
-  /* 修改点：表格也放宽到 900px */
   .compare-table { table-layout: fixed; min-width: 900px; width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
   .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
   .compare-table th { background: #f8f9fa; color: #2c3e50; font-weight: 600; text-align: center; vertical-align: middle; }
@@ -196,6 +194,20 @@
     background: #d4edda; border-left: 4px solid #27ae60;
     padding: 16px; border-radius: 8px; color: #155724;
     font-size: 14px; margin-bottom: 16px;
+  }
+
+  /* ===== 新增：小圆圈加载动画 ===== */
+  .spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #8e44ad;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 
   @media (max-width: 800px) {
@@ -509,7 +521,7 @@ async function query() {
   }
 }
 
-// ===== 修改点：换一批的覆盖层UI逻辑与换一批按钮加长 =====
+// ===== 修改点：换一批的覆盖层UI逻辑（小巧转圈） =====
 async function querySubstitute(isRefresh = false) {
   const input = document.getElementById('partInput');
   const btn = document.getElementById('subBtn');
@@ -532,12 +544,11 @@ async function querySubstitute(isRefresh = false) {
     btn.textContent = '检索中...';
     currentAlternatives = [];
   } else {
-    // 修改点：白色背景框缩短，左右各留 20px（与 info-card 的 padding 相同），保证刚好对齐
     subDiv.style.position = 'relative';
     refreshOverlay = document.createElement('div');
     refreshOverlay.id = 'refresh-overlay';
-    refreshOverlay.style.cssText = 'position: absolute; top: 50%; left: 20px; right: 20px; transform: translateY(-50%); background: #fff; padding: 24px 0; text-align: center; font-size: 24px; font-weight: bold; color: #7f8c8d; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.08); letter-spacing: 2px; border-radius: 8px;';
-    refreshOverlay.innerText = '正在更新替换料号，请稍后...';
+    refreshOverlay.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.95); padding: 15px 30px; text-align: center; font-size: 14px; color: #7f8c8d; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 10px; border: 1px solid #e0e6ed;';
+    refreshOverlay.innerHTML = '<div class="spinner"></div><span>加载中，请稍后...</span>';
     subDiv.appendChild(refreshOverlay);
   }
 
@@ -560,7 +571,7 @@ async function querySubstitute(isRefresh = false) {
     } catch (err) {
       if (!isRefresh) subDiv.innerHTML = '<div class="error">服务器响应超时或异常，请稍后重试。</div>';
       else if(refreshOverlay) {
-        refreshOverlay.innerText = '更新失败，请重试';
+        refreshOverlay.innerHTML = '<span style="color:#e74c3c;">更新失败，请重试</span>';
         setTimeout(() => refreshOverlay.remove(), 2000);
       }
       return;
@@ -569,7 +580,7 @@ async function querySubstitute(isRefresh = false) {
     if (data.status === 'not_found') {
       if (!isRefresh) subDiv.innerHTML = '<div class="error">AI未能检索到查询型号的任何信息，请检查所输入型号是否准确。</div>';
       else if(refreshOverlay) {
-        refreshOverlay.innerText = '未能找到更多替代型号';
+        refreshOverlay.innerHTML = '<span style="color:#e74c3c;">未能找到更多替代型号</span>';
         setTimeout(() => refreshOverlay.remove(), 2000);
       }
       return;
@@ -612,9 +623,10 @@ async function querySubstitute(isRefresh = false) {
       });
       html += '</tr>';
 
+      // 修改点：原型号填充产地/性质
       html += '<tr>';
       html += '<td>产地/性质</td>';
-      html += '<td>-</td>'; 
+      html += '<td>' + escapeHtml(data.original.origin || '-') + '</td>'; 
       data.alternatives.forEach(alt => {
         html += '<td>' + escapeHtml(alt.origin) + '</td>';
       });
@@ -634,7 +646,7 @@ async function querySubstitute(isRefresh = false) {
         });
       }
 
-      // 修改点：删除橙色标签，仅保留推荐理由文本
+      // 删除橙色标签，仅保留推荐理由文本
       html += '<tr>';
       html += '<td>推荐理由</td>';
       html += '<td>-</td>';
@@ -646,9 +658,9 @@ async function querySubstitute(isRefresh = false) {
       html += '</tbody></table>';
       html += '</div>'; 
 
-      // 修改点：按钮 padding 从 20px 变为了 28px，加长约 40%
+      // 修改点：按钮 padding 变为 8px 42px，并保留紫色
       html += '<div style="text-align: right; margin-top: 10px;">';
-      html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 28px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button>';
+      html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 42px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button>';
       html += '</div>';
 
       html += '</div>'; 
@@ -658,7 +670,7 @@ async function querySubstitute(isRefresh = false) {
         subDiv.innerHTML = '<div style="color:#7f8c8d; background:none; border:none; text-align:center; padding:20px; font-size:14px;">暂未找到合适的跨品牌同级别替代型号，该芯片可能具有较高的技术壁垒或封闭生态。</div>'; 
       } else {
         if(refreshOverlay) {
-          refreshOverlay.innerText = '没有找到新的替代型号了';
+          refreshOverlay.innerHTML = '<span style="color:#e74c3c;">没有找到新的替代型号了</span>';
           setTimeout(() => refreshOverlay.remove(), 2000);
         }
       }
@@ -666,7 +678,7 @@ async function querySubstitute(isRefresh = false) {
   } catch (e) {
     if (!isRefresh) subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
     else if(refreshOverlay) {
-      refreshOverlay.innerText = '网络异常，请稍后重试';
+      refreshOverlay.innerHTML = '<span style="color:#e74c3c;">网络异常，请稍后重试</span>';
       setTimeout(() => refreshOverlay.remove(), 2000);
     }
   } finally {
