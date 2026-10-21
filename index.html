@@ -24,9 +24,10 @@
   body.is-home {
     align-items: center; 
     padding-top: 0;
+    /* 修改点：增加底边距让整个容器视觉上移 */
+    padding-bottom: 80px; 
   }
   
-  /* 修改点：限制整体宽度，让输入框和按钮完美适配，不拥挤 */
   body.is-home .container {
     max-width: 850px; 
   }
@@ -54,7 +55,7 @@
     height: fit-content;
     transition: max-width 0.4s ease, opacity 0.4s ease;
     
-    /* 修改点：初始隐藏，等话题加载完再淡入 */
+    /* 初始隐藏，等话题加载完再淡入 */
     opacity: 0;
     visibility: hidden;
   }
@@ -64,7 +65,8 @@
   }
 
   h1 { font-size: 32px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: bold; }
-  .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 30px; }
+  /* 修改点：垂直距离变为 1.5 倍 (30 -> 45) */
+  .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 45px; }
 
   .search-box { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
   
@@ -98,10 +100,16 @@
   .clear-btn:hover { background: #95a5a6; }
   .clear-btn.show { display: flex; }
 
+  /* 修改点：按钮尺寸缩小（宽度变 0.8倍），由 padding 与字号控制 */
   button {
-    padding: 16px 28px;
-    font-size: 16px; background: #3498db; color: #fff;
-    border: none; border-radius: 12px; cursor: pointer; font-weight: bold;
+    padding: 14px 20px; 
+    font-size: 15px; 
+    background: #3498db; 
+    color: #fff;
+    border: none; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    font-weight: bold;
     transition: background 0.3s, transform 0.2s;
     white-space: nowrap;
     box-shadow: 0 4px 10px rgba(52,152,219,0.2);
@@ -109,11 +117,19 @@
   button:hover { background: #2980b9; transform: translateY(-1px); }
   button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
 
-  .batch-btn { background: #27ae60; box-shadow: 0 4px 10px rgba(39,174,96,0.2); }
-  .batch-btn:hover { background: #219150; }
+  /* 修改点：颜色互换 */
+  /* 原来的 batch-btn 是绿色，sub-btn 是紫色。现在互换 */
+  .batch-btn { 
+    background: #8e44ad; /* 紫色 */
+    box-shadow: 0 4px 10px rgba(142,68,173,0.2); 
+  }
+  .batch-btn:hover { background: #732d91; }
 
-  .sub-btn { background: #8e44ad; box-shadow: 0 4px 10px rgba(142,68,173,0.2); }
-  .sub-btn:hover { background: #732d91; }
+  .sub-btn { 
+    background: #27ae60; /* 绿色 */
+    box-shadow: 0 4px 10px rgba(39,174,96,0.2); 
+  }
+  .sub-btn:hover { background: #219150; }
 
   /* 对比表格 */
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px; background: #fff;}
@@ -304,7 +320,7 @@
 
 <div class="container" id="main-container">
   <h1>ChipCost 芯片成本</h1>
-  <!-- 修改点：去掉“后”字 -->
+  <!-- 副标题文案 -->
   <p class="subtitle">输入芯片型号，获取 AI 分析的推荐成本</p>
 
   <div class="search-box">
@@ -318,6 +334,7 @@
       </span>
     </div>
     <button id="queryBtn" onclick="query()">单件查询</button>
+    <!-- 按钮类名依然保留，颜色已在 CSS 中互换 -->
     <button class="sub-btn" id="subBtn" onclick="querySubstitute()">替代型号</button>
     <button class="batch-btn" onclick="openBatchModal()">批量分析</button>
   </div>
@@ -492,7 +509,7 @@ document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
 
-// 修改点：初始化时，先等待热门话题加载完，再显示整个界面
+// 初始化时，先等待热门话题加载完，再显示整个界面
 window.addEventListener('DOMContentLoaded', async () => {
   await fetchTrending();
   document.getElementById('main-container').classList.add('loaded');
