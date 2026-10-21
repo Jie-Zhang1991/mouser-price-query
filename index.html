@@ -15,7 +15,6 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    /* 默认给顶部留距离，配合居中的flex布局 */
     align-items: flex-start; 
     padding: 40px 16px;
     transition: padding 0.4s ease;
@@ -23,36 +22,45 @@
 
   /* ===== 首页居中模式 ===== */
   body.is-home {
-    align-items: center; /* 垂直居中 */
+    align-items: center; 
     padding-top: 0;
   }
   
+  /* 修改点：限制整体宽度，让输入框和按钮完美适配，不拥挤 */
   body.is-home .container {
-    max-width: 1000px; /* 稍微限制首页最大宽度 */
+    max-width: 850px; 
   }
 
   body.is-home .search-box {
-    width: 60%; /* 首页搜索框缩短为 60% */
+    width: 100%; 
     margin: 0 auto 20px auto;
     transition: width 0.4s ease, margin 0.4s ease;
   }
 
   /* ===== 查询结果模式 ===== */
   body:not(.is-home) .container {
-    max-width: 1200px; /* 结果页宽屏 */
+    max-width: 1200px; 
   }
   body:not(.is-home) .search-box {
-    width: 100%; /* 恢复全宽 */
+    width: 100%; 
   }
 
-  /* 主容器：取消白色背景框，去掉阴影 */
+  /* 主容器 */
   .container {
     width: 100%; 
     background: transparent; 
     border-radius: 16px; 
     padding: 40px;
     height: fit-content;
-    transition: max-width 0.4s ease;
+    transition: max-width 0.4s ease, opacity 0.4s ease;
+    
+    /* 修改点：初始隐藏，等话题加载完再淡入 */
+    opacity: 0;
+    visibility: hidden;
+  }
+  .container.loaded {
+    opacity: 1;
+    visibility: visible;
   }
 
   h1 { font-size: 32px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: bold; }
@@ -107,6 +115,7 @@
   .sub-btn { background: #8e44ad; box-shadow: 0 4px 10px rgba(142,68,173,0.2); }
   .sub-btn:hover { background: #732d91; }
 
+  /* 对比表格 */
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px; background: #fff;}
   .compare-table { table-layout: fixed; min-width: 900px; width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
   .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
@@ -276,7 +285,7 @@
 
   @media (max-width: 800px) {
     body { padding: 20px 12px; }
-    body.is-home { padding-top: 20px; align-items: flex-start; } /* 手机端居中会导致键盘顶起，改为靠上 */
+    body.is-home { padding-top: 20px; align-items: flex-start; } 
     .container { padding: 20px; }
     h1 { font-size: 26px; }
     .search-box { flex-direction: column; width: 100% !important; }
@@ -293,9 +302,10 @@
   document.title = 'ChipCost - AI分析芯片成本';
 </script>
 
-<div class="container">
+<div class="container" id="main-container">
   <h1>ChipCost 芯片成本</h1>
-  <p class="subtitle">输入芯片型号，获取 AI 分析后的推荐成本</p>
+  <!-- 修改点：去掉“后”字 -->
+  <p class="subtitle">输入芯片型号，获取 AI 分析的推荐成本</p>
 
   <div class="search-box">
     <div class="input-wrapper">
@@ -315,7 +325,7 @@
   <div id="substitute-result"></div>
   <div id="result"></div>
 
-  <!-- ===== 热门话题区域 ===== -->
+  <!-- 热门话题区域 -->
   <div id="trending-box">
     <div class="trending-header">
       <div class="trending-title">🔥 芯片热门话题</div>
@@ -482,14 +492,15 @@ document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
 
-// 初始化加载热门话题
-window.addEventListener('DOMContentLoaded', () => {
-  fetchTrending();
+// 修改点：初始化时，先等待热门话题加载完，再显示整个界面
+window.addEventListener('DOMContentLoaded', async () => {
+  await fetchTrending();
+  document.getElementById('main-container').classList.add('loaded');
 });
 
 // ===== 单件查询 =====
 async function query() {
-  document.body.classList.remove('is-home'); // 切换布局模式
+  document.body.classList.remove('is-home'); 
 
   const input = document.getElementById('partInput');
   const btn = document.getElementById('queryBtn');
@@ -658,7 +669,7 @@ async function query() {
 // ===== 替代型号查询 =====
 async function querySubstitute(isRefresh = false) {
   if (!isRefresh) {
-    document.body.classList.remove('is-home'); // 切换布局
+    document.body.classList.remove('is-home'); 
   }
 
   const input = document.getElementById('partInput');
@@ -850,7 +861,7 @@ fileInput.addEventListener('change', (e) => {
 });
 
 async function handleFile(file) {
-  document.body.classList.remove('is-home'); // 切换布局
+  document.body.classList.remove('is-home'); 
   
   const name = file.name.toLowerCase();
   if (!name.endsWith('.xlsx') && !name.endsWith('.xls')) {
