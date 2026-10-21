@@ -196,7 +196,6 @@
     font-size: 14px; margin-bottom: 16px;
   }
 
-  /* ===== 新增：小圆圈加载动画 ===== */
   .spinner {
     border: 3px solid #f3f3f3;
     border-top: 3px solid #8e44ad;
@@ -521,7 +520,7 @@ async function query() {
   }
 }
 
-// ===== 修改点：换一批的覆盖层UI逻辑（小巧转圈） =====
+// ===== 修改点：换一批的覆盖层UI逻辑 =====
 async function querySubstitute(isRefresh = false) {
   const input = document.getElementById('partInput');
   const btn = document.getElementById('subBtn');
@@ -590,9 +589,10 @@ async function querySubstitute(isRefresh = false) {
       currentAlternatives = data.alternatives;
 
       let html = '<div class="info-card" style="border-top: 4px solid #8e44ad; padding-bottom: 5px;">';
+      
+      // 修改点：删除右侧警告文字
       html += '<div class="info-title" style="display:flex; justify-content:space-between;">';
       html += '<span>AI 替代参考推荐与参数对比</span>';
-      html += '<span style="font-size:12px;color:#e74c3c;font-weight:normal;">⚠️ 仅供参考，请核对Datasheet</span>';
       html += '</div>';
       
       html += '<div class="compare-table-container">';
@@ -615,20 +615,21 @@ async function querySubstitute(isRefresh = false) {
       html += '</tr></thead>';
 
       html += '<tbody>';
+      // 修改点：价格数字居中
       html += '<tr>';
       html += '<td>Should Cost参考值</td>';
-      html += '<td style="font-weight:bold; color:#e74c3c; font-size:15px;">' + (data.original.shouldCost ? '¥ ' + data.original.shouldCost : '-') + '</td>';
+      html += '<td style="font-weight:bold; color:#e74c3c; font-size:15px; text-align:center;">' + (data.original.shouldCost ? '¥ ' + data.original.shouldCost : '-') + '</td>';
       data.alternatives.forEach(alt => {
-        html += '<td style="font-weight:bold; color:#e74c3c; font-size:15px;">' + (alt.shouldCost ? '¥ ' + alt.shouldCost : '-') + '</td>';
+        html += '<td style="font-weight:bold; color:#e74c3c; font-size:15px; text-align:center;">' + (alt.shouldCost ? '¥ ' + alt.shouldCost : '-') + '</td>';
       });
       html += '</tr>';
 
-      // 修改点：原型号填充产地/性质
+      // 修改点：国别/厂商 行
       html += '<tr>';
-      html += '<td>产地/性质</td>';
-      html += '<td>' + escapeHtml(data.original.origin || '-') + '</td>'; 
+      html += '<td>国别/厂商</td>';
+      html += '<td>' + escapeHtml((data.original.origin || '-') + ' / ' + (data.original.manufacturer || '-')) + '</td>'; 
       data.alternatives.forEach(alt => {
-        html += '<td>' + escapeHtml(alt.origin) + '</td>';
+        html += '<td>' + escapeHtml((alt.origin || '-') + ' / ' + (alt.manufacturer || '-')) + '</td>';
       });
       html += '</tr>';
 
@@ -658,7 +659,7 @@ async function querySubstitute(isRefresh = false) {
       html += '</tbody></table>';
       html += '</div>'; 
 
-      // 修改点：按钮 padding 变为 8px 42px，并保留紫色
+      // 按钮 padding 变为 8px 42px，并保留紫色
       html += '<div style="text-align: right; margin-top: 10px;">';
       html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 42px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button>';
       html += '</div>';
