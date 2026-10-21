@@ -59,7 +59,7 @@
   .clear-btn.show { display: flex; }
 
   button {
-    padding: 14px 32px;
+    padding: 14px 24px;
     font-size: 16px; background: #3498db; color: #fff;
     border: none; border-radius: 12px; cursor: pointer; font-weight: bold;
     transition: background 0.3s;
@@ -75,7 +75,28 @@
   }
   .batch-btn:hover { background: #219150; }
 
+  /* ===== 新增：替代型号按钮和列表样式 ===== */
+  .sub-btn {
+    background: #8e44ad;
+  }
+  .sub-btn:hover { background: #732d91; }
+
+  .sub-card { border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 16px; background: #fff; }
+  .sub-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #f1f4f8; }
+  .sub-item:last-child { border-bottom: none; }
+  .sub-pn { font-size: 16px; font-weight: bold; color: #2c3e50; }
+  .sub-origin { color: #7f8c8d; font-size: 14px; margin-right: 8px; }
+  .sub-query-btn { color: #3498db; cursor: pointer; font-size: 14px; text-decoration: none; margin-left: 12px; font-weight: bold;}
+  .sub-query-btn:hover { text-decoration: underline; }
+  .sub-reason { font-size: 13px; color: #7f8c8d; margin-top: 4px; }
+  .match-tag { font-size: 12px; padding: 2px 6px; border-radius: 4px; background: #e8f5e9; color: #2e7d32; margin-left: 8px; }
+  .match-tag.warn { background: #fff3e0; color: #e65100; }
+  /* ========================================= */
+
   #result { margin-top: 30px; }
+  /* 新增替代列表容器上边距 */
+  #substitute-result { margin-top: 30px; }
+
   .loading { text-align: center; color: #7f8c8d; padding: 30px; }
   .error { color: #e74c3c; background: #fdf0ed; padding: 20px; border-radius: 12px; border-left: 4px solid #e74c3c; }
 
@@ -210,9 +231,13 @@
       </span>
     </div>
     <button id="queryBtn" onclick="query()">单件查询</button>
+    <!-- 新增：替代型号按钮 -->
+    <button class="sub-btn" id="subBtn" onclick="querySubstitute()">替代型号</button>
     <button class="batch-btn" onclick="openBatchModal()">批量分析</button>
   </div>
 
+  <!-- 新增：替代列表在页面偏上方，价格列表在其下方，实现“上下分离” -->
+  <div id="substitute-result"></div>
   <div id="result"></div>
 </div>
 
@@ -288,6 +313,7 @@ document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
 
+// ===== 原有单件查询逻辑完全不动 =====
 async function query() {
   const input = document.getElementById('partInput');
   const btn = document.getElementById('queryBtn');
@@ -321,9 +347,7 @@ async function query() {
 
     html += '<div class="should-cost-card">';
     html += '<div class="should-cost-label">SHOULD COST 推荐值</div>';
-    // ===== 修改点：第二行只保留数字 =====
     html += '<div class="should-cost-value">' + data.shouldCost + '</div>';
-    // ===== 修改点：第三行改为 CNY（不含税） =====
     html += '<div class="should-cost-tax">CNY（不含税）</div>';
     html += '</div>';
 
@@ -334,7 +358,6 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div>';
     html += '</div>';
 
-    // 得捷卡片
     if (data.digikey) {
       const hasPrice = data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0;
       const err = data.digikey.error || "";
@@ -369,7 +392,6 @@ async function query() {
       }
     }
 
-    // 贸泽卡片
     if (data.mouser) {
       const hasPrice = data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0;
       const err = data.mouser.error || "";
@@ -404,7 +426,6 @@ async function query() {
       }
     }
 
-    // 立创卡片
     if (data.lcsc) {
       const hasPrice = data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0;
       const err = data.lcsc.error || "";
@@ -449,6 +470,85 @@ async function query() {
   }
 }
 
+// ===== 新增：替代型号查询逻辑 =====
+async function querySubstitute() {
+  const input = document.getElementById('partInput');
+  const btn = document.getElementById('subBtn');
+  const subDiv = document.getElementById('substitute-result');
+  const priceDiv = document.getElementById('result');
+  const partNumber = input.value.trim();
+
+  if (!partNumber) {
+    subDiv.innerHTML = '<div class="error">请输入芯片型号</div>';
+    return;
+  }
+
+  // 点击替代时，清空下方的价格区域，保持页面干净
+  priceDiv.innerHTML = ''; 
+  subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品，AI 深度分析中，可能需要 10-20 秒...</div>';
+  btn.disabled = true;
+  btn.textContent = '检索中...';
+
+  try {
+    const resp = await fetch(API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber));
+    const data = await resp.json();
+
+    if (data.status === 'not_found') {
+      subDiv.innerHTML = '<div class="error">未能检索到该型号的任何信息。</div>';
+      return;
+    }
+
+    if (data.status === 'success' && data.alternatives && data.alternatives.length > 0) {
+      let html = '<div class="info-card" style="border-top: 4px solid #8e44ad;">';
+      html += '<div class="info-title" style="display:flex; justify-content:space-between;">';
+      html += '<span>AI 替代参考推荐</span>';
+      html += '<span style="font-size:12px;color:#e74c3c;font-weight:normal;">⚠️ 仅供参考，请核对Datasheet</span>';
+      html += '</div>';
+      
+      data.alternatives.forEach(alt => {
+        const tagClass = alt.match_type.includes("Pin-to-Pin") ? "match-tag" : "match-tag warn";
+        html += '<div class="sub-item">';
+        html += '  <div>';
+        html += '    <div class="sub-pn">';
+        html += '      <span class="sub-origin">(' + escapeHtml(alt.origin) + ')</span>';
+        html += '      ' + escapeHtml(alt.part_number);
+        html += '      <span class="' + tagClass + '">' + escapeHtml(alt.match_type) + '</span>';
+        html += '    </div>';
+        html += '    <div class="sub-reason">' + escapeHtml(alt.reason) + '</div>';
+        html += '  </div>';
+        // 点击查询联动
+        html += '  <div><span class="sub-query-btn" onclick="queryFromSub(\'' + escapeHtml(alt.part_number) + '\')">查询</span></div>';
+        html += '</div>';
+      });
+      html += '</div>';
+      subDiv.innerHTML = html;
+    } else {
+      // 查到了基本信息，但未找到替代料，直接不显示替代卡片
+      subDiv.innerHTML = ''; 
+    }
+  } catch (e) {
+    subDiv.innerHTML = '<div class="error">检索替代型号失败，请稍后重试</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '替代型号';
+  }
+}
+
+// ===== 新增：替代列表与单件查询的联动 =====
+function queryFromSub(subPartNumber) {
+  const input = document.getElementById('partInput');
+  input.value = subPartNumber;
+  updateClearBtn();
+  
+  // 平滑滚动到下方价格显示区
+  const priceDiv = document.getElementById('result');
+  priceDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  
+  // 调用原有的单件查询逻辑
+  query();
+}
+// ==========================================
+
 function openBatchModal() { document.getElementById('batchModal').classList.add('show'); }
 function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
 
@@ -466,6 +566,7 @@ fileInput.addEventListener('change', (e) => {
   if (e.target.files.length > 0) handleFile(e.target.files[0]);
 });
 
+// ===== 原有批量分析逻辑完全不动 =====
 async function handleFile(file) {
   const name = file.name.toLowerCase();
   if (!name.endsWith('.xlsx') && !name.endsWith('.xls')) {
