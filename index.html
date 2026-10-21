@@ -15,27 +15,59 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 10px 16px 40px; 
+    /* 默认给顶部留距离，配合居中的flex布局 */
+    align-items: flex-start; 
+    padding: 40px 16px;
+    transition: padding 0.4s ease;
   }
 
+  /* ===== 首页居中模式 ===== */
+  body.is-home {
+    align-items: center; /* 垂直居中 */
+    padding-top: 0;
+  }
+  
+  body.is-home .container {
+    max-width: 1000px; /* 稍微限制首页最大宽度 */
+  }
+
+  body.is-home .search-box {
+    width: 60%; /* 首页搜索框缩短为 60% */
+    margin: 0 auto 20px auto;
+    transition: width 0.4s ease, margin 0.4s ease;
+  }
+
+  /* ===== 查询结果模式 ===== */
+  body:not(.is-home) .container {
+    max-width: 1200px; /* 结果页宽屏 */
+  }
+  body:not(.is-home) .search-box {
+    width: 100%; /* 恢复全宽 */
+  }
+
+  /* 主容器：取消白色背景框，去掉阴影 */
   .container {
-    width: 100%; max-width: 1200px; 
-    background: #fff;
-    border-radius: 16px; padding: 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    width: 100%; 
+    background: transparent; 
+    border-radius: 16px; 
+    padding: 40px;
     height: fit-content;
+    transition: max-width 0.4s ease;
   }
 
-  h1 { font-size: 26px; text-align: center; margin-bottom: 8px; color: #2c3e50; }
-  .subtitle { text-align: center; color: #7f8c8d; font-size: 14px; margin-bottom: 30px; }
+  h1 { font-size: 32px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: bold; }
+  .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 30px; }
 
-  .search-box { display: flex; gap: 12px; margin-bottom: 20px; }
+  .search-box { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
+  
   input[type="text"] {
-    flex: 1; padding: 14px 20px; font-size: 16px;
-    border: 2px solid #e0e6ed; border-radius: 12px; outline: none;
-    transition: border-color 0.3s;
+    flex: 1; padding: 16px 24px; font-size: 16px;
+    border: 2px solid #cbd5e1; border-radius: 12px; outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
   }
-  input[type="text"]:focus { border-color: #3498db; }
+  input[type="text"]:focus { border-color: #3498db; box-shadow: 0 4px 15px rgba(52,152,219,0.15); }
 
   .input-wrapper { position: relative; display: flex; flex: 1 1 auto; min-width: 0; }
   .input-wrapper input[type="text"] { padding-right: 44px; }
@@ -43,7 +75,7 @@
   .clear-btn {
     display: none;
     position: absolute;
-    right: 12px;
+    right: 14px;
     top: 50%;
     transform: translateY(-50%);
     width: 22px;
@@ -59,27 +91,23 @@
   .clear-btn.show { display: flex; }
 
   button {
-    padding: 14px 24px;
+    padding: 16px 28px;
     font-size: 16px; background: #3498db; color: #fff;
     border: none; border-radius: 12px; cursor: pointer; font-weight: bold;
-    transition: background 0.3s;
+    transition: background 0.3s, transform 0.2s;
     white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(52,152,219,0.2);
   }
-  button:hover { background: #2980b9; }
-  button:disabled { background: #bdc3c7; cursor: not-allowed; }
+  button:hover { background: #2980b9; transform: translateY(-1px); }
+  button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
 
-  .batch-btn {
-    background: #27ae60;
-    font-size: 16px;
-  }
+  .batch-btn { background: #27ae60; box-shadow: 0 4px 10px rgba(39,174,96,0.2); }
   .batch-btn:hover { background: #219150; }
 
-  .sub-btn {
-    background: #8e44ad;
-  }
+  .sub-btn { background: #8e44ad; box-shadow: 0 4px 10px rgba(142,68,173,0.2); }
   .sub-btn:hover { background: #732d91; }
 
-  .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px;}
+  .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px; background: #fff;}
   .compare-table { table-layout: fixed; min-width: 900px; width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
   .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
   .compare-table th { background: #f8f9fa; color: #2c3e50; font-weight: 600; text-align: center; vertical-align: middle; }
@@ -101,6 +129,7 @@
   .should-cost-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 16px; padding: 32px; text-align: center; color: #fff; margin-bottom: 24px;
+    box-shadow: 0 10px 20px rgba(102,126,234,0.2);
   }
   .should-cost-label {
     font-size: 22px; font-weight: 700; opacity: 0.95;
@@ -111,7 +140,8 @@
   .should-cost-tax { font-size: 16px; opacity: 0.85; margin-top: 6px; }
 
   .info-card {
-    border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 20px;
+    border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 20px; background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
   }
   .info-title {
     font-size: 16px; font-weight: 700; color: #2c3e50;
@@ -124,7 +154,7 @@
   .pn-match { color: #27ae60; font-weight: bold; }
   .pn-mismatch { color: #e74c3c; font-weight: bold; }
 
-  .source-section { border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .source-section { border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 16px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
   .source-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .source-name { font-size: 16px; font-weight: 700; color: #2c3e50; }
   .source-badge { font-size: 12px; padding: 3px 10px; border-radius: 20px; background: #ecf0f1; color: #7f8c8d; }
@@ -134,11 +164,12 @@
   .detail-link { display: block; text-align: center; margin-top: 14px; color: #3498db; text-decoration: none; font-size: 13px; }
   .detail-link:hover { text-decoration: underline; }
 
-  /* ===== 新增：热搜相关样式 ===== */
+  /* ===== 热搜相关样式 ===== */
   #trending-box {
     margin-top: 40px;
     padding-top: 20px;
-    border-top: 1px dashed #e0e6ed;
+    border-top: 1px dashed #cbd5e1;
+    transition: opacity 0.3s;
   }
   .trending-header {
     display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
@@ -164,7 +195,6 @@
   .trending-item:nth-child(2) .trending-num { color: #ff7a45; }
   .trending-item:nth-child(3) .trending-num { color: #ffc53d; }
   .trending-text { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  /* ========================================= */
 
   .modal-overlay {
     display: none; position: fixed; inset: 0;
@@ -175,6 +205,7 @@
   .modal {
     background: #fff; border-radius: 16px; padding: 32px;
     max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
   }
   .modal h2 { font-size: 22px; color: #2c3e50; margin-bottom: 16px; text-align: center; }
   .notice {
@@ -199,7 +230,8 @@
 
   .progress-container {
     border: 1px solid #e0e6ed; border-radius: 12px;
-    padding: 24px; margin-bottom: 20px;
+    padding: 24px; margin-bottom: 20px; background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
   }
   .progress-title { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 12px; }
   .progress-tip {
@@ -226,6 +258,7 @@
     background: #d4edda; border-left: 4px solid #27ae60;
     padding: 16px; border-radius: 8px; color: #155724;
     font-size: 14px; margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(39,174,96,0.1);
   }
 
   .spinner {
@@ -242,10 +275,11 @@
   }
 
   @media (max-width: 800px) {
-    body { padding: 20px 12px 20px; }
-    .container { padding: 24px; }
-    h1 { font-size: 22px; }
-    .search-box { flex-direction: column; }
+    body { padding: 20px 12px; }
+    body.is-home { padding-top: 20px; align-items: flex-start; } /* 手机端居中会导致键盘顶起，改为靠上 */
+    .container { padding: 20px; }
+    h1 { font-size: 26px; }
+    .search-box { flex-direction: column; width: 100% !important; }
     .search-box input[type="text"], .search-box button { width: 100%; }
     .input-wrapper { flex: none; width: 100%; }
     .should-cost-value { font-size: 40px; }
@@ -254,7 +288,7 @@
   }
 </style>
 </head>
-<body>
+<body class="is-home">
 <script>
   document.title = 'ChipCost - AI分析芯片成本';
 </script>
@@ -281,7 +315,7 @@
   <div id="substitute-result"></div>
   <div id="result"></div>
 
-  <!-- ===== 新增：热门话题区域 ===== -->
+  <!-- ===== 热门话题区域 ===== -->
   <div id="trending-box">
     <div class="trending-header">
       <div class="trending-title">🔥 芯片热门话题</div>
@@ -291,12 +325,9 @@
       </div>
     </div>
     <ul class="trending-list" id="trending-list">
-      <!-- 列表项由 JS 动态渲染 -->
       <li style="text-align:center; color:#999; grid-column: 1/-1;">正在获取最新话题...</li>
     </ul>
   </div>
-  <!-- ============================== -->
-
 </div>
 
 <div class="modal-overlay" id="batchModal">
@@ -364,7 +395,6 @@ async function fetchTrending(isRefresh = false) {
       currentTopics = data.topics;
       let html = '';
       data.topics.forEach((topic, index) => {
-        // 点击跳转到百度搜索该话题
         const searchUrl = 'https://www.baidu.com/s?wd=' + encodeURIComponent(topic);
         html += `<li class="trending-item" onclick="window.open('${searchUrl}', '_blank')">`;
         html += `<span class="trending-num">${index + 1}</span>`;
@@ -392,7 +422,6 @@ function formatPartNumber(displayPn, searchPn) {
   }
 }
 
-// 静默复制变绿
 function copyText(text, element) {
   const handleSuccess = () => {
     const originalText = element.innerText;
@@ -458,8 +487,10 @@ window.addEventListener('DOMContentLoaded', () => {
   fetchTrending();
 });
 
-// ===== 原有单件查询逻辑 =====
+// ===== 单件查询 =====
 async function query() {
+  document.body.classList.remove('is-home'); // 切换布局模式
+
   const input = document.getElementById('partInput');
   const btn = document.getElementById('queryBtn');
   const resultDiv = document.getElementById('result');
@@ -474,7 +505,6 @@ async function query() {
   subDiv.innerHTML = '';
   currentAlternatives = [];
   
-  // 查询开始时隐藏热搜
   trendingBox.style.display = 'none';
 
   btn.disabled = true;
@@ -487,7 +517,7 @@ async function query() {
 
     if (!resp.ok) {
       resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>';
-      trendingBox.style.display = 'block'; // 失败时恢复热搜
+      trendingBox.style.display = 'block'; 
       return;
     }
 
@@ -615,19 +645,22 @@ async function query() {
     }
 
     resultDiv.innerHTML = html;
-    // 正常展示结果时，保持热搜隐藏
 
   } catch (e) {
     resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
-    trendingBox.style.display = 'block'; // 异常时恢复热搜
+    trendingBox.style.display = 'block'; 
   } finally {
     btn.disabled = false;
     btn.textContent = '单件查询';
   }
 }
 
-// ===== 替代型号查询逻辑 =====
+// ===== 替代型号查询 =====
 async function querySubstitute(isRefresh = false) {
+  if (!isRefresh) {
+    document.body.classList.remove('is-home'); // 切换布局
+  }
+
   const input = document.getElementById('partInput');
   const btn = document.getElementById('subBtn');
   const subDiv = document.getElementById('substitute-result');
@@ -648,7 +681,7 @@ async function querySubstitute(isRefresh = false) {
     btn.disabled = true;
     btn.textContent = '检索中...';
     currentAlternatives = [];
-    trendingBox.style.display = 'none'; // 隐藏热搜
+    trendingBox.style.display = 'none'; 
   } else {
     subDiv.style.position = 'relative';
     refreshOverlay = document.createElement('div');
@@ -817,6 +850,8 @@ fileInput.addEventListener('change', (e) => {
 });
 
 async function handleFile(file) {
+  document.body.classList.remove('is-home'); // 切换布局
+  
   const name = file.name.toLowerCase();
   if (!name.endsWith('.xlsx') && !name.endsWith('.xls')) {
     alert('请上传 Excel (.xlsx / .xls) 格式的文件');
@@ -829,7 +864,7 @@ async function handleFile(file) {
 
   subDiv.innerHTML = '';
   currentAlternatives = [];
-  trendingBox.style.display = 'none'; // 批量查询时隐藏热搜
+  trendingBox.style.display = 'none'; 
 
   let workbook;
   try {
