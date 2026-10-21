@@ -80,18 +80,20 @@
   }
   .sub-btn:hover { background: #732d91; }
 
+  /* ===== 修改点：表格样式美化 ===== */
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px;}
   .compare-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: left; font-size: 13px; }
   .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
-  .compare-table th { background: #f8f9fa; color: #2c3e50; font-weight: 600; }
+  .compare-table th { background: #f8f9fa; color: #2c3e50; font-weight: 600; text-align: center; vertical-align: middle; }
   .compare-table tr:last-child td { border-bottom: none; }
-  .compare-table th:first-child, .compare-table td:first-child { width: 140px; background: #fafbfc; color: #7f8c8d; font-weight: bold; }
-  .compare-table th:not(:first-child), .compare-table td:not(:first-child) { text-align: left; }
+  
+  /* 第一列宽度加宽 40%：140 * 1.4 = 196px */
+  .compare-table th:first-child, .compare-table td:first-child { width: 196px; background: #fafbfc; color: #7f8c8d; font-weight: bold; text-align: left; }
+  .compare-table td:not(:first-child) { text-align: left; }
   
   .sub-pn { font-size: 15px; font-weight: bold; color: #2c3e50; display: block; }
-
-  .match-tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e8f5e9; color: #2e7d32; margin-top: 4px; display: inline-block; }
-  .match-tag.warn { background: #fff3e0; color: #e65100; }
+  .copy-btn { display: inline-block; color: #3498db; cursor: pointer; font-size: 12px; font-weight: normal; margin-top: 6px; text-decoration: none; }
+  .copy-btn:hover { text-decoration: underline; }
 
   #result { margin-top: 30px; }
   #substitute-result { margin-top: 30px; }
@@ -286,6 +288,41 @@ function formatPartNumber(displayPn, searchPn) {
   } else {
     return '<span class="pn-mismatch">' + escapeHtml(displayPn) + '（型号未完全匹配，注意甄别）</span>';
   }
+}
+
+// ===== 新增：复制文本到剪贴板 =====
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('已复制: ' + text);
+    }).catch(err => {
+      fallbackCopyTextToClipboard(text);
+    });
+  } else {
+    fallbackCopyTextToClipboard(text);
+  }
+}
+
+function fallbackCopyTextToClipboard(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.style.top = "0";
+  textArea.style.left = "0";
+  textArea.style.position = "fixed";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      alert('已复制: ' + text);
+    } else {
+      alert('复制失败，请手动复制');
+    }
+  } catch (err) {
+    alert('复制失败，请手动复制');
+  }
+  document.body.removeChild(textArea);
 }
 
 const partInputEl = document.getElementById('partInput');
@@ -539,12 +576,11 @@ async function querySubstitute(isRefresh = false) {
       // 1. 表头行
       html += '<thead><tr>';
       html += '<th>对比项</th>';
-      html += '<th>原型号<br><span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span></th>';
+      html += '<th><span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span><div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(data.original.part_number || partNumber) + '\')">复制型号</span></div></th>';
       data.alternatives.forEach(alt => {
-        const tagClass = alt.match_type.includes("Pin-to-Pin") ? "match-tag" : "match-tag warn";
         html += '<th>';
         html += '<span class="sub-pn">' + escapeHtml(alt.part_number) + '</span>';
-        html += '<div><span class="' + tagClass + '">' + escapeHtml(alt.match_type) + '</span></div>';
+        html += '<div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(alt.part_number) + '\')">复制型号</span></div>';
         html += '</th>';
       });
       html += '</tr></thead>';
@@ -583,21 +619,21 @@ async function querySubstitute(isRefresh = false) {
         });
       }
 
-      // 5. 推荐理由行
+      // 5. 推荐理由行 (包含原先的性能标签)
       html += '<tr>';
       html += '<td>推荐理由</td>';
       html += '<td>-</td>';
       data.alternatives.forEach(alt => {
-        html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + '</td>';
+        html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + ' <span style="color:#e65100;">(' + escapeHtml(alt.match_type) + ')</span></td>';
       });
       html += '</tr>';
 
       html += '</tbody></table>';
       html += '</div>'; // end container
 
-      // ===== 新增：换一批按钮 =====
+      // ===== 换一批按钮（改为紫色） =====
       html += '<div style="text-align: right; margin-top: 10px;">';
-      html += '<button style="background: #ecf0f1; color: #2c3e50; border: 1px solid #bdc3c7; padding: 8px 16px; font-size: 13px; border-radius: 8px;" onclick="querySubstitute(true)">🔄 换一批</button>';
+      html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 20px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">🔄 换一批</button>';
       html += '</div>';
 
       html += '</div>'; // end info-card
@@ -621,8 +657,6 @@ function queryFromSub(subPartNumber) {
   input.value = subPartNumber;
   updateClearBtn();
   
-  // 注意：这里不再滚动，因为表格中的操作按钮已经删除了。
-  // 如果用户在表格里点击了其他的查询按钮（如果有的话），依然可以使用这个函数。
   query();
 }
 
