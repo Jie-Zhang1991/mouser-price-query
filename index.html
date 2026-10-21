@@ -19,7 +19,8 @@
   }
 
   .container {
-    width: 100%; max-width: 800px; background: #fff;
+    width: 100%; max-width: 1000px; /* 修改点：加宽界面 */
+    background: #fff;
     border-radius: 16px; padding: 40px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     height: fit-content;
@@ -81,21 +82,19 @@
 
   /* ===== 新增：对比表格样式 ===== */
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; }
-  .compare-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 600px; }
-  .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; }
+  .compare-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: left; font-size: 13px; }
+  .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
   .compare-table th { background: #f8f9fa; color: #2c3e50; font-weight: 600; }
   .compare-table tr:last-child td { border-bottom: none; }
-  .compare-table .param-name { font-weight: bold; color: #7f8c8d; width: 120px; background: #fafbfc; }
-  .compare-table .col-original { background: #f4f9ff; width: 150px; }
-  .compare-table .col-alt { min-width: 160px; }
+  .compare-table th:first-child, .compare-table td:first-child { width: 140px; background: #fafbfc; color: #7f8c8d; font-weight: bold; }
+  .compare-table th:not(:first-child), .compare-table td:not(:first-child) { text-align: left; }
   
   .sub-query-btn { display: inline-block; padding: 6px 16px; background: #3498db; color: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; text-decoration: none; text-align: center; }
   .sub-query-btn:hover { background: #2980b9; text-decoration: none; }
   
-  .match-tag { font-size: 12px; padding: 2px 6px; border-radius: 4px; background: #e8f5e9; color: #2e7d32; margin-left: 8px; font-weight: normal; }
+  .match-tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e8f5e9; color: #2e7d32; margin-top: 4px; display: inline-block; }
   .match-tag.warn { background: #fff3e0; color: #e65100; }
-  .sub-pn { font-size: 15px; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 4px; }
-  .sub-origin { color: #7f8c8d; font-size: 13px; font-weight: normal;}
+  .sub-pn { font-size: 15px; font-weight: bold; color: #2c3e50; display: block; }
   /* ========================================= */
 
   #result { margin-top: 30px; }
@@ -202,7 +201,7 @@
     font-size: 14px; margin-bottom: 16px;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 800px) {
     body { padding: 30px 12px 20px; }
     .container { padding: 24px; }
     h1 { font-size: 22px; }
@@ -471,7 +470,7 @@ async function query() {
   }
 }
 
-// ===== 新增：替代型号查询逻辑（已改为参数对比表格） =====
+// ===== 新增：替代型号查询逻辑 =====
 async function querySubstitute() {
   const input = document.getElementById('partInput');
   const btn = document.getElementById('subBtn');
@@ -485,7 +484,7 @@ async function querySubstitute() {
   }
 
   priceDiv.innerHTML = ''; 
-  subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品，AI 深度分析中，可能需要 10-20 秒...</div>';
+  subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...</div>';
   btn.disabled = true;
   btn.textContent = '检索中...';
 
@@ -513,34 +512,48 @@ async function querySubstitute() {
       html += '<span style="font-size:12px;color:#e74c3c;font-weight:normal;">⚠️ 仅供参考，请核对Datasheet</span>';
       html += '</div>';
       
-      // ===== 渲染二维对比表格 =====
       html += '<div class="compare-table-container">';
       html += '<table class="compare-table">';
       
-      // 表头
+      // 1. 表头行
       html += '<thead><tr>';
-      html += '<th class="param-name">对比项</th>';
-      html += '<th class="col-original">原型号<br><span style="font-size:16px;color:#2c3e50;">' + escapeHtml(data.original.part_number || partNumber) + '</span></th>';
+      html += '<th>对比项</th>';
+      html += '<th>原型号<br><span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span></th>';
       data.alternatives.forEach(alt => {
         const tagClass = alt.match_type.includes("Pin-to-Pin") ? "match-tag" : "match-tag warn";
-        html += '<th class="col-alt">';
-        html += '<span class="sub-pn"><span class="sub-origin">(' + escapeHtml(alt.origin) + ')</span> ' + escapeHtml(alt.part_number) + '</span>';
-        html += '<div style="margin-top:4px;"><span class="' + tagClass + '">' + escapeHtml(alt.match_type) + '</span></div>';
+        html += '<th>';
+        html += '<span class="sub-pn">' + escapeHtml(alt.part_number) + '</span>';
+        html += '<div><span class="' + tagClass + '">' + escapeHtml(alt.match_type) + '</span></div>';
         html += '</th>';
       });
       html += '</tr></thead>';
 
-      // 表格主体
       html += '<tbody>';
-      // 遍历 AI 提取的参数名
+      // 2. Should Cost 行
+      html += '<tr>';
+      html += '<td>Should Cost参考值</td>';
+      html += '<td style="font-weight:bold; color:#e74c3c; font-size:15px;">' + (data.original.shouldCost ? '¥ ' + data.original.shouldCost : '-') + '</td>';
+      data.alternatives.forEach(alt => {
+        html += '<td style="font-weight:bold; color:#e74c3c; font-size:15px;">' + (alt.shouldCost ? '¥ ' + alt.shouldCost : '-') + '</td>';
+      });
+      html += '</tr>';
+
+      // 3. 进口/国产 行
+      html += '<tr>';
+      html += '<td>产地/性质</td>';
+      html += '<td>-</td>'; 
+      data.alternatives.forEach(alt => {
+        html += '<td>' + escapeHtml(alt.origin) + '</td>';
+      });
+      html += '</tr>';
+
+      // 4. 遍历 AI 提取的关键参数
       if (data.param_names && Array.isArray(data.param_names)) {
         data.param_names.forEach(paramName => {
           html += '<tr>';
-          html += '<td class="param-name">' + escapeHtml(paramName) + '</td>';
-          // 原型号参数
+          html += '<td>' + escapeHtml(paramName) + '</td>';
           const origVal = data.original.key_params && data.original.key_params[paramName] ? data.original.key_params[paramName] : '-';
-          html += '<td class="col-original">' + escapeHtml(origVal) + '</td>';
-          // 替代型号参数
+          html += '<td>' + escapeHtml(origVal) + '</td>';
           data.alternatives.forEach(alt => {
             const altVal = alt.key_params && alt.key_params[paramName] ? alt.key_params[paramName] : '-';
             html += '<td>' + escapeHtml(altVal) + '</td>';
@@ -549,28 +562,28 @@ async function querySubstitute() {
         });
       }
 
-      // 推荐理由行
+      // 5. 推荐理由行
       html += '<tr>';
-      html += '<td class="param-name">推荐理由</td>';
-      html += '<td class="col-original">-</td>';
+      html += '<td>推荐理由</td>';
+      html += '<td>-</td>';
       data.alternatives.forEach(alt => {
-        html += '<td style="font-size:12px;color:#555;">' + escapeHtml(alt.reason) + '</td>';
+        html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + '</td>';
       });
       html += '</tr>';
 
-      // 操作行
+      // 6. 操作行
       html += '<tr>';
-      html += '<td class="param-name">操作</td>';
-      html += '<td class="col-original">-</td>';
+      html += '<td>操作</td>';
+      html += '<td>-</td>';
       data.alternatives.forEach(alt => {
         html += '<td><span class="sub-query-btn" onclick="queryFromSub(\'' + escapeHtml(alt.part_number) + '\')">查询该型号</span></td>';
       });
       html += '</tr>';
 
       html += '</tbody></table>';
-      html += '</div>'; // end container
+      html += '</div>'; 
 
-      html += '</div>'; // end info-card
+      html += '</div>'; 
       subDiv.innerHTML = html;
     } else {
       subDiv.innerHTML = '<div style="color:#7f8c8d; background:none; border:none; text-align:center; padding:20px; font-size:14px;">暂未找到合适的跨品牌同级别替代型号，该芯片可能具有较高的技术壁垒或封闭生态。</div>'; 
@@ -589,14 +602,11 @@ function queryFromSub(subPartNumber) {
   input.value = subPartNumber;
   updateClearBtn();
   
-  // 平滑滚动到下方价格显示区
   const priceDiv = document.getElementById('result');
   priceDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
   
-  // 调用原有的单件查询逻辑
   query();
 }
-// ==========================================
 
 function openBatchModal() { document.getElementById('batchModal').classList.add('show'); }
 function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
