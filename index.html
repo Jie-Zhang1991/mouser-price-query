@@ -80,14 +80,14 @@
   }
   .sub-btn:hover { background: #732d91; }
 
-  /* ===== 修改点：表格样式美化 ===== */
+  /* ===== 修改点：允许手机端横向滑动 ===== */
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px;}
-  .compare-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: left; font-size: 13px; }
+  /* 设定 min-width 确保在手机上撑开，不纵向压缩文字 */
+  .compare-table { min-width: 800px; width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
   .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
   .compare-table th { background: #f8f9fa; color: #2c3e50; font-weight: 600; text-align: center; vertical-align: middle; }
   .compare-table tr:last-child td { border-bottom: none; }
   
-  /* 第一列宽度加宽 40%：140 * 1.4 = 196px */
   .compare-table th:first-child, .compare-table td:first-child { width: 196px; background: #fafbfc; color: #7f8c8d; font-weight: bold; text-align: left; }
   .compare-table td:not(:first-child) { text-align: left; }
   
@@ -290,20 +290,26 @@ function formatPartNumber(displayPn, searchPn) {
   }
 }
 
-// ===== 新增：复制文本到剪贴板 =====
-function copyText(text) {
+// ===== 修改点：静默复制功能 =====
+function copyText(text, element) {
+  const handleSuccess = () => {
+    const originalText = element.innerText;
+    element.innerText = "已复制!";
+    element.style.color = "#27ae60"; // 绿色提示
+    setTimeout(() => {
+      element.innerText = originalText;
+      element.style.color = "#3498db"; // 恢复蓝色
+    }, 1500);
+  };
+
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert('已复制: ' + text);
-    }).catch(err => {
-      fallbackCopyTextToClipboard(text);
-    });
+    navigator.clipboard.writeText(text).then(handleSuccess).catch(() => fallbackCopy(text, handleSuccess));
   } else {
-    fallbackCopyTextToClipboard(text);
+    fallbackCopy(text, handleSuccess);
   }
 }
 
-function fallbackCopyTextToClipboard(text) {
+function fallbackCopy(text, callback) {
   const textArea = document.createElement("textarea");
   textArea.value = text;
   textArea.style.top = "0";
@@ -313,14 +319,10 @@ function fallbackCopyTextToClipboard(text) {
   textArea.focus();
   textArea.select();
   try {
-    const successful = document.execCommand('copy');
-    if (successful) {
-      alert('已复制: ' + text);
-    } else {
-      alert('复制失败，请手动复制');
-    }
+    document.execCommand('copy');
+    callback();
   } catch (err) {
-    alert('复制失败，请手动复制');
+    console.error("复制失败", err);
   }
   document.body.removeChild(textArea);
 }
@@ -353,7 +355,7 @@ async function query() {
   const input = document.getElementById('partInput');
   const btn = document.getElementById('queryBtn');
   const resultDiv = document.getElementById('result');
-  const subDiv = document.getElementById('substitute-result'); // 新增获取替代结果容器
+  const subDiv = document.getElementById('substitute-result');
   const partNumber = input.value.trim();
 
   if (!partNumber) {
@@ -524,14 +526,24 @@ async function querySubstitute(isRefresh = false) {
   }
 
   priceDiv.innerHTML = ''; 
-  subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...</div>';
   
+  // ===== 修改点：换一批时不覆盖原表格，而是插入提示 =====
+  let refreshMsgDiv = null;
   if (!isRefresh) {
+    subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...</div>';
     btn.disabled = true;
     btn.textContent = '检索中...';
     currentAlternatives = [];
   } else {
-    subDiv.innerHTML = '<div class="loading">正在为您换一批替代型号，AI 深度分析中，请稍候...</div>';
+    // 检查是否已经有提示，没有则创建
+    refreshMsgDiv = document.getElementById('refresh-msg');
+    if (!refreshMsgDiv) {
+      refreshMsgDiv = document.createElement('div');
+      refreshMsgDiv.id = 'refresh-msg';
+      refreshMsgDiv.style.cssText = 'text-align: center; color: #7f8c8d; font-size: 18px; font-weight: bold; margin-bottom: 15px; padding: 10px;';
+      subDiv.insertBefore(refreshMsgDiv, subDiv.firstChild);
+    }
+    refreshMsgDiv.innerText = '正在更新新的替代料号，请稍后...';
   }
 
   // 构造排除参数
@@ -552,17 +564,19 @@ async function querySubstitute(isRefresh = false) {
     try {
       data = JSON.parse(text);
     } catch (err) {
-      subDiv.innerHTML = '<div class="error">服务器响应超时或异常，请稍后重试。</div>';
+      if (!isRefresh) subDiv.innerHTML = '<div class="error">服务器响应超时或异常，请稍后重试。</div>';
+      else if(refreshMsgDiv) refreshMsgDiv.innerText = '更新失败，请重试';
       return;
     }
 
     if (data.status === 'not_found') {
-      subDiv.innerHTML = '<div class="error">AI未能检索到查询型号的任何信息，请检查所输入型号是否准确。</div>';
+      if (!isRefresh) subDiv.innerHTML = '<div class="error">AI未能检索到查询型号的任何信息，请检查所输入型号是否准确。</div>';
+      else if(refreshMsgDiv) refreshMsgDiv.innerText = '未能找到更多替代型号';
       return;
     }
 
     if (data.status === 'success' && data.alternatives && data.alternatives.length > 0) {
-      currentAlternatives = data.alternatives; // 记录当前显示的型号，用于下次换一批
+      currentAlternatives = data.alternatives;
 
       let html = '<div class="info-card" style="border-top: 4px solid #8e44ad; padding-bottom: 5px;">';
       html += '<div class="info-title" style="display:flex; justify-content:space-between;">';
@@ -576,11 +590,19 @@ async function querySubstitute(isRefresh = false) {
       // 1. 表头行
       html += '<thead><tr>';
       html += '<th>对比项</th>';
-      html += '<th><span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span><div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(data.original.part_number || partNumber) + '\')">复制型号</span></div></th>';
+      
+      // 原型号列：深灰色(原型号)，不可点击
+      html += '<th>';
+      html += '<span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span>';
+      html += '<div><span style="color:#7f8c8d; font-size:12px;">(原型号)</span></div>';
+      html += '</th>';
+
+      // 替代型号列：蓝字复制
       data.alternatives.forEach(alt => {
         html += '<th>';
         html += '<span class="sub-pn">' + escapeHtml(alt.part_number) + '</span>';
-        html += '<div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(alt.part_number) + '\')">复制型号</span></div>';
+        // 修改点：内联 onclick 传入 this 对象用于静默改变文本
+        html += '<div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(alt.part_number) + '\', this)">复制型号</span></div>';
         html += '</th>';
       });
       html += '</tr></thead>';
@@ -619,30 +641,39 @@ async function querySubstitute(isRefresh = false) {
         });
       }
 
-      // 5. 推荐理由行 (包含原先的性能标签)
+      // 5. 推荐理由行 (包含 match_type 橙色提示)
       html += '<tr>';
       html += '<td>推荐理由</td>';
       html += '<td>-</td>';
       data.alternatives.forEach(alt => {
-        html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + ' <span style="color:#e65100;">(' + escapeHtml(alt.match_type) + ')</span></td>';
+        let mType = alt.match_type || "性能相近";
+        if (mType === "参数相近（需改板）" || mType === "参数相近(需改板)") {
+          mType = "性能相近"; // 兼容性处理
+        }
+        html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + ' <span style="color:#e65100;">(' + escapeHtml(mType) + ')</span></td>';
       });
       html += '</tr>';
 
       html += '</tbody></table>';
-      html += '</div>'; // end container
+      html += '</div>'; 
 
-      // ===== 换一批按钮（改为紫色） =====
+      // ===== 换一批按钮（去除图标，紫色） =====
       html += '<div style="text-align: right; margin-top: 10px;">';
-      html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 20px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">🔄 换一批</button>';
+      html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 20px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button>';
       html += '</div>';
 
-      html += '</div>'; // end info-card
+      html += '</div>'; 
       subDiv.innerHTML = html;
     } else {
-      subDiv.innerHTML = '<div style="color:#7f8c8d; background:none; border:none; text-align:center; padding:20px; font-size:14px;">暂未找到合适的跨品牌同级别替代型号，该芯片可能具有较高的技术壁垒或封闭生态。</div>'; 
+      if (!isRefresh) {
+        subDiv.innerHTML = '<div style="color:#7f8c8d; background:none; border:none; text-align:center; padding:20px; font-size:14px;">暂未找到合适的跨品牌同级别替代型号，该芯片可能具有较高的技术壁垒或封闭生态。</div>'; 
+      } else {
+        if(refreshMsgDiv) refreshMsgDiv.innerText = '没有找到新的替代型号了。';
+      }
     }
   } catch (e) {
-    subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
+    if (!isRefresh) subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
+    else if(refreshMsgDiv) refreshMsgDiv.innerText = '网络异常，请稍后重试。';
   } finally {
     if (!isRefresh) {
       btn.disabled = false;
@@ -656,7 +687,6 @@ function queryFromSub(subPartNumber) {
   const input = document.getElementById('partInput');
   input.value = subPartNumber;
   updateClearBtn();
-  
   query();
 }
 
@@ -687,7 +717,7 @@ async function handleFile(file) {
 
   closeBatchModal();
   const resultDiv = document.getElementById('result');
-  const subDiv = document.getElementById('substitute-result'); // 新增获取替代结果容器
+  const subDiv = document.getElementById('substitute-result'); 
 
   // 清空旧的替代结果
   subDiv.innerHTML = '';
