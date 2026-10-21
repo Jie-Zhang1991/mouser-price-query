@@ -80,9 +80,9 @@
   }
   .sub-btn:hover { background: #732d91; }
 
-  /* ===== 修改点：允许手机端横向滑动 ===== */
+  /* ===== 修改点：手机端允许滑动 ===== */
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px;}
-  /* 设定 min-width 确保在手机上撑开，不纵向压缩文字 */
+  /* 移除 table-layout: fixed，保证内容不会被挤压，加入 min-width 确保出现横向滚动条 */
   .compare-table { min-width: 800px; width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
   .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
   .compare-table th { background: #f8f9fa; color: #2c3e50; font-weight: 600; text-align: center; vertical-align: middle; }
@@ -290,41 +290,24 @@ function formatPartNumber(displayPn, searchPn) {
   }
 }
 
-// ===== 修改点：静默复制功能 =====
-function copyText(text, element) {
-  const handleSuccess = () => {
-    const originalText = element.innerText;
-    element.innerText = "已复制!";
-    element.style.color = "#27ae60"; // 绿色提示
-    setTimeout(() => {
-      element.innerText = originalText;
-      element.style.color = "#3498db"; // 恢复蓝色
-    }, 1500);
-  };
-
+// ===== 修改点：静默复制（无弹窗） =====
+function copyText(text) {
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(handleSuccess).catch(() => fallbackCopy(text, handleSuccess));
+    navigator.clipboard.writeText(text);
   } else {
-    fallbackCopy(text, handleSuccess);
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+    } catch (err) {}
+    document.body.removeChild(textArea);
   }
-}
-
-function fallbackCopy(text, callback) {
-  const textArea = document.createElement("textarea");
-  textArea.value = text;
-  textArea.style.top = "0";
-  textArea.style.left = "0";
-  textArea.style.position = "fixed";
-  document.body.appendChild(textArea);
-  textArea.focus();
-  textArea.select();
-  try {
-    document.execCommand('copy');
-    callback();
-  } catch (err) {
-    console.error("复制失败", err);
-  }
-  document.body.removeChild(textArea);
 }
 
 const partInputEl = document.getElementById('partInput');
@@ -526,24 +509,14 @@ async function querySubstitute(isRefresh = false) {
   }
 
   priceDiv.innerHTML = ''; 
+  subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...</div>';
   
-  // ===== 修改点：换一批时不覆盖原表格，而是插入提示 =====
-  let refreshMsgDiv = null;
   if (!isRefresh) {
-    subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...</div>';
     btn.disabled = true;
     btn.textContent = '检索中...';
     currentAlternatives = [];
   } else {
-    // 检查是否已经有提示，没有则创建
-    refreshMsgDiv = document.getElementById('refresh-msg');
-    if (!refreshMsgDiv) {
-      refreshMsgDiv = document.createElement('div');
-      refreshMsgDiv.id = 'refresh-msg';
-      refreshMsgDiv.style.cssText = 'text-align: center; color: #7f8c8d; font-size: 18px; font-weight: bold; margin-bottom: 15px; padding: 10px;';
-      subDiv.insertBefore(refreshMsgDiv, subDiv.firstChild);
-    }
-    refreshMsgDiv.innerText = '正在更新新的替代料号，请稍后...';
+    subDiv.innerHTML = '<div class="loading">正在为您换一批替代型号，AI 深度分析中，请稍候...</div>';
   }
 
   // 构造排除参数
@@ -564,19 +537,17 @@ async function querySubstitute(isRefresh = false) {
     try {
       data = JSON.parse(text);
     } catch (err) {
-      if (!isRefresh) subDiv.innerHTML = '<div class="error">服务器响应超时或异常，请稍后重试。</div>';
-      else if(refreshMsgDiv) refreshMsgDiv.innerText = '更新失败，请重试';
+      subDiv.innerHTML = '<div class="error">服务器响应超时或异常，请稍后重试。</div>';
       return;
     }
 
     if (data.status === 'not_found') {
-      if (!isRefresh) subDiv.innerHTML = '<div class="error">AI未能检索到查询型号的任何信息，请检查所输入型号是否准确。</div>';
-      else if(refreshMsgDiv) refreshMsgDiv.innerText = '未能找到更多替代型号';
+      subDiv.innerHTML = '<div class="error">AI未能检索到查询型号的任何信息，请检查所输入型号是否准确。</div>';
       return;
     }
 
     if (data.status === 'success' && data.alternatives && data.alternatives.length > 0) {
-      currentAlternatives = data.alternatives;
+      currentAlternatives = data.alternatives; 
 
       let html = '<div class="info-card" style="border-top: 4px solid #8e44ad; padding-bottom: 5px;">';
       html += '<div class="info-title" style="display:flex; justify-content:space-between;">';
@@ -591,7 +562,7 @@ async function querySubstitute(isRefresh = false) {
       html += '<thead><tr>';
       html += '<th>对比项</th>';
       
-      // 原型号列：深灰色(原型号)，不可点击
+      // 修改点 (1)：原型号下方改为(原型号)，深灰色，不可点击
       html += '<th>';
       html += '<span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span>';
       html += '<div><span style="color:#7f8c8d; font-size:12px;">(原型号)</span></div>';
@@ -601,8 +572,8 @@ async function querySubstitute(isRefresh = false) {
       data.alternatives.forEach(alt => {
         html += '<th>';
         html += '<span class="sub-pn">' + escapeHtml(alt.part_number) + '</span>';
-        // 修改点：内联 onclick 传入 this 对象用于静默改变文本
-        html += '<div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(alt.part_number) + '\', this)">复制型号</span></div>';
+        // 修改点 (2)：调用新的静默复制
+        html += '<div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(alt.part_number) + '\')">复制型号</span></div>';
         html += '</th>';
       });
       html += '</tr></thead>';
@@ -646,10 +617,8 @@ async function querySubstitute(isRefresh = false) {
       html += '<td>推荐理由</td>';
       html += '<td>-</td>';
       data.alternatives.forEach(alt => {
-        let mType = alt.match_type || "性能相近";
-        if (mType === "参数相近（需改板）" || mType === "参数相近(需改板)") {
-          mType = "性能相近"; // 兼容性处理
-        }
+        let mType = alt.match_type || "性能相当";
+        if (mType.includes("参数相近")) mType = "参数相近（需改板）"; // 兼容老版本数据
         html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + ' <span style="color:#e65100;">(' + escapeHtml(mType) + ')</span></td>';
       });
       html += '</tr>';
@@ -657,7 +626,7 @@ async function querySubstitute(isRefresh = false) {
       html += '</tbody></table>';
       html += '</div>'; 
 
-      // ===== 换一批按钮（去除图标，紫色） =====
+      // 修改点 (3)：去除循环图标
       html += '<div style="text-align: right; margin-top: 10px;">';
       html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 20px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button>';
       html += '</div>';
@@ -665,15 +634,10 @@ async function querySubstitute(isRefresh = false) {
       html += '</div>'; 
       subDiv.innerHTML = html;
     } else {
-      if (!isRefresh) {
-        subDiv.innerHTML = '<div style="color:#7f8c8d; background:none; border:none; text-align:center; padding:20px; font-size:14px;">暂未找到合适的跨品牌同级别替代型号，该芯片可能具有较高的技术壁垒或封闭生态。</div>'; 
-      } else {
-        if(refreshMsgDiv) refreshMsgDiv.innerText = '没有找到新的替代型号了。';
-      }
+      subDiv.innerHTML = '<div style="color:#7f8c8d; background:none; border:none; text-align:center; padding:20px; font-size:14px;">暂未找到合适的跨品牌同级别替代型号，该芯片可能具有较高的技术壁垒或封闭生态。</div>'; 
     }
   } catch (e) {
-    if (!isRefresh) subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
-    else if(refreshMsgDiv) refreshMsgDiv.innerText = '网络异常，请稍后重试。';
+    subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
   } finally {
     if (!isRefresh) {
       btn.disabled = false;
