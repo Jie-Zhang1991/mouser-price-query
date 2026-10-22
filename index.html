@@ -97,11 +97,10 @@
   .clear-btn:hover { background: #95a5a6; }
   .clear-btn.show { display: flex; }
 
-  /* 修改点：单件查询按钮（马卡龙蓝） */
   button {
     padding: 14px 20px; 
     font-size: 15px; 
-    background: #63B3ED; 
+    background: #3498db; 
     color: #fff;
     border: none; 
     border-radius: 12px; 
@@ -109,24 +108,22 @@
     font-weight: bold;
     transition: background 0.3s, transform 0.2s;
     white-space: nowrap;
-    box-shadow: 0 4px 10px rgba(99,179,237,0.3);
+    box-shadow: 0 4px 10px rgba(52,152,219,0.2);
   }
-  button:hover { background: #4299E1; transform: translateY(-1px); }
+  button:hover { background: #2980b9; transform: translateY(-1px); }
   button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
 
-  /* 修改点：批量分析（马卡龙紫） */
   .batch-btn { 
-    background: #B794F4; 
-    box-shadow: 0 4px 10px rgba(183,148,244,0.3); 
+    background: #8e44ad; 
+    box-shadow: 0 4px 10px rgba(142,68,173,0.2); 
   }
-  .batch-btn:hover { background: #9F7AEA; }
+  .batch-btn:hover { background: #732d91; }
 
-  /* 修改点：替代型号（马卡龙绿） */
   .sub-btn { 
-    background: #68D391; 
-    box-shadow: 0 4px 10px rgba(104,211,145,0.3); 
+    background: #27ae60; 
+    box-shadow: 0 4px 10px rgba(39,174,96,0.2); 
   }
-  .sub-btn:hover { background: #48BB78; }
+  .sub-btn:hover { background: #219150; }
 
   /* 对比表格 */
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px; background: #fff;}
@@ -206,6 +203,7 @@
   .trending-list {
     list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px;
   }
+  /* 修改点：字号从 15px 缩小为 14px */
   .trending-item {
     display: flex; align-items: center; cursor: pointer; font-size: 14px; color: #333; transition: color 0.2s;
   }
@@ -755,8 +753,7 @@ async function querySubstitute(isRefresh = false) {
     if (data.status === 'success' && data.alternatives && data.alternatives.length > 0) {
       currentAlternatives = data.alternatives;
 
-      // 修改点：边框颜色改为马卡龙紫
-      let html = '<div class="info-card" style="border-top: 4px solid #B794F4; padding-bottom: 5px;">';
+      let html = '<div class="info-card" style="border-top: 4px solid #8e44ad; padding-bottom: 5px;">';
       
       html += '<div class="info-title" style="display:flex; justify-content:space-between;">';
       html += '<span>AI 替代参考推荐与参数对比</span>';
@@ -823,9 +820,8 @@ async function querySubstitute(isRefresh = false) {
       html += '</tbody></table>';
       html += '</div>'; 
 
-      // 修改点：换一批按钮改为马卡龙紫
       html += '<div style="text-align: right; margin-top: 10px;">';
-      html += '<button style="background: #B794F4; color: #fff; border: none; padding: 8px 42px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(183,148,244,0.3);" onclick="querySubstitute(true)">换一批</button>';
+      html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 42px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button>';
       html += '</div>';
 
       html += '</div>'; 
