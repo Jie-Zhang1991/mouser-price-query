@@ -203,7 +203,6 @@
   .trending-list {
     list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px;
   }
-  /* 修改点：字号从 15px 缩小为 14px */
   .trending-item {
     display: flex; align-items: center; cursor: pointer; font-size: 14px; color: #333; transition: color 0.2s;
   }
@@ -753,7 +752,8 @@ async function querySubstitute(isRefresh = false) {
     if (data.status === 'success' && data.alternatives && data.alternatives.length > 0) {
       currentAlternatives = data.alternatives;
 
-      let html = '<div class="info-card" style="border-top: 4px solid #8e44ad; padding-bottom: 5px;">';
+      // 修改点：去除了 padding-bottom: 5px; 让它恢复默认的 20px 底部内边距
+      let html = '<div class="info-card" style="border-top: 4px solid #8e44ad;">';
       
       html += '<div class="info-title" style="display:flex; justify-content:space-between;">';
       html += '<span>AI 替代参考推荐与参数对比</span>';
