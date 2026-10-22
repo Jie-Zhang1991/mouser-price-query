@@ -16,15 +16,15 @@
     display: flex;
     justify-content: center;
     align-items: flex-start; 
-    /* 修改点 1：顶部内边距缩小为 13px (约 40px 的 1/3) */
-    padding: 13px 16px 40px;
+    /* 修改点 1：顶部内边距缩小为 7px */
+    padding: 7px 16px 40px;
     transition: padding 0.4s ease;
   }
 
   /* ===== 首页居中模式 ===== */
   body.is-home {
     align-items: center; 
-    padding-top: 0; /* 首页上方间距保持不变 */
+    padding-top: 0; /* 首页上方间距不受影响 */
     padding-bottom: 80px; 
   }
   
@@ -68,7 +68,7 @@
   /* 首页保持 45px 的间距 */
   .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 45px; }
 
-  /* 修改点 2：非首页状态下，副标题下方间距缩短一半（45px -> 22px） */
+  /* 非首页状态下，副标题下方间距缩短一半（45px -> 22px） */
   body:not(.is-home) .subtitle {
     margin-bottom: 22px;
   }
@@ -525,7 +525,9 @@ async function query() {
   const subDiv = document.getElementById('substitute-result');
   const partNumber = input.value.trim();
 
+  // 修改点 2：输入为空时，清空另一个区域，只保留一个提示
   if (!partNumber) {
+    subDiv.innerHTML = '';
     resultDiv.innerHTML = '<div class="error">请输入芯片型号</div>';
     return;
   }
@@ -695,7 +697,9 @@ async function querySubstitute(isRefresh = false) {
   const priceDiv = document.getElementById('result');
   const partNumber = input.value.trim();
 
+  // 修改点 2：输入为空时，清空另一个区域，只保留一个提示
   if (!partNumber) {
+    priceDiv.innerHTML = '';
     subDiv.innerHTML = '<div class="error">请输入芯片型号</div>';
     return;
   }
