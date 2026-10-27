@@ -203,7 +203,8 @@
 
   @media (max-width: 800px) {
     body { padding: 20px 12px; }
-    body.is-home { padding-top: 20px; align-items: flex-start; } 
+    /* 修改点：将 padding-top 从 20px 增加至 90px，使移动端内容整体下移，避开图标 */
+    body.is-home { padding-top: 90px; align-items: flex-start; } 
     .container { padding: 20px; }
     h1 { font-size: 26px; }
     .search-box { flex-direction: column; width: 100% !important; }
@@ -645,7 +646,7 @@ document.addEventListener('click', function() {
   statsProfile.classList.remove('show'); settingsProfile.classList.remove('show'); userProfile.classList.remove('show');
 });
 
-// 单件查询 (移除多余的自定义 Header)
+// 单件查询
 async function query() {
   document.body.classList.remove('is-home'); 
   const input = document.getElementById('partInput');
@@ -723,7 +724,7 @@ async function query() {
   }
 }
 
-// 替代型号 (移除多余的自定义 Header)
+// 替代型号
 async function querySubstitute(isRefresh = false) {
   if (!isRefresh) document.body.classList.remove('is-home'); 
 
