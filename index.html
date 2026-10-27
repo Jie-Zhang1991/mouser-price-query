@@ -441,6 +441,7 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   });
 });
 
+// 修改：增强了邮箱解析失败的降级策略
 function getUserEmail() {
   const cookies = document.cookie.split(';');
   let token = null;
@@ -451,7 +452,10 @@ function getUserEmail() {
       break;
     }
   }
-  if (!token) return '未获取到登录信息';
+  if (!token) {
+    console.warn("无法在 Cookie 中找到 CF_Authorization，降级使用 sessionStorage/默认");
+    return sessionStorage.getItem('cached_user_email') || 'unknown@unknown.com';
+  }
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -459,8 +463,14 @@ function getUserEmail() {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
     const payload = JSON.parse(jsonPayload);
-    return payload.email || '未找到邮箱';
+    const email = payload.email;
+    if (email) {
+      sessionStorage.setItem('cached_user_email', email);
+      return email;
+    }
+    return '未找到邮箱';
   } catch (e) {
+    console.error("解析 JWT 失败", e);
     return '解析登录信息失败';
   }
 }
@@ -517,7 +527,6 @@ async function fetchTrending(isRefresh = false) {
 async function clearAllStats() {
   if (!confirm('确定要清空所有数据统计吗？此操作不可恢复！')) return;
   try {
-    // 修改：通过 URL 参数传递邮箱
     const resp = await fetch(API_URL + '?action=admin_clear_stats&userEmail=' + encodeURIComponent(currentUserEmail));
     const result = await resp.json();
     if (result.status === 'success') {
@@ -534,7 +543,6 @@ async function clearAllStats() {
 // ===== 管理员功能：下载用户使用情况 =====
 async function downloadUserStats() {
   try {
-    // 修改：通过 URL 参数传递邮箱
     const resp = await fetch(API_URL + '?action=admin_get_user_stats&userEmail=' + encodeURIComponent(currentUserEmail));
     const result = await resp.json();
     if (result.status !== 'success') {
@@ -660,7 +668,6 @@ async function query() {
   btn.disabled = true; btn.textContent = '分析中...'; resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
 
   try {
-    // 修改：通过 URL 参数传递邮箱
     const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(partNumber) + '&userEmail=' + encodeURIComponent(currentUserEmail));
     const data = await resp.json();
     if (!resp.ok) { resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>'; trendingBox.style.display = 'block'; return; }
@@ -753,7 +760,6 @@ async function querySubstitute(isRefresh = false) {
   let excludeStr = (isRefresh && currentAlternatives.length > 0) ? currentAlternatives.map(alt => alt.part_number).join(',') : "";
 
   try {
-    // 修改：通过 URL 参数传递邮箱
     let url = API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber) + '&userEmail=' + encodeURIComponent(currentUserEmail);
     if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
     const resp = await fetch(url);
@@ -885,7 +891,6 @@ async function handleFile(file) {
     progressCurrent.textContent = `正在分析：${pn}`;
 
     try {
-      // 修改：通过 URL 参数传递邮箱
       const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn) + '&isBatch=true&userEmail=' + encodeURIComponent(currentUserEmail));
       const data = await resp.json();
 
