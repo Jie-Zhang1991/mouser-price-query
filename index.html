@@ -1,9 +1,10 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230054A6'/%3E%3Ctext x='50' y='74' font-size='68' font-family='Microsoft YaHei,sans-serif' text-anchor='middle' fill='white' font-weight='bold'%3E%E8%8A%AF%3C/text%3E%3C/svg%3E">
+<!-- 修复：将原SVG的URL编码改为Base64编码，彻底解决复制导致字符丢失、Logo不显示的问题 -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDA1NEE2Ii8+PHRleHQgeD0iNTAiIHk9Ijc0IiBmb250LXNpemU9IjY4IiBmb250LWZhbWlseT0iTWljcm9zb2Z0IFlhSGVpLHNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCI+6IqvPC90ZXh0Pjwvc3ZnPg==">
 <title>ChipCost</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -211,10 +212,12 @@
   .trending-list {
     list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px;
   }
+  /* 修改点：热搜字体缩小一号 (14px -> 13px) */
   .trending-item {
     display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #333; transition: color 0.2s;
   }
   .trending-item:hover { color: #3498db; }
+  /* 修改点：序号字体缩小 (16px -> 15px) */
   .trending-num {
     font-size: 15px; font-weight: bold; font-style: italic; width: 24px; text-align: center; margin-right: 10px; color: #999;
   }
@@ -304,7 +307,7 @@
     100% { transform: rotate(360deg); }
   }
 
-  /* ===== 新增：用户图标及提示框 ===== */
+  /* ===== 新增：右上角用户图标 ===== */
   .user-profile {
     position: fixed;
     top: 20px;
