@@ -203,8 +203,9 @@
 
   @media (max-width: 800px) {
     body { padding: 20px 12px; }
-    /* 修改点：将 padding-top 从 90px 调整为 45px，实现 0.3a 的下移效果 */
     body.is-home { padding-top: 45px; align-items: flex-start; } 
+    /* 修改点：针对非首页状态，增加 padding-top 下移 18px */
+    body:not(.is-home) { padding-top: 38px; } 
     .container { padding: 20px; }
     h1 { font-size: 26px; }
     .search-box { flex-direction: column; width: 100% !important; }
