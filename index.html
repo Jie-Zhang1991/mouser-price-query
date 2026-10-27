@@ -467,15 +467,11 @@ function getUserEmail() {
   }
 }
 
-function getHeaders() {
-  return { 'X-User-Email': currentUserEmail };
-}
-
-// 获取统计数据并渲染
+// 获取统计数据并渲染 (移除多余的自定义 Header)
 async function fetchStats() {
   const tooltip = document.getElementById('statsTooltip');
   try {
-    const resp = await fetch(API_URL + '?action=stats', { headers: getHeaders() });
+    const resp = await fetch(API_URL + '?action=stats');
     const data = await resp.json();
     if (data.status === 'success') {
       const quotaColor = data.todayQuota > 900 ? '#e74c3c' : '#3498db';
@@ -500,7 +496,7 @@ async function fetchTrending(isRefresh = false) {
   try {
     let url = API_URL + '?action=trending';
     if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
-    const resp = await fetch(url, { headers: getHeaders() });
+    const resp = await fetch(url);
     const data = await resp.json();
 
     if (data.status === 'success' && data.topics && data.topics.length > 0) {
@@ -523,7 +519,7 @@ async function fetchTrending(isRefresh = false) {
 async function clearAllStats() {
   if (!confirm('确定要清空所有数据统计吗？此操作不可恢复！')) return;
   try {
-    const resp = await fetch(API_URL + '?action=admin_clear_stats', { headers: getHeaders() });
+    const resp = await fetch(API_URL + '?action=admin_clear_stats');
     const result = await resp.json();
     if (result.status === 'success') {
       alert('数据统计已成功清空！');
@@ -539,7 +535,7 @@ async function clearAllStats() {
 // ===== 管理员功能：下载用户使用情况 =====
 async function downloadUserStats() {
   try {
-    const resp = await fetch(API_URL + '?action=admin_get_user_stats', { headers: getHeaders() });
+    const resp = await fetch(API_URL + '?action=admin_get_user_stats');
     const result = await resp.json();
     if (result.status !== 'success') {
       alert('下载失败：' + (result.error || '无权限'));
@@ -649,7 +645,7 @@ document.addEventListener('click', function() {
   statsProfile.classList.remove('show'); settingsProfile.classList.remove('show'); userProfile.classList.remove('show');
 });
 
-// 单件查询
+// 单件查询 (移除多余的自定义 Header)
 async function query() {
   document.body.classList.remove('is-home'); 
   const input = document.getElementById('partInput');
@@ -664,7 +660,7 @@ async function query() {
   btn.disabled = true; btn.textContent = '分析中...'; resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
 
   try {
-    const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(partNumber), { headers: getHeaders() });
+    const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(partNumber));
     const data = await resp.json();
     if (!resp.ok) { resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>'; trendingBox.style.display = 'block'; return; }
     if (!data.shouldCost) { resultDiv.innerHTML = '<div class="error">抱歉，未检索到任何价格信息。</div>'; trendingBox.style.display = 'block'; return; }
@@ -727,7 +723,7 @@ async function query() {
   }
 }
 
-// 替代型号
+// 替代型号 (移除多余的自定义 Header)
 async function querySubstitute(isRefresh = false) {
   if (!isRefresh) document.body.classList.remove('is-home'); 
 
@@ -758,7 +754,7 @@ async function querySubstitute(isRefresh = false) {
   try {
     let url = API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber);
     if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
-    const resp = await fetch(url, { headers: getHeaders() });
+    const resp = await fetch(url);
     
     const text = await resp.text();
     let data;
@@ -887,7 +883,7 @@ async function handleFile(file) {
     progressCurrent.textContent = `正在分析：${pn}`;
 
     try {
-      const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn) + '&isBatch=true', { headers: getHeaders() });
+      const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn) + '&isBatch=true');
       const data = await resp.json();
 
       results.push({
