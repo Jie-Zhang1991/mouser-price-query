@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 修复：将原SVG的URL编码改为Base64编码，彻底解决复制导致字符丢失、Logo不显示的问题 -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDA1NEE2Ii8+PHRleHQgeD0iNTAiIHk9Ijc0IiBmb250LXNpemU9IjY4IiBmb250LWZhbWlseT0iTWljcm9zb2Z0IFlhSGVpLHNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCI+6IqvPC90ZXh0Pjwvc3ZnPg==">
 <title>ChipCost</title>
 <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -17,15 +16,13 @@
     display: flex;
     justify-content: center;
     align-items: flex-start; 
-    /* 顶部内边距缩小为 7px */
     padding: 7px 16px 40px;
     transition: padding 0.4s ease;
   }
 
-  /* ===== 首页居中模式 ===== */
   body.is-home {
     align-items: center; 
-    padding-top: 0; /* 首页上方间距不受影响 */
+    padding-top: 0;
     padding-bottom: 80px; 
   }
   
@@ -39,7 +36,6 @@
     transition: width 0.4s ease, margin 0.4s ease;
   }
 
-  /* ===== 查询结果模式 ===== */
   body:not(.is-home) .container {
     max-width: 1200px; 
   }
@@ -47,7 +43,6 @@
     width: 100%; 
   }
 
-  /* 主容器 */
   .container {
     width: 100%; 
     background: transparent; 
@@ -55,7 +50,6 @@
     padding: 40px;
     height: fit-content;
     transition: max-width 0.4s ease, opacity 0.4s ease;
-    
     opacity: 0;
     visibility: hidden;
   }
@@ -65,14 +59,8 @@
   }
 
   h1 { font-size: 32px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: bold; }
-  
-  /* 首页保持 45px 的间距 */
   .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 45px; }
-
-  /* 非首页状态下，副标题下方间距缩短一半（45px -> 22px） */
-  body:not(.is-home) .subtitle {
-    margin-bottom: 22px;
-  }
+  body:not(.is-home) .subtitle { margin-bottom: 22px; }
 
   .search-box { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
   
@@ -122,28 +110,18 @@
   button:hover { background: #2980b9; transform: translateY(-1px); }
   button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
 
-  .batch-btn { 
-    background: #8e44ad; 
-    box-shadow: 0 4px 10px rgba(142,68,173,0.2); 
-  }
+  .batch-btn { background: #8e44ad; box-shadow: 0 4px 10px rgba(142,68,173,0.2); }
   .batch-btn:hover { background: #732d91; }
-
-  .sub-btn { 
-    background: #27ae60; 
-    box-shadow: 0 4px 10px rgba(39,174,96,0.2); 
-  }
+  .sub-btn { background: #27ae60; box-shadow: 0 4px 10px rgba(39,174,96,0.2); }
   .sub-btn:hover { background: #219150; }
 
-  /* 对比表格 */
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px; background: #fff;}
   .compare-table { table-layout: fixed; min-width: 900px; width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
   .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
   .compare-table th { background: #f8f9fa; color: #2c3e50; font-weight: 600; text-align: center; vertical-align: middle; }
   .compare-table tr:last-child td { border-bottom: none; }
-  
   .compare-table th:first-child, .compare-table td:first-child { width: 196px; background: #fafbfc; color: #7f8c8d; font-weight: bold; text-align: left; }
   .compare-table td:not(:first-child) { text-align: left; }
-  
   .sub-pn { font-size: 15px; font-weight: bold; color: #2c3e50; display: block; }
   .copy-btn { display: inline-block; color: #3498db; cursor: pointer; font-size: 12px; font-weight: normal; margin-top: 6px; text-decoration: none; transition: color 0.2s;}
   .copy-btn:hover { text-decoration: underline; }
@@ -159,22 +137,15 @@
     border-radius: 16px; padding: 32px; text-align: center; color: #fff; margin-bottom: 24px;
     box-shadow: 0 10px 20px rgba(102,126,234,0.2);
   }
-  .should-cost-label {
-    font-size: 22px; font-weight: 700; opacity: 0.95;
-    margin-bottom: 12px; letter-spacing: 1.5px;
-  }
+  .should-cost-label { font-size: 22px; font-weight: 700; opacity: 0.95; margin-bottom: 12px; letter-spacing: 1.5px; }
   .should-cost-value { font-size: 52px; font-weight: 800; margin-bottom: 6px; line-height: 1.1; }
-  
   .should-cost-tax { font-size: 16px; opacity: 0.85; margin-top: 6px; }
 
   .info-card {
     border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 20px; background: #fff;
     box-shadow: 0 2px 10px rgba(0,0,0,0.02);
   }
-  .info-title {
-    font-size: 16px; font-weight: 700; color: #2c3e50;
-    margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f1f4f8;
-  }
+  .info-title { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f1f4f8; }
   .info-row { display: flex; padding: 8px 0; font-size: 14px; }
   .info-label { color: #7f8c8d; min-width: 110px; flex-shrink: 0; }
   .info-value { color: #2c3e50; font-weight: 500; }
@@ -192,126 +163,56 @@
   .detail-link { display: block; text-align: center; margin-top: 14px; color: #3498db; text-decoration: none; font-size: 13px; }
   .detail-link:hover { text-decoration: underline; }
 
-  /* ===== 热搜相关样式 ===== */
-  #trending-box {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px dashed #cbd5e1;
-    transition: opacity 0.3s;
-  }
-  .trending-header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
-  }
-  .trending-title {
-    font-size: 18px; font-weight: bold; color: #2c3e50; display: flex; align-items: center; gap: 6px;
-  }
-  .trending-refresh {
-    color: #3498db; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: color 0.2s;
-  }
+  #trending-box { margin-top: 40px; padding-top: 20px; border-top: 1px dashed #cbd5e1; transition: opacity 0.3s; }
+  .trending-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+  .trending-title { font-size: 18px; font-weight: bold; color: #2c3e50; display: flex; align-items: center; gap: 6px; }
+  .trending-refresh { color: #3498db; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
   .trending-refresh:hover { color: #2980b9; }
-  .trending-list {
-    list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px;
-  }
-  /* 修改点：热搜字体缩小一号 (14px -> 13px) */
-  .trending-item {
-    display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #333; transition: color 0.2s;
-  }
+  .trending-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px; }
+  .trending-item { display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #333; transition: color 0.2s; }
   .trending-item:hover { color: #3498db; }
-  /* 修改点：序号字体缩小 (16px -> 15px) */
-  .trending-num {
-    font-size: 15px; font-weight: bold; font-style: italic; width: 24px; text-align: center; margin-right: 10px; color: #999;
-  }
+  .trending-num { font-size: 15px; font-weight: bold; font-style: italic; width: 24px; text-align: center; margin-right: 10px; color: #999; }
   .trending-item:nth-child(1) .trending-num { color: #ff4d4f; }
   .trending-item:nth-child(2) .trending-num { color: #ff7a45; }
   .trending-item:nth-child(3) .trending-num { color: #ffc53d; }
   .trending-text { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.5); z-index: 1000;
-    justify-content: center; align-items: center; padding: 20px;
-  }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
   .modal-overlay.show { display: flex; }
-  
-  /* 修改点：宽度从 600px 放大到 840px (约 1.4 倍) */
-  .modal {
-    background: #fff; border-radius: 16px; padding: 32px;
-    max-width: 840px; width: 100%; max-height: 90vh; overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-  }
-  
+  .modal { background: #fff; border-radius: 16px; padding: 32px; max-width: 840px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
   .modal h2 { font-size: 22px; color: #2c3e50; margin-bottom: 16px; text-align: center; }
-  .notice {
-    background: #fff9e6; border-left: 4px solid #f39c12;
-    padding: 14px 18px; border-radius: 8px; font-size: 13px;
-    color: #7f5f00; line-height: 1.7; margin-bottom: 20px;
-  }
+  .notice { background: #fff9e6; border-left: 4px solid #f39c12; padding: 14px 18px; border-radius: 8px; font-size: 13px; color: #7f5f00; line-height: 1.7; margin-bottom: 20px; }
   .notice strong { color: #d35400; }
-  .drop-zone {
-    border: 2px dashed #bdc3c7; border-radius: 12px;
-    padding: 40px 20px; text-align: center; color: #7f8c8d;
-    cursor: pointer; transition: all 0.3s; margin-bottom: 20px;
-    background: #fafbfc;
-  }
-  .drop-zone:hover, .drop-zone.dragover {
-    border-color: #3498db; background: #f0f7ff; color: #3498db;
-  }
+  .drop-zone { border: 2px dashed #bdc3c7; border-radius: 12px; padding: 40px 20px; text-align: center; color: #7f8c8d; cursor: pointer; transition: all 0.3s; margin-bottom: 20px; background: #fafbfc; }
+  .drop-zone:hover, .drop-zone.dragover { border-color: #3498db; background: #f0f7ff; color: #3498db; }
   .drop-zone-icon { font-size: 42px; margin-bottom: 10px; }
   .drop-zone-text { font-size: 15px; margin-bottom: 6px; }
   .drop-zone-hint { font-size: 12px; color: #95a5a6; }
   .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; }
 
-  .progress-container {
-    border: 1px solid #e0e6ed; border-radius: 12px;
-    padding: 24px; margin-bottom: 20px; background: #fff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-  }
+  .progress-container { border: 1px solid #e0e6ed; border-radius: 12px; padding: 24px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
   .progress-title { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 12px; }
-  .progress-tip {
-    background: #eaf6ff; border-left: 4px solid #3498db;
-    padding: 12px 16px; border-radius: 8px; font-size: 13px;
-    color: #2c5282; line-height: 1.7; margin-bottom: 16px;
-  }
-  .progress-bar-bg {
-    background: #ecf0f1; border-radius: 10px; height: 20px;
-    overflow: hidden; margin-bottom: 12px;
-  }
-  .progress-bar-fill {
-    background: linear-gradient(90deg, #3498db, #2ecc71);
-    height: 100%; width: 0%; transition: width 0.3s;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 12px; font-weight: bold;
-  }
+  .progress-tip { background: #eaf6ff; border-left: 4px solid #3498db; padding: 12px 16px; border-radius: 8px; font-size: 13px; color: #2c5282; line-height: 1.7; margin-bottom: 16px; }
+  .progress-bar-bg { background: #ecf0f1; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 12px; }
+  .progress-bar-fill { background: linear-gradient(90deg, #3498db, #2ecc71); height: 100%; width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: bold; }
   .progress-text { font-size: 13px; color: #7f8c8d; text-align: center; }
-  .progress-current {
-    font-size: 12px; color: #95a5a6; text-align: center;
-    margin-top: 8px; word-break: break-all;
-  }
-  .success-msg {
-    background: #d4edda; border-left: 4px solid #27ae60;
-    padding: 16px; border-radius: 8px; color: #155724;
-    font-size: 14px; margin-bottom: 16px;
-    box-shadow: 0 2px 10px rgba(39,174,96,0.1);
-  }
+  .progress-current { font-size: 12px; color: #95a5a6; text-align: center; margin-top: 8px; word-break: break-all; }
+  .success-msg { background: #d4edda; border-left: 4px solid #27ae60; padding: 16px; border-radius: 8px; color: #155724; font-size: 14px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(39,174,96,0.1); }
 
-  .spinner {
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #8e44ad;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+  .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #8e44ad; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-  /* ===== 新增：右上角用户图标 ===== */
-  .user-profile {
+  .top-right-actions {
     position: fixed;
     top: 20px;
     right: 20px;
+    display: flex;
+    gap: 12px;
+    z-index: 1000;
+  }
+
+  .top-icon-btn {
+    position: relative;
     width: 40px;
     height: 40px;
     background: #fff;
@@ -321,10 +222,11 @@
     align-items: center;
     cursor: pointer;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    z-index: 1000;
     transition: all 0.3s;
   }
-  .user-profile:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+  .top-icon-btn:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+  .top-icon-btn svg { stroke: #2c3e50; }
+
   .user-tooltip {
     position: absolute;
     top: 50px;
@@ -339,9 +241,12 @@
     visibility: hidden;
     transition: all 0.3s;
     pointer-events: none;
+    line-height: 1.6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    text-align: left;
   }
-  .user-profile:hover .user-tooltip,
-  .user-profile.show .user-tooltip {
+  .top-icon-btn:hover .user-tooltip,
+  .top-icon-btn.show .user-tooltip {
     opacity: 1;
     visibility: visible;
     top: 45px;
@@ -366,13 +271,23 @@
   document.title = 'ChipCost - AI分析芯片成本';
 </script>
 
-<!-- 新增：右上角用户图标 -->
-<div class="user-profile" id="userProfile">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-    <circle cx="12" cy="7" r="4"></circle>
-  </svg>
-  <div class="user-tooltip" id="userTooltip">加载中...</div>
+<div class="top-right-actions">
+  <div class="top-icon-btn" id="statsProfile">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10"></line>
+      <line x1="12" y1="20" x2="12" y2="4"></line>
+      <line x1="6" y1="20" x2="6" y2="14"></line>
+    </svg>
+    <div class="user-tooltip" id="statsTooltip" style="min-width: 180px;">加载用量中...</div>
+  </div>
+
+  <div class="top-icon-btn" id="userProfile">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+    <div class="user-tooltip" id="userTooltip">加载中...</div>
+  </div>
 </div>
 
 <div class="container" id="main-container">
@@ -397,7 +312,6 @@
   <div id="substitute-result"></div>
   <div id="result"></div>
 
-  <!-- 热门话题区域 -->
   <div id="trending-box">
     <div class="trending-header">
       <div class="trending-title">🔥 芯片热门话题</div>
@@ -453,7 +367,23 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
-// ===== 热搜加载函数 =====
+async function fetchStats() {
+  const tooltip = document.getElementById('statsTooltip');
+  try {
+    const resp = await fetch(API_URL + '?action=stats');
+    const data = await resp.json();
+    if (data.status === 'success') {
+      tooltip.innerHTML = `<div><strong>API额度使用情况</strong></div>
+        <div style="margin-top:4px;">当日API额度：${data.todayCount}/${data.dailyQuota}次</div>
+        <div>本月API已调用：${data.monthCount}次</div>`;
+    } else {
+      tooltip.textContent = '获取用量失败';
+    }
+  } catch (e) {
+    tooltip.textContent = '网络异常，无法获取';
+  }
+}
+
 async function fetchTrending(isRefresh = false) {
   const listContainer = document.getElementById('trending-list');
   
@@ -492,7 +422,6 @@ async function fetchTrending(isRefresh = false) {
   }
 }
 
-// ===== 工具函数 =====
 function formatPartNumber(displayPn, searchPn) {
   if (!displayPn) return '-';
   const a = String(displayPn).trim().toLowerCase();
@@ -564,7 +493,6 @@ document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
 
-// ===== 获取 Cloudflare Access 邮箱 =====
 function getUserEmail() {
   const cookies = document.cookie.split(';');
   let token = null;
@@ -589,32 +517,37 @@ function getUserEmail() {
   }
 }
 
-// 初始化时，先等待热门话题加载完，再显示整个界面
 window.addEventListener('DOMContentLoaded', async () => {
-  // 初始化用户邮箱显示
-  const tooltip = document.getElementById('userTooltip');
-  if (tooltip) {
-    tooltip.textContent = getUserEmail();
+  const userTooltip = document.getElementById('userTooltip');
+  if (userTooltip) {
+    userTooltip.textContent = getUserEmail();
   }
 
+  fetchStats();
   await fetchTrending();
   document.getElementById('main-container').classList.add('loaded');
 });
 
-// 支持点击图标也能切换显示
-document.getElementById('userProfile').addEventListener('click', function(e) {
+const statsProfile = document.getElementById('statsProfile');
+const userProfile = document.getElementById('userProfile');
+
+statsProfile.addEventListener('click', function(e) {
   e.stopPropagation();
+  userProfile.classList.remove('show');
   this.classList.toggle('show');
 });
-// 点击空白处隐藏
-document.addEventListener('click', function() {
-  const profile = document.getElementById('userProfile');
-  if (profile.classList.contains('show')) {
-    profile.classList.remove('show');
-  }
+
+userProfile.addEventListener('click', function(e) {
+  e.stopPropagation();
+  statsProfile.classList.remove('show');
+  this.classList.toggle('show');
 });
 
-// ===== 单件查询 =====
+document.addEventListener('click', function() {
+  statsProfile.classList.remove('show');
+  userProfile.classList.remove('show');
+});
+
 async function query() {
   document.body.classList.remove('is-home'); 
 
@@ -624,7 +557,6 @@ async function query() {
   const subDiv = document.getElementById('substitute-result');
   const partNumber = input.value.trim();
 
-  // 输入为空时，清空另一个区域，只保留一个提示
   if (!partNumber) {
     subDiv.innerHTML = '';
     resultDiv.innerHTML = '<div class="error">请输入芯片型号</div>';
@@ -633,7 +565,6 @@ async function query() {
 
   subDiv.innerHTML = '';
   currentAlternatives = [];
-  
   trendingBox.style.display = 'none';
 
   btn.disabled = true;
@@ -784,7 +715,6 @@ async function query() {
   }
 }
 
-// ===== 替代型号查询 =====
 async function querySubstitute(isRefresh = false) {
   if (!isRefresh) {
     document.body.classList.remove('is-home'); 
@@ -796,7 +726,6 @@ async function querySubstitute(isRefresh = false) {
   const priceDiv = document.getElementById('result');
   const partNumber = input.value.trim();
 
-  // 输入为空时，清空另一个区域，只保留一个提示
   if (!partNumber) {
     priceDiv.innerHTML = '';
     subDiv.innerHTML = '<div class="error">请输入芯片型号</div>';
