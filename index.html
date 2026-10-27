@@ -8,6 +8,9 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  /* 全局禁用选中和光标，输入框和结果区除外 */
+  body { user-select: none; }
 
   body {
     font-family: -apple-system, "Microsoft YaHei", sans-serif;
@@ -19,6 +22,8 @@
     padding: 7px 16px 40px;
     transition: padding 0.4s ease;
   }
+
+  input[type="text"], #result, #substitute-result { user-select: text; }
 
   body.is-home { align-items: center; padding-top: 0; padding-bottom: 80px; }
   body.is-home .container { max-width: 850px; }
@@ -41,6 +46,7 @@
   input[type="text"] {
     flex: 1; padding: 16px 24px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 12px; outline: none;
     transition: border-color 0.3s, box-shadow 0.3s; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    cursor: text;
   }
   input[type="text"]:focus { border-color: #3498db; box-shadow: 0 4px 15px rgba(52,152,219,0.15); }
 
@@ -50,7 +56,7 @@
   .clear-btn {
     display: none; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
     width: 22px; height: 22px; border-radius: 50%; background: #c0c7ce;
-    align-items: center; justify-content: center; cursor: pointer; user-select: none;
+    align-items: center; justify-content: center; cursor: pointer;
   }
   .clear-btn:hover { background: #95a5a6; }
   .clear-btn.show { display: flex; }
@@ -59,6 +65,7 @@
     padding: 14px 20px; font-size: 15px; background: #3498db; color: #fff;
     border: none; border-radius: 12px; cursor: pointer; font-weight: bold;
     transition: background 0.3s, transform 0.2s; white-space: nowrap; box-shadow: 0 4px 10px rgba(52,152,219,0.2);
+    outline: none;
   }
   button:hover { background: #2980b9; transform: translateY(-1px); }
   button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
@@ -154,7 +161,16 @@
   .top-icon-btn:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
   .top-icon-btn svg { stroke: #2c3e50; }
 
-  .user-tooltip { position: absolute; top: 50px; right: 0; background: #2c3e50; color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.3s; pointer-events: none; line-height: 1.8; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: left; }
+  /* 统一改为白底黑字 */
+  .user-tooltip { 
+    position: absolute; top: 50px; right: 0; 
+    background: #fff; 
+    color: #2c3e50; 
+    border: 1px solid #e0e6ed;
+    padding: 10px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap; 
+    opacity: 0; visibility: hidden; transition: all 0.3s; pointer-events: none; line-height: 1.8; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15); text-align: left; 
+  }
   .top-icon-btn:hover .user-tooltip, .top-icon-btn.show .user-tooltip { opacity: 1; visibility: visible; top: 45px; }
 
   .admin-menu { position: absolute; top: 50px; right: 0; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 8px 0; min-width: 170px; opacity: 0; visibility: hidden; transition: all 0.3s; border: 1px solid #e0e6ed; z-index: 1001; }
@@ -332,11 +348,13 @@ async function fetchStats() {
     const resp = await fetch(API_URL + '?action=stats', { headers: getHeaders() });
     const data = await resp.json();
     if (data.status === 'success') {
+      // 大于 900 将分子变为红色，否则保持蓝色
+      const quotaColor = data.todayQuota > 900 ? '#e74c3c' : '#3498db';
       tooltip.innerHTML = `<div><strong>数据统计</strong></div>
-        <div style="margin-top:4px;">今日芯片查询次数：${data.todayChipQuery}次</div>
-        <div>累计芯片查询次数：${data.totalChipQuery}次</div>
-        <div style="margin-top:4px;">今日芯片代理平台API额度：${data.todayQuota}/1000</div>
-        <div>累计API调用次数：${data.totalApiCall}次</div>`;
+        <div style="margin-top:4px;">今日芯片查询次数：<span style="color:#3498db; font-weight:bold;">${data.todayChipQuery}</span>次</div>
+        <div>累计芯片查询次数：<span style="color:#3498db; font-weight:bold;">${data.totalChipQuery}</span>次</div>
+        <div style="margin-top:4px;">今日芯片代理平台API额度：<span style="color:${quotaColor}; font-weight:bold;">${data.todayQuota}</span><span style="color:#2c3e50; font-weight:bold;">/1000</span></div>
+        <div>累计API调用次数：<span style="color:#3498db; font-weight:bold;">${data.totalApiCall}</span>次</div>`;
     } else {
       tooltip.textContent = '获取用量失败';
     }
@@ -469,7 +487,9 @@ document.getElementById('partInput').addEventListener('keydown', function(e) { i
 
 window.addEventListener('DOMContentLoaded', async () => {
   currentUserEmail = getUserEmail();
-  document.getElementById('userTooltip').textContent = currentUserEmail;
+  
+  // 增加“当前用户”标题，邮箱使用蓝色加粗
+  document.getElementById('userTooltip').innerHTML = `<div><strong>当前用户</strong></div><div style="margin-top:4px; color:#3498db; font-weight:bold;">${currentUserEmail}</div>`;
 
   // 判断管理员权限，如果是超级管理员，显示管理员菜单，隐藏无权限提示
   if (currentUserEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
