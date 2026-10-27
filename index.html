@@ -517,10 +517,8 @@ async function fetchTrending(isRefresh = false) {
 async function clearAllStats() {
   if (!confirm('确定要清空所有数据统计吗？此操作不可恢复！')) return;
   try {
-    // 修复点：附带 X-User-Email 以确保后端能够识别管理员
-    const resp = await fetch(API_URL + '?action=admin_clear_stats', {
-      headers: { 'X-User-Email': currentUserEmail }
-    });
+    // 修改：通过 URL 参数传递邮箱
+    const resp = await fetch(API_URL + '?action=admin_clear_stats&userEmail=' + encodeURIComponent(currentUserEmail));
     const result = await resp.json();
     if (result.status === 'success') {
       alert('数据统计已成功清空！');
@@ -536,10 +534,8 @@ async function clearAllStats() {
 // ===== 管理员功能：下载用户使用情况 =====
 async function downloadUserStats() {
   try {
-    // 修复点：附带 X-User-Email 以确保后端能够识别管理员
-    const resp = await fetch(API_URL + '?action=admin_get_user_stats', {
-      headers: { 'X-User-Email': currentUserEmail }
-    });
+    // 修改：通过 URL 参数传递邮箱
+    const resp = await fetch(API_URL + '?action=admin_get_user_stats&userEmail=' + encodeURIComponent(currentUserEmail));
     const result = await resp.json();
     if (result.status !== 'success') {
       alert('下载失败：' + (result.error || '无权限'));
@@ -664,7 +660,8 @@ async function query() {
   btn.disabled = true; btn.textContent = '分析中...'; resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
 
   try {
-    const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(partNumber));
+    // 修改：通过 URL 参数传递邮箱
+    const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(partNumber) + '&userEmail=' + encodeURIComponent(currentUserEmail));
     const data = await resp.json();
     if (!resp.ok) { resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>'; trendingBox.style.display = 'block'; return; }
     if (!data.shouldCost) { resultDiv.innerHTML = '<div class="error">抱歉，未检索到任何价格信息。</div>'; trendingBox.style.display = 'block'; return; }
@@ -756,7 +753,8 @@ async function querySubstitute(isRefresh = false) {
   let excludeStr = (isRefresh && currentAlternatives.length > 0) ? currentAlternatives.map(alt => alt.part_number).join(',') : "";
 
   try {
-    let url = API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber);
+    // 修改：通过 URL 参数传递邮箱
+    let url = API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber) + '&userEmail=' + encodeURIComponent(currentUserEmail);
     if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
     const resp = await fetch(url);
     
@@ -887,7 +885,8 @@ async function handleFile(file) {
     progressCurrent.textContent = `正在分析：${pn}`;
 
     try {
-      const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn) + '&isBatch=true');
+      // 修改：通过 URL 参数传递邮箱
+      const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn) + '&isBatch=true&userEmail=' + encodeURIComponent(currentUserEmail));
       const data = await resp.json();
 
       results.push({
