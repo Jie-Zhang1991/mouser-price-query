@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -212,11 +212,11 @@
     list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px;
   }
   .trending-item {
-    display: flex; align-items: center; cursor: pointer; font-size: 14px; color: #333; transition: color 0.2s;
+    display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #333; transition: color 0.2s;
   }
   .trending-item:hover { color: #3498db; }
   .trending-num {
-    font-size: 16px; font-weight: bold; font-style: italic; width: 24px; text-align: center; margin-right: 10px; color: #999;
+    font-size: 15px; font-weight: bold; font-style: italic; width: 24px; text-align: center; margin-right: 10px; color: #999;
   }
   .trending-item:nth-child(1) .trending-num { color: #ff4d4f; }
   .trending-item:nth-child(2) .trending-num { color: #ff7a45; }
@@ -304,6 +304,46 @@
     100% { transform: rotate(360deg); }
   }
 
+  /* ===== 新增：用户图标及提示框 ===== */
+  .user-profile {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transition: all 0.3s;
+  }
+  .user-profile:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+  .user-tooltip {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: #2c3e50;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  .user-profile:hover .user-tooltip,
+  .user-profile.show .user-tooltip {
+    opacity: 1;
+    visibility: visible;
+    top: 45px;
+  }
+
   @media (max-width: 800px) {
     body { padding: 20px 12px; }
     body.is-home { padding-top: 20px; align-items: flex-start; } 
@@ -322,6 +362,15 @@
 <script>
   document.title = 'ChipCost - AI分析芯片成本';
 </script>
+
+<!-- 新增：右上角用户图标 -->
+<div class="user-profile" id="userProfile">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+  </svg>
+  <div class="user-tooltip" id="userTooltip">加载中...</div>
+</div>
 
 <div class="container" id="main-container">
   <h1>ChipCost 芯片成本</h1>
@@ -388,7 +437,7 @@ if (location.hostname === 'chipcost.space') {
 
 const API_URL = 'https://chipcost.space';
 const MAX_BATCH = 100;
-const QUERY_INTERVAL_MS = 1500;
+const QUERY_INTERVAL_MS = 2500;
 
 let currentAlternatives = [];
 let currentTopics = [];
@@ -512,10 +561,54 @@ document.getElementById('partInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') query();
 });
 
+// ===== 获取 Cloudflare Access 邮箱 =====
+function getUserEmail() {
+  const cookies = document.cookie.split(';');
+  let token = null;
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim();
+    if (cookie.startsWith('CF_Authorization=')) {
+      token = cookie.substring('CF_Authorization='.length, cookie.length);
+      break;
+    }
+  }
+  if (!token) return '未获取到登录信息';
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    const payload = JSON.parse(jsonPayload);
+    return payload.email || '未找到邮箱';
+  } catch (e) {
+    return '解析登录信息失败';
+  }
+}
+
 // 初始化时，先等待热门话题加载完，再显示整个界面
 window.addEventListener('DOMContentLoaded', async () => {
+  // 初始化用户邮箱显示
+  const tooltip = document.getElementById('userTooltip');
+  if (tooltip) {
+    tooltip.textContent = getUserEmail();
+  }
+
   await fetchTrending();
   document.getElementById('main-container').classList.add('loaded');
+});
+
+// 支持点击图标也能切换显示
+document.getElementById('userProfile').addEventListener('click', function(e) {
+  e.stopPropagation();
+  this.classList.toggle('show');
+});
+// 点击空白处隐藏
+document.addEventListener('click', function() {
+  const profile = document.getElementById('userProfile');
+  if (profile.classList.contains('show')) {
+    profile.classList.remove('show');
+  }
 });
 
 // ===== 单件查询 =====
@@ -940,7 +1033,7 @@ async function handleFile(file) {
     <div class="progress-container">
       <div class="progress-title">批量分析进行中</div>
       <div class="progress-tip">
-        💡 <strong>温馨提示：</strong>批量分析需要为每个芯片型号依次调用芯片网站与AI 接口，为保证 API 稳定性，每个型号之间至少有 1.5 秒以上的时间间隔。整个过程可能需要数分钟，请耐心等待，不要关闭或刷新页面。
+        💡 <strong>温馨提示：</strong>批量分析需要为每个芯片型号依次调用芯片网站与AI 接口，为保证 API 稳定性，每个型号之间至少有 2.5 秒以上的时间间隔。整个过程可能需要数分钟，请耐心等待，不要关闭或刷新页面。
         ${truncated ? '<br><br>⚠️ 文件中共有 ' + partNumbers.length + ' 个型号，超出单次上限，本次仅分析前 ' + MAX_BATCH + ' 个。' : ''}
       </div>
       <div class="progress-bar-bg">
