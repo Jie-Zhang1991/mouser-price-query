@@ -181,7 +181,8 @@
   .admin-menu-item:hover { background: #f0f7ff; color: #3498db; }
 
   /* 页脚样式 */
-  .footer { position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 11px; color: #7f8c8d; }
+  .footer { position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 11px; color: #7f8c8d; opacity: 0; visibility: hidden; transition: opacity 0.4s ease; }
+  .footer.loaded { opacity: 1; visibility: visible; }
   .footer span { cursor: pointer; margin: 0 10px; transition: color 0.2s; }
   .footer span:hover { color: #3498db; text-decoration: underline; }
 
@@ -288,7 +289,7 @@
 </div>
 
 <!-- 页脚区域 -->
-<div class="footer">
+<div class="footer" id="footer">
   <span onclick="openModal('termsModal')">使用ChipCost前必读</span>
   |
   <span onclick="openModal('privacyModal')">隐私政策</span>
@@ -305,7 +306,7 @@
       <p>ChipCost 是一款基于 AI 大模型的芯片价格预测与竞品分析工具。输入芯片型号后，系统会并发查询得捷（DigiKey）、贸泽（Mouser）、立创商城（LCSC）的 1000pcs 阶梯报价，并结合 DeepSeek 的语义分析与底层业务系数，为您计算出最终的 "Should Cost" 推荐成本。</p>
       
       <h3>二、 API 额度与性能说明</h3>
-      <p>受限于底层数据供应商与大模型接口的频率限制，平台每日设置了固定的全局调用额度（如：每日1000次）。同时，为防止接口被封禁，单次批量分析最多支持 100 个型号，且每个型号之间设置了至少 2.5 秒的请求延迟。如遇系统提示“API超限”或“未查询到”，请稍后或次日再试。</p>
+      <p>网站使用过程涉及芯片代理平台、Deepseek大模型、汇率接口等多个API，受限于底层数据供应商与大模型接口的频率限制，平台每日设置了固定的全局调用额度（如：每日1000次）。同时，为防止接口被封禁，单次批量分析最多支持 100 个型号，且每个型号之间设置了至少 2.5 秒的请求延迟。如遇系统提示“API超限”或“未查询到”，请稍后或次日再试。</p>
       
       <h3>三、 免责声明</h3>
       <ul>
@@ -616,6 +617,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   fetchStats();
   await fetchTrending();
   document.getElementById('main-container').classList.add('loaded');
+  document.getElementById('footer').classList.add('loaded'); // 页脚同步显示
 });
 
 const statsProfile = document.getElementById('statsProfile');
@@ -695,6 +697,7 @@ async function query() {
     trendingBox.style.display = 'block'; 
   } finally {
     btn.disabled = false; btn.textContent = '单件查询';
+    fetchStats(); // 刷新统计数据
   }
 }
 
@@ -796,6 +799,7 @@ async function querySubstitute(isRefresh = false) {
     else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">网络异常，请稍后重试</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
   } finally {
     if (!isRefresh) { btn.disabled = false; btn.textContent = '替代型号'; }
+    fetchStats(); // 刷新统计数据
   }
 }
 
@@ -876,6 +880,9 @@ async function handleFile(file) {
 
     const pct = Math.round(((i + 1) / total) * 100);
     progressFill.style.width = pct + '%'; progressFill.textContent = pct + '%';
+    
+    fetchStats(); // 每查完一个型号刷新统计数据
+
     if (i < list.length - 1) await new Promise(r => setTimeout(r, QUERY_INTERVAL_MS));
   }
 
