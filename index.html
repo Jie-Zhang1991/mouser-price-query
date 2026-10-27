@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDA1NEE2Ii8+PHRleHQgeD0iNTAiIHk9Ijc0IiBmb250LXNpemU9IjY4IiBmb250LWZhbWlseT0iTWljcm9zb2Z0IFlhSGVpLHNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCI+6IqvPC90ZXh0Pjwvc3ZnPg==">
 <title>ChipCost</title>
-<script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- 修改点：彻底移除 xlsx 库的外部加载，改为按需加载 -->
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   
@@ -176,8 +176,8 @@
     color: #2c3e50; 
     border: 1px solid #e0e6ed;
     padding: 10px 14px; border-radius: 8px; font-size: 13px; 
-    white-space: nowrap; 
-    width: max-content; /* 确保卡片宽度自适应内容，不折行 */
+    white-space: nowrap;
+    width: max-content;
     opacity: 0; visibility: hidden; transition: all 0.3s; pointer-events: none; line-height: 1.8; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.15); text-align: left; 
   }
@@ -204,7 +204,6 @@
   @media (max-width: 800px) {
     body { padding: 20px 12px; }
     body.is-home { padding-top: 45px; align-items: flex-start; } 
-    /* 修改点：针对非首页状态，下移 5px (38px + 5px = 43px) */
     body:not(.is-home) { padding-top: 43px; } 
     .container { padding: 20px; }
     h1 { font-size: 26px; }
@@ -423,6 +422,24 @@ let currentAlternatives = [];
 let currentTopics = [];
 let currentUserEmail = '';
 
+// 动态加载 XLSX 库
+let xlsxPromise = null;
+function loadXlsxLibrary() {
+  if (window.XLSX) return Promise.resolve();
+  if (xlsxPromise) return xlsxPromise;
+  xlsxPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    script.onload = resolve;
+    script.onerror = () => {
+      xlsxPromise = null;
+      reject(new Error('加载 XLSX 库失败'));
+    };
+    document.head.appendChild(script);
+  });
+  return xlsxPromise;
+}
+
 function escapeHtml(str) {
   return String(str == null ? "" : str)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -441,7 +458,7 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   });
 });
 
-// 修改：增强了邮箱解析失败的降级策略
+// 邮箱解析失败降级策略
 function getUserEmail() {
   const cookies = document.cookie.split(';');
   let token = null;
@@ -496,6 +513,17 @@ async function fetchStats() {
   }
 }
 
+// 渲染热搜列表
+function renderTrendingList(topics) {
+  const listContainer = document.getElementById('trending-list');
+  let html = '';
+  topics.forEach((topic, index) => {
+    const searchUrl = 'https://www.baidu.com/s?wd=' + encodeURIComponent(topic);
+    html += `<li class="trending-item" onclick="window.open('${searchUrl}', '_blank')"><span class="trending-num">${index + 1}</span><span class="trending-text">${escapeHtml(topic)}</span></li>`;
+  });
+  listContainer.innerHTML = html;
+}
+
 async function fetchTrending(isRefresh = false) {
   const listContainer = document.getElementById('trending-list');
   if (isRefresh) listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">正在更新热门话题...</li>';
@@ -509,12 +537,13 @@ async function fetchTrending(isRefresh = false) {
 
     if (data.status === 'success' && data.topics && data.topics.length > 0) {
       currentTopics = data.topics;
-      let html = '';
-      data.topics.forEach((topic, index) => {
-        const searchUrl = 'https://www.baidu.com/s?wd=' + encodeURIComponent(topic);
-        html += `<li class="trending-item" onclick="window.open('${searchUrl}', '_blank')"><span class="trending-num">${index + 1}</span><span class="trending-text">${escapeHtml(topic)}</span></li>`;
-      });
-      listContainer.innerHTML = html;
+      renderTrendingList(currentTopics);
+      
+      // 如果是正常加载（非换一换），则存入缓存
+      if (!isRefresh) {
+        localStorage.setItem('trending_cache', JSON.stringify(currentTopics));
+        localStorage.setItem('trending_time', Date.now().toString());
+      }
     } else {
       listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">暂无话题，请稍后重试</li>';
     }
@@ -543,6 +572,9 @@ async function clearAllStats() {
 // ===== 管理员功能：下载用户使用情况 =====
 async function downloadUserStats() {
   try {
+    // 点击下载时，确保 XLSX 库已加载
+    await loadXlsxLibrary();
+
     const resp = await fetch(API_URL + '?action=admin_get_user_stats&userEmail=' + encodeURIComponent(currentUserEmail));
     const result = await resp.json();
     if (result.status !== 'success') {
@@ -575,7 +607,7 @@ async function downloadUserStats() {
     a.href = url; a.download = outFileName;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   } catch (e) {
-    alert('网络异常，下载失败。');
+    alert('生成或下载文件失败，请检查网络。');
   }
 }
 
@@ -633,12 +665,24 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   fetchStats();
 
-  // 限制热搜加载最多等待3秒
-  const timeoutPromise = new Promise(resolve => setTimeout(resolve, 3000));
-  await Promise.race([fetchTrending(), timeoutPromise]);
-
-  document.getElementById('main-container').classList.add('loaded');
-  document.getElementById('footer').classList.add('loaded'); // 页脚同步显示
+  // 热搜缓存判断逻辑（修改为 4 小时缓存）
+  const cachedTrending = localStorage.getItem('trending_cache');
+  const cachedTime = localStorage.getItem('trending_time');
+  const now = Date.now();
+  
+  if (cachedTrending && cachedTime && (now - parseInt(cachedTime) < 4 * 60 * 60 * 1000)) {
+    // 4小时内的有效缓存，瞬间渲染，且直接展示页面
+    currentTopics = JSON.parse(cachedTrending);
+    renderTrendingList(currentTopics);
+    document.getElementById('main-container').classList.add('loaded');
+    document.getElementById('footer').classList.add('loaded');
+  } else {
+    // 无有效缓存，走原来的逻辑（最多等3秒）
+    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 3000));
+    await Promise.race([fetchTrending(), timeoutPromise]);
+    document.getElementById('main-container').classList.add('loaded');
+    document.getElementById('footer').classList.add('loaded');
+  }
 });
 
 const statsProfile = document.getElementById('statsProfile');
@@ -834,7 +878,11 @@ async function querySubstitute(isRefresh = false) {
 }
 
 // 批量分析
-function openBatchModal() { document.getElementById('batchModal').classList.add('show'); }
+function openBatchModal() { 
+  document.getElementById('batchModal').classList.add('show'); 
+  // 在用户点击批量分析打开弹窗时，后台静默预加载 XLSX 库
+  loadXlsxLibrary().catch(e => console.error("预加载 XLSX 失败:", e));
+}
 function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
 
 const dropZone = document.getElementById('dropZone');
@@ -856,6 +904,15 @@ async function handleFile(file) {
   const subDiv = document.getElementById('substitute-result'); 
 
   subDiv.innerHTML = ''; currentAlternatives = []; trendingBox.style.display = 'none'; 
+
+  // 解析前确保 XLSX 库已加载完毕
+  try {
+    await loadXlsxLibrary();
+  } catch (e) {
+    resultDiv.innerHTML = '<div class="error">Excel 解析组件加载失败，请检查网络后重试。</div>';
+    trendingBox.style.display = 'block';
+    return;
+  }
 
   let workbook;
   try { workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' }); } catch (e) { resultDiv.innerHTML = '<div class="error">文件解析失败，请确认是有效的 Excel 文件</div>'; trendingBox.style.display = 'block'; return; }
