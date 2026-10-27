@@ -21,9 +21,10 @@
     align-items: flex-start; 
     padding: 7px 16px 40px;
     transition: padding 0.4s ease;
+    position: relative;
   }
 
-  input[type="text"], #result, #substitute-result { user-select: text; }
+  input[type="text"], #result, #substitute-result, .modal { user-select: text; }
 
   body.is-home { align-items: center; padding-top: 0; padding-bottom: 80px; }
   body.is-home .container { max-width: 850px; }
@@ -141,7 +142,7 @@
   .drop-zone-icon { font-size: 42px; margin-bottom: 10px; }
   .drop-zone-text { font-size: 15px; margin-bottom: 6px; }
   .drop-zone-hint { font-size: 12px; color: #95a5a6; }
-  .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; }
+  .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
 
   .progress-container { border: 1px solid #e0e6ed; border-radius: 12px; padding: 24px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
   .progress-title { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 12px; }
@@ -161,13 +162,14 @@
   .top-icon-btn:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
   .top-icon-btn svg { stroke: #2c3e50; }
 
-  /* 统一改为白底黑字 */
   .user-tooltip { 
     position: absolute; top: 50px; right: 0; 
     background: #fff; 
     color: #2c3e50; 
     border: 1px solid #e0e6ed;
-    padding: 10px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap; 
+    padding: 10px 14px; border-radius: 8px; font-size: 13px; 
+    white-space: nowrap; 
+    width: max-content; /* 确保卡片宽度自适应内容，不折行 */
     opacity: 0; visibility: hidden; transition: all 0.3s; pointer-events: none; line-height: 1.8; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.15); text-align: left; 
   }
@@ -177,6 +179,18 @@
   .top-icon-btn.show .admin-menu { opacity: 1; visibility: visible; top: 45px; }
   .admin-menu-item { padding: 10px 16px; font-size: 14px; color: #2c3e50; cursor: pointer; transition: background 0.2s; text-align: left; display: flex; align-items: center; gap: 8px; }
   .admin-menu-item:hover { background: #f0f7ff; color: #3498db; }
+
+  /* 页脚样式 */
+  .footer { position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 13px; color: #7f8c8d; }
+  .footer span { cursor: pointer; margin: 0 10px; transition: color 0.2s; }
+  .footer span:hover { color: #3498db; text-decoration: underline; }
+
+  /* 声明内容样式 */
+  .statement-content { font-size: 14px; color: #333; line-height: 1.8; }
+  .statement-content h3 { font-size: 15px; color: #2c3e50; margin-top: 16px; margin-bottom: 8px; }
+  .statement-content p { margin-bottom: 10px; }
+  .statement-content ul { padding-left: 20px; margin-bottom: 10px; }
+  .statement-content li { margin-bottom: 6px; }
 
   @media (max-width: 800px) {
     body { padding: 20px 12px; }
@@ -214,7 +228,7 @@
       <line x1="12" y1="20" x2="12" y2="4"></line>
       <line x1="6" y1="20" x2="6" y2="14"></line>
     </svg>
-    <div class="user-tooltip" id="statsTooltip" style="min-width: 220px;">数据统计加载中...</div>
+    <div class="user-tooltip" id="statsTooltip">数据统计加载中...</div>
   </div>
 
   <!-- 3. 设置齿轮图标 -->
@@ -273,6 +287,55 @@
   </div>
 </div>
 
+<!-- 页脚区域 -->
+<div class="footer">
+  <span onclick="openModal('termsModal')">使用ChipCost前必读</span>
+  |
+  <span onclick="openModal('contactModal')">联系我们</span>
+</div>
+
+<!-- 免责声明与使用条款弹窗 -->
+<div class="modal-overlay" id="termsModal">
+  <div class="modal">
+    <h2>使用ChipCost前必读</h2>
+    <div class="statement-content">
+      <h3>一、 产品使用介绍</h3>
+      <p>ChipCost 是一款基于 AI 大模型的芯片价格预测与竞品分析工具。输入芯片型号后，系统会并发查询得捷（DigiKey）、贸泽（Mouser）、立创商城（LCSC）的 1000pcs 阶梯报价，并结合 DeepSeek 的语义分析与底层业务系数，为您计算出最终的 "Should Cost" 推荐成本。</p>
+      
+      <h3>二、 API 额度与性能说明</h3>
+      <p>受限于底层数据供应商与大模型接口的频率限制，平台每日设置了固定的全局调用额度（如：1000次）。同时，为防止接口被封禁，单次批量分析最多支持 100 个型号，且每个型号之间设置了至少 2.5 秒的请求延迟。如遇系统提示“API超限”或“未查询到”，请稍后或次日再试。</p>
+      
+      <h3>三、 免责声明</h3>
+      <ul>
+        <li><strong>数据来源</strong>：本平台展示的所有价格、参数、分类及 AI 推荐理由，均来源于第三方公开数据接口及大模型自动生成，仅供参考。</li>
+        <li><strong>准确性免责</strong>：由于汇率波动、供应商库存变化、AI幻觉等因素，本站不保证数据的绝对准确性、及时性与完整性。任何基于本数据做出的采购、交易或生产决策，由用户自行承担风险，本站不承担任何连带法律责任。</li>
+        <li><strong>服务中断免责</strong>：因不可抗力、第三方接口故障、云服务商宕机或网络攻击导致的服务不可用，本站不承担赔偿责任。</li>
+        <li><strong>使用规范</strong>：严禁使用爬虫脚本、自动化工具恶意刷取接口数据。一经发现，管理员有权直接封禁您的访问权限。</li>
+      </ul>
+      <p style="margin-top: 20px; font-size: 12px; color: #999; text-align: right;">更新日期：2026年10月</p>
+    </div>
+    <div class="modal-buttons">
+      <button style="background:#3498db;" onclick="closeModal('termsModal')">我已知晓并同意</button>
+    </div>
+  </div>
+</div>
+
+<!-- 联系我们弹窗 -->
+<div class="modal-overlay" id="contactModal">
+  <div class="modal" style="max-width: 500px;">
+    <h2>联系我们</h2>
+    <div class="statement-content" style="text-align: center; padding: 20px 0;">
+      <p style="font-size: 16px; margin-bottom: 20px;">如果您在使用过程中遇到任何问题，或对网站有功能建议与 Bug 反馈，欢迎随时通过以下邮箱联系我。</p>
+      <p style="font-size: 20px; font-weight: bold; color: #3498db; margin-bottom: 30px;">Jie18_Zhang@SAIC-GM.com</p>
+      <p style="color: #7f8c8d; font-size: 13px;">感谢您的支持与理解！</p>
+    </div>
+    <div class="modal-buttons" style="justify-content: center;">
+      <button style="background:#95a5a6;" onclick="closeModal('contactModal')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 批量分析弹窗 -->
 <div class="modal-overlay" id="batchModal">
   <div class="modal">
     <h2>批量分析 BOM 文件</h2>
@@ -313,6 +376,19 @@ function escapeHtml(str) {
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+// 打开/关闭通用弹窗
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// 点击遮罩层关闭弹窗
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('show');
+    }
+  });
+});
+
 function getUserEmail() {
   const cookies = document.cookie.split(';');
   let token = null;
@@ -348,12 +424,11 @@ async function fetchStats() {
     const resp = await fetch(API_URL + '?action=stats', { headers: getHeaders() });
     const data = await resp.json();
     if (data.status === 'success') {
-      // 大于 900 将分子变为红色，否则保持蓝色
       const quotaColor = data.todayQuota > 900 ? '#e74c3c' : '#3498db';
       tooltip.innerHTML = `<div><strong>数据统计</strong></div>
         <div style="margin-top:4px;">今日芯片查询次数：<span style="color:#3498db; font-weight:bold;">${data.todayChipQuery}</span>次</div>
         <div>累计芯片查询次数：<span style="color:#3498db; font-weight:bold;">${data.totalChipQuery}</span>次</div>
-        <div style="margin-top:4px;">今日芯片代理平台API额度：<span style="color:${quotaColor}; font-weight:bold;">${data.todayQuota}</span><span style="color:#2c3e50; font-weight:bold;">/1000</span></div>
+        <div style="margin-top:4px;">今日芯片代理平台API已用额度：<span style="color:${quotaColor}; font-weight:bold;">${data.todayQuota}</span><span style="color:#2c3e50; font-weight:bold;">/1000</span></div>
         <div>累计API调用次数：<span style="color:#3498db; font-weight:bold;">${data.totalApiCall}</span>次</div>`;
     } else {
       tooltip.textContent = '获取用量失败';
@@ -488,10 +563,8 @@ document.getElementById('partInput').addEventListener('keydown', function(e) { i
 window.addEventListener('DOMContentLoaded', async () => {
   currentUserEmail = getUserEmail();
   
-  // 增加“当前用户”标题，邮箱使用蓝色加粗
   document.getElementById('userTooltip').innerHTML = `<div><strong>当前用户</strong></div><div style="margin-top:4px; color:#3498db; font-weight:bold;">${currentUserEmail}</div>`;
 
-  // 判断管理员权限，如果是超级管理员，显示管理员菜单，隐藏无权限提示
   if (currentUserEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
     document.getElementById('adminMenu').style.display = 'block';
     document.getElementById('settingsTooltip').style.display = 'none';
