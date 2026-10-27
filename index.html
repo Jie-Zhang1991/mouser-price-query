@@ -148,15 +148,16 @@
   .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #8e44ad; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+  /* 顶部图标区 */
   .top-right-actions { position: fixed; top: 20px; right: 20px; display: flex; gap: 12px; z-index: 1000; }
   .top-icon-btn { position: relative; width: 40px; height: 40px; background: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s; }
   .top-icon-btn:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
   .top-icon-btn svg { stroke: #2c3e50; }
 
-  .user-tooltip { position: absolute; top: 50px; right: 0; background: #2c3e50; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.3s; pointer-events: none; line-height: 1.6; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: left; }
+  .user-tooltip { position: absolute; top: 50px; right: 0; background: #2c3e50; color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.3s; pointer-events: none; line-height: 1.8; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: left; }
   .top-icon-btn:hover .user-tooltip, .top-icon-btn.show .user-tooltip { opacity: 1; visibility: visible; top: 45px; }
 
-  .admin-menu { position: absolute; top: 50px; right: 0; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 8px 0; min-width: 160px; opacity: 0; visibility: hidden; transition: all 0.3s; border: 1px solid #e0e6ed; z-index: 1001; }
+  .admin-menu { position: absolute; top: 50px; right: 0; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 8px 0; min-width: 170px; opacity: 0; visibility: hidden; transition: all 0.3s; border: 1px solid #e0e6ed; z-index: 1001; }
   .top-icon-btn.show .admin-menu { opacity: 1; visibility: visible; top: 45px; }
   .admin-menu-item { padding: 10px 16px; font-size: 14px; color: #2c3e50; cursor: pointer; transition: background 0.2s; text-align: left; display: flex; align-items: center; gap: 8px; }
   .admin-menu-item:hover { background: #f0f7ff; color: #3498db; }
@@ -180,18 +181,27 @@
   document.title = 'ChipCost - AI分析芯片成本';
 </script>
 
-<input type="file" id="adminUploadWhitelist" accept=".xlsx,.xls" style="display:none;" />
-
 <div class="top-right-actions">
+  <!-- 1. 用户图标 -->
+  <div class="top-icon-btn" id="userProfile">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+    <div class="user-tooltip" id="userTooltip">加载中...</div>
+  </div>
+
+  <!-- 2. 统计图标 -->
   <div class="top-icon-btn" id="statsProfile">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="18" y1="20" x2="18" y2="10"></line>
       <line x1="12" y1="20" x2="12" y2="4"></line>
       <line x1="6" y1="20" x2="6" y2="14"></line>
     </svg>
-    <div class="user-tooltip" id="statsTooltip" style="min-width: 180px;">加载用量中...</div>
+    <div class="user-tooltip" id="statsTooltip" style="min-width: 220px;">数据统计加载中...</div>
   </div>
 
+  <!-- 3. 设置齿轮图标 -->
   <div class="top-icon-btn" id="settingsProfile">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="3"></circle>
@@ -199,23 +209,15 @@
     </svg>
     <div class="user-tooltip" id="settingsTooltip">仅限网站开发者使用，当前用户无权限。</div>
     <div class="admin-menu" id="adminMenu">
-      <div class="admin-menu-item" onclick="triggerUploadWhitelist()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-        上传白名单邮箱
-      </div>
       <div class="admin-menu-item" onclick="downloadUserStats()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
         下载用户使用情况
       </div>
+      <div class="admin-menu-item" onclick="clearAllStats()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <span style="color:#e74c3c;">清空当前数据统计</span>
+      </div>
     </div>
-  </div>
-
-  <div class="top-icon-btn" id="userProfile">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-      <circle cx="12" cy="7" r="4"></circle>
-    </svg>
-    <div class="user-tooltip" id="userTooltip">加载中...</div>
   </div>
 </div>
 
@@ -282,6 +284,7 @@ if (location.hostname === 'chipcost.space') {
 }
 
 const API_URL = 'https://chipcost.space';
+const SUPER_ADMIN_EMAIL = '878903142@qq.com';
 const MAX_BATCH = 100;
 const QUERY_INTERVAL_MS = 2500;
 
@@ -319,20 +322,21 @@ function getUserEmail() {
 }
 
 function getHeaders() {
-  return {
-    'X-User-Email': currentUserEmail
-  };
+  return { 'X-User-Email': currentUserEmail };
 }
 
+// 获取统计数据并渲染
 async function fetchStats() {
   const tooltip = document.getElementById('statsTooltip');
   try {
     const resp = await fetch(API_URL + '?action=stats', { headers: getHeaders() });
     const data = await resp.json();
     if (data.status === 'success') {
-      tooltip.innerHTML = `<div><strong>API额度使用情况</strong></div>
-        <div style="margin-top:4px;">当日API额度：${data.todayCount}/${data.dailyQuota}次</div>
-        <div>本月API已调用：${data.monthCount}次</div>`;
+      tooltip.innerHTML = `<div><strong>数据统计</strong></div>
+        <div style="margin-top:4px;">今日芯片查询次数：${data.todayChipQuery}次</div>
+        <div>累计芯片查询次数：${data.totalChipQuery}次</div>
+        <div style="margin-top:4px;">今日芯片代理平台API额度：${data.todayQuota}/1000</div>
+        <div>累计API调用次数：${data.totalApiCall}次</div>`;
     } else {
       tooltip.textContent = '获取用量失败';
     }
@@ -368,44 +372,22 @@ async function fetchTrending(isRefresh = false) {
   }
 }
 
-// ===== 管理员功能：上传白名单 =====
-function triggerUploadWhitelist() {
-  document.getElementById('adminUploadWhitelist').click();
-}
-
-document.getElementById('adminUploadWhitelist').addEventListener('change', async (e) => {
-  if (e.target.files.length === 0) return;
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = async (evt) => {
-    try {
-      const data = new Uint8Array(evt.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-      
-      const emails = rows.map(r => String(r[0] || '').trim()).filter(e => e.includes('@'));
-      if (emails.length === 0) {
-        alert('未在 A 列找到合法的邮箱地址。');
-        return;
-      }
-
-      const emailStr = emails.join(',');
-      const resp = await fetch(API_URL + '?action=admin_update_whitelist&emails=' + encodeURIComponent(emailStr), { headers: getHeaders() });
-      const result = await resp.json();
-
-      if (result.status === 'success') {
-        alert('白名单已成功覆盖更新！共导入 ' + emails.length + ' 个邮箱。');
-      } else {
-        alert('更新失败：' + (result.error || result.message || '未知错误'));
-      }
-    } catch (err) {
-      alert('文件解析失败，请确认是有效的 Excel 文件。');
+// ===== 管理员功能：清空数据统计 =====
+async function clearAllStats() {
+  if (!confirm('确定要清空所有数据统计吗？此操作不可恢复！')) return;
+  try {
+    const resp = await fetch(API_URL + '?action=admin_clear_stats', { headers: getHeaders() });
+    const result = await resp.json();
+    if (result.status === 'success') {
+      alert('数据统计已成功清空！');
+      fetchStats(); // 刷新面板
+    } else {
+      alert('清空失败：' + (result.error || '无权限'));
     }
-    e.target.value = '';
-  };
-  reader.readAsArrayBuffer(file);
-});
+  } catch (e) {
+    alert('网络异常，清空失败。');
+  }
+}
 
 // ===== 管理员功能：下载用户使用情况 =====
 async function downloadUserStats() {
@@ -416,7 +398,6 @@ async function downloadUserStats() {
       alert('下载失败：' + (result.error || '无权限'));
       return;
     }
-
     if (result.data.length === 0) {
       alert('暂无用户使用数据。');
       return;
@@ -425,18 +406,11 @@ async function downloadUserStats() {
     const exportData = [['用户邮箱', '单件查询次数', '替代型号查询次数', '批量查询型号数量', '总数']];
     result.data.forEach(row => {
       const total = (row.single_count || 0) + (row.substitute_count || 0) + (row.batch_count || 0);
-      exportData.push([
-        row.email,
-        row.single_count || 0,
-        row.substitute_count || 0,
-        row.batch_count || 0,
-        total
-      ]);
+      exportData.push([row.email, row.single_count || 0, row.substitute_count || 0, row.batch_count || 0, total]);
     });
 
     const newSheet = XLSX.utils.aoa_to_sheet(exportData);
     newSheet['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
-
     const newWorkbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(newWorkbook, newSheet, '用户使用情况');
     
@@ -447,11 +421,8 @@ async function downloadUserStats() {
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement('a');
-    a.href = url;
-    a.download = outFileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    a.href = url; a.download = outFileName;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
   } catch (e) {
     alert('网络异常，下载失败。');
   }
@@ -500,15 +471,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   currentUserEmail = getUserEmail();
   document.getElementById('userTooltip').textContent = currentUserEmail;
 
-  // 初始化管理员权限判断
-  try {
-    const adminCheck = await fetch(API_URL + '?action=admin_check', { headers: getHeaders() });
-    // 如果没有这个 action，就通过尝试拉取白名单或直接不发请求，依靠后端在操作时判断
-    // 为了不增加后端接口，我们其实不需要专门拉取。用户点击菜单时，后端会拒绝。
-    // 这里我们可以通过比较或者直接展示菜单（后端会拦截）
-    // 但为了用户体验：假设默认是隐藏的，只展示无权限。
-    // 后端判断逻辑：如果是管理员，返回 {isAdmin: true}，我们需要这个接口。
-  } catch(e) {}
+  // 判断管理员权限，如果是超级管理员，显示管理员菜单，隐藏无权限提示
+  if (currentUserEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+    document.getElementById('adminMenu').style.display = 'block';
+    document.getElementById('settingsTooltip').style.display = 'none';
+  }
 
   fetchStats();
   await fetchTrending();
@@ -527,6 +494,7 @@ document.addEventListener('click', function() {
   statsProfile.classList.remove('show'); settingsProfile.classList.remove('show'); userProfile.classList.remove('show');
 });
 
+// 单件查询
 async function query() {
   document.body.classList.remove('is-home'); 
   const input = document.getElementById('partInput');
@@ -594,6 +562,7 @@ async function query() {
   }
 }
 
+// 替代型号
 async function querySubstitute(isRefresh = false) {
   if (!isRefresh) document.body.classList.remove('is-home'); 
 
@@ -694,6 +663,7 @@ async function querySubstitute(isRefresh = false) {
   }
 }
 
+// 批量分析
 function openBatchModal() { document.getElementById('batchModal').classList.add('show'); }
 function closeBatchModal() { document.getElementById('batchModal').classList.remove('show'); }
 
@@ -751,7 +721,6 @@ async function handleFile(file) {
     progressCurrent.textContent = `正在分析：${pn}`;
 
     try {
-      // 注意这里：&isBatch=true 用于后端区分
       const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn) + '&isBatch=true', { headers: getHeaders() });
       const data = await resp.json();
 
