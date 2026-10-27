@@ -318,7 +318,6 @@
       <p>ChipCost 是一款基于 AI 大模型的芯片价格预测与竞品分析工具。输入芯片型号后，系统会并发查询得捷（DigiKey）、贸泽（Mouser）、立创商城（LCSC）的 1000pcs 阶梯报价，并结合 DeepSeek 的语义分析与底层业务系数，为您计算出最终的 "Should Cost" 推荐成本。</p>
       
       <h3>二、 API 额度与性能说明</h3>
-      <!-- 修改点：删除“如：” -->
       <p>网站使用过程涉及芯片代理平台、Deepseek大模型、汇率接口等多个API，受限于底层数据供应商与大模型接口的频率限制，平台每日设置了固定的全局调用额度（每日1000次）。同时，为防止接口被封禁，单次批量分析最多支持 100 个型号，且每个型号之间设置了至少 2.5 秒的请求延迟。如遇系统提示“API超限”或“未查询到”，请稍后或次日再试。</p>
       
       <h3>三、 免责声明</h3>
@@ -366,8 +365,6 @@
 
       <h3>五、 您的权利</h3>
       <p>您有权联系我们查询、更正您的相关信息。网站管理员（管理员邮箱）在后台拥有清空历史统计数据的管理权限。</p>
-
-      <!-- 修改点：删除了“六、 联系我们”整段内容 -->
     </div>
     <div class="modal-buttons">
       <button style="background:#3498db;" onclick="closeModal('privacyModal')">我已知晓</button>
@@ -520,7 +517,10 @@ async function fetchTrending(isRefresh = false) {
 async function clearAllStats() {
   if (!confirm('确定要清空所有数据统计吗？此操作不可恢复！')) return;
   try {
-    const resp = await fetch(API_URL + '?action=admin_clear_stats');
+    // 修复点：附带 X-User-Email 以确保后端能够识别管理员
+    const resp = await fetch(API_URL + '?action=admin_clear_stats', {
+      headers: { 'X-User-Email': currentUserEmail }
+    });
     const result = await resp.json();
     if (result.status === 'success') {
       alert('数据统计已成功清空！');
@@ -536,7 +536,10 @@ async function clearAllStats() {
 // ===== 管理员功能：下载用户使用情况 =====
 async function downloadUserStats() {
   try {
-    const resp = await fetch(API_URL + '?action=admin_get_user_stats');
+    // 修复点：附带 X-User-Email 以确保后端能够识别管理员
+    const resp = await fetch(API_URL + '?action=admin_get_user_stats', {
+      headers: { 'X-User-Email': currentUserEmail }
+    });
     const result = await resp.json();
     if (result.status !== 'success') {
       alert('下载失败：' + (result.error || '无权限'));
