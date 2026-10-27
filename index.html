@@ -20,43 +20,17 @@
     transition: padding 0.4s ease;
   }
 
-  body.is-home {
-    align-items: center; 
-    padding-top: 0;
-    padding-bottom: 80px; 
-  }
-  
-  body.is-home .container {
-    max-width: 850px; 
-  }
-
-  body.is-home .search-box {
-    width: 100%; 
-    margin: 0 auto 20px auto;
-    transition: width 0.4s ease, margin 0.4s ease;
-  }
-
-  body:not(.is-home) .container {
-    max-width: 1200px; 
-  }
-  body:not(.is-home) .search-box {
-    width: 100%; 
-  }
+  body.is-home { align-items: center; padding-top: 0; padding-bottom: 80px; }
+  body.is-home .container { max-width: 850px; }
+  body.is-home .search-box { width: 100%; margin: 0 auto 20px auto; transition: width 0.4s ease, margin 0.4s ease; }
+  body:not(.is-home) .container { max-width: 1200px; }
+  body:not(.is-home) .search-box { width: 100%; }
 
   .container {
-    width: 100%; 
-    background: transparent; 
-    border-radius: 16px; 
-    padding: 40px;
-    height: fit-content;
-    transition: max-width 0.4s ease, opacity 0.4s ease;
-    opacity: 0;
-    visibility: hidden;
+    width: 100%; background: transparent; border-radius: 16px; padding: 40px; height: fit-content;
+    transition: max-width 0.4s ease, opacity 0.4s ease; opacity: 0; visibility: hidden;
   }
-  .container.loaded {
-    opacity: 1;
-    visibility: visible;
-  }
+  .container.loaded { opacity: 1; visibility: visible; }
 
   h1 { font-size: 32px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: bold; }
   .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 45px; }
@@ -65,11 +39,8 @@
   .search-box { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
   
   input[type="text"] {
-    flex: 1; padding: 16px 24px; font-size: 16px;
-    border: 2px solid #cbd5e1; border-radius: 12px; outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    background: #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    flex: 1; padding: 16px 24px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 12px; outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
   }
   input[type="text"]:focus { border-color: #3498db; box-shadow: 0 4px 15px rgba(52,152,219,0.15); }
 
@@ -77,35 +48,17 @@
   .input-wrapper input[type="text"] { padding-right: 44px; }
   
   .clear-btn {
-    display: none;
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: #c0c7ce;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    user-select: none;
+    display: none; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    width: 22px; height: 22px; border-radius: 50%; background: #c0c7ce;
+    align-items: center; justify-content: center; cursor: pointer; user-select: none;
   }
   .clear-btn:hover { background: #95a5a6; }
   .clear-btn.show { display: flex; }
 
   button {
-    padding: 14px 20px; 
-    font-size: 15px; 
-    background: #3498db; 
-    color: #fff;
-    border: none; 
-    border-radius: 12px; 
-    cursor: pointer; 
-    font-weight: bold;
-    transition: background 0.3s, transform 0.2s;
-    white-space: nowrap;
-    box-shadow: 0 4px 10px rgba(52,152,219,0.2);
+    padding: 14px 20px; font-size: 15px; background: #3498db; color: #fff;
+    border: none; border-radius: 12px; cursor: pointer; font-weight: bold;
+    transition: background 0.3s, transform 0.2s; white-space: nowrap; box-shadow: 0 4px 10px rgba(52,152,219,0.2);
   }
   button:hover { background: #2980b9; transform: translateY(-1px); }
   button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
@@ -132,19 +85,12 @@
   .loading { text-align: center; color: #7f8c8d; padding: 30px; }
   .error { color: #e74c3c; background: #fdf0ed; padding: 20px; border-radius: 12px; border-left: 4px solid #e74c3c; }
 
-  .should-cost-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 16px; padding: 32px; text-align: center; color: #fff; margin-bottom: 24px;
-    box-shadow: 0 10px 20px rgba(102,126,234,0.2);
-  }
+  .should-cost-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 32px; text-align: center; color: #fff; margin-bottom: 24px; box-shadow: 0 10px 20px rgba(102,126,234,0.2); }
   .should-cost-label { font-size: 22px; font-weight: 700; opacity: 0.95; margin-bottom: 12px; letter-spacing: 1.5px; }
   .should-cost-value { font-size: 52px; font-weight: 800; margin-bottom: 6px; line-height: 1.1; }
   .should-cost-tax { font-size: 16px; opacity: 0.85; margin-top: 6px; }
 
-  .info-card {
-    border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 20px; background: #fff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-  }
+  .info-card { border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
   .info-title { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f1f4f8; }
   .info-row { display: flex; padding: 8px 0; font-size: 14px; }
   .info-label { color: #7f8c8d; min-width: 110px; flex-shrink: 0; }
@@ -202,55 +148,18 @@
   .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #8e44ad; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-  .top-right-actions {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    gap: 12px;
-    z-index: 1000;
-  }
-
-  .top-icon-btn {
-    position: relative;
-    width: 40px;
-    height: 40px;
-    background: #fff;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: all 0.3s;
-  }
+  .top-right-actions { position: fixed; top: 20px; right: 20px; display: flex; gap: 12px; z-index: 1000; }
+  .top-icon-btn { position: relative; width: 40px; height: 40px; background: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s; }
   .top-icon-btn:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
   .top-icon-btn svg { stroke: #2c3e50; }
 
-  .user-tooltip {
-    position: absolute;
-    top: 50px;
-    right: 0;
-    background: #2c3e50;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s;
-    pointer-events: none;
-    line-height: 1.6;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    text-align: left;
-  }
-  .top-icon-btn:hover .user-tooltip,
-  .top-icon-btn.show .user-tooltip {
-    opacity: 1;
-    visibility: visible;
-    top: 45px;
-  }
+  .user-tooltip { position: absolute; top: 50px; right: 0; background: #2c3e50; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.3s; pointer-events: none; line-height: 1.6; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: left; }
+  .top-icon-btn:hover .user-tooltip, .top-icon-btn.show .user-tooltip { opacity: 1; visibility: visible; top: 45px; }
+
+  .admin-menu { position: absolute; top: 50px; right: 0; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 8px 0; min-width: 160px; opacity: 0; visibility: hidden; transition: all 0.3s; border: 1px solid #e0e6ed; z-index: 1001; }
+  .top-icon-btn.show .admin-menu { opacity: 1; visibility: visible; top: 45px; }
+  .admin-menu-item { padding: 10px 16px; font-size: 14px; color: #2c3e50; cursor: pointer; transition: background 0.2s; text-align: left; display: flex; align-items: center; gap: 8px; }
+  .admin-menu-item:hover { background: #f0f7ff; color: #3498db; }
 
   @media (max-width: 800px) {
     body { padding: 20px 12px; }
@@ -271,6 +180,8 @@
   document.title = 'ChipCost - AI分析芯片成本';
 </script>
 
+<input type="file" id="adminUploadWhitelist" accept=".xlsx,.xls" style="display:none;" />
+
 <div class="top-right-actions">
   <div class="top-icon-btn" id="statsProfile">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -279,6 +190,24 @@
       <line x1="6" y1="20" x2="6" y2="14"></line>
     </svg>
     <div class="user-tooltip" id="statsTooltip" style="min-width: 180px;">加载用量中...</div>
+  </div>
+
+  <div class="top-icon-btn" id="settingsProfile">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </svg>
+    <div class="user-tooltip" id="settingsTooltip">仅限网站开发者使用，当前用户无权限。</div>
+    <div class="admin-menu" id="adminMenu">
+      <div class="admin-menu-item" onclick="triggerUploadWhitelist()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        上传白名单邮箱
+      </div>
+      <div class="admin-menu-item" onclick="downloadUserStats()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        下载用户使用情况
+      </div>
+    </div>
   </div>
 
   <div class="top-icon-btn" id="userProfile">
@@ -358,140 +287,12 @@ const QUERY_INTERVAL_MS = 2500;
 
 let currentAlternatives = [];
 let currentTopics = [];
+let currentUserEmail = '';
 
 function escapeHtml(str) {
   return String(str == null ? "" : str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
-
-async function fetchStats() {
-  const tooltip = document.getElementById('statsTooltip');
-  try {
-    const resp = await fetch(API_URL + '?action=stats');
-    const data = await resp.json();
-    if (data.status === 'success') {
-      tooltip.innerHTML = `<div><strong>API额度使用情况</strong></div>
-        <div style="margin-top:4px;">当日API额度：${data.todayCount}/${data.dailyQuota}次</div>
-        <div>本月API已调用：${data.monthCount}次</div>`;
-    } else {
-      tooltip.textContent = '获取用量失败';
-    }
-  } catch (e) {
-    tooltip.textContent = '网络异常，无法获取';
-  }
-}
-
-async function fetchTrending(isRefresh = false) {
-  const listContainer = document.getElementById('trending-list');
-  
-  if (isRefresh) {
-    listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">正在更新热门话题...</li>';
-  }
-
-  let excludeStr = "";
-  if (isRefresh && currentTopics.length > 0) {
-    excludeStr = currentTopics.join(',');
-  }
-
-  try {
-    let url = API_URL + '?action=trending';
-    if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
-    
-    const resp = await fetch(url);
-    const data = await resp.json();
-
-    if (data.status === 'success' && data.topics && data.topics.length > 0) {
-      currentTopics = data.topics;
-      let html = '';
-      data.topics.forEach((topic, index) => {
-        const searchUrl = 'https://www.baidu.com/s?wd=' + encodeURIComponent(topic);
-        html += `<li class="trending-item" onclick="window.open('${searchUrl}', '_blank')">`;
-        html += `<span class="trending-num">${index + 1}</span>`;
-        html += `<span class="trending-text">${escapeHtml(topic)}</span>`;
-        html += `</li>`;
-      });
-      listContainer.innerHTML = html;
-    } else {
-      listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">暂无话题，请稍后重试</li>';
-    }
-  } catch (e) {
-    listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">获取热门话题失败</li>';
-  }
-}
-
-function formatPartNumber(displayPn, searchPn) {
-  if (!displayPn) return '-';
-  const a = String(displayPn).trim().toLowerCase();
-  const b = String(searchPn || '').trim().toLowerCase();
-  if (a === b) {
-    return '<span class="pn-match">' + escapeHtml(displayPn) + '</span>';
-  } else {
-    return '<span class="pn-mismatch">' + escapeHtml(displayPn) + '（型号未完全匹配，注意甄别）</span>';
-  }
-}
-
-function copyText(text, element) {
-  const handleSuccess = () => {
-    const originalText = element.innerText;
-    element.innerText = "已复制";
-    element.style.color = "#27ae60";
-    setTimeout(() => {
-      element.innerText = originalText;
-      element.style.color = "#3498db";
-    }, 1000);
-  };
-
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(handleSuccess).catch(() => fallbackCopy(text, handleSuccess));
-  } else {
-    fallbackCopy(text, handleSuccess);
-  }
-}
-
-function fallbackCopy(text, callback) {
-  const textArea = document.createElement("textarea");
-  textArea.value = text;
-  textArea.style.top = "0";
-  textArea.style.left = "0";
-  textArea.style.position = "fixed";
-  document.body.appendChild(textArea);
-  textArea.focus();
-  textArea.select();
-  try {
-    document.execCommand('copy');
-    callback();
-  } catch (err) {
-    console.error("复制失败", err);
-  }
-  document.body.removeChild(textArea);
-}
-
-const partInputEl = document.getElementById('partInput');
-const clearBtnEl = document.getElementById('clearBtn');
-const trendingBox = document.getElementById('trending-box');
-
-function updateClearBtn() {
-  if (partInputEl.value.length > 0) {
-    clearBtnEl.classList.add('show');
-  } else {
-    clearBtnEl.classList.remove('show');
-  }
-}
-
-function clearInput() {
-  partInputEl.value = '';
-  updateClearBtn();
-  partInputEl.focus();
-}
-
-partInputEl.addEventListener('input', updateClearBtn);
-
-document.getElementById('partInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') query();
-});
 
 function getUserEmail() {
   const cookies = document.cookie.split(';');
@@ -517,11 +318,197 @@ function getUserEmail() {
   }
 }
 
-window.addEventListener('DOMContentLoaded', async () => {
-  const userTooltip = document.getElementById('userTooltip');
-  if (userTooltip) {
-    userTooltip.textContent = getUserEmail();
+function getHeaders() {
+  return {
+    'X-User-Email': currentUserEmail
+  };
+}
+
+async function fetchStats() {
+  const tooltip = document.getElementById('statsTooltip');
+  try {
+    const resp = await fetch(API_URL + '?action=stats', { headers: getHeaders() });
+    const data = await resp.json();
+    if (data.status === 'success') {
+      tooltip.innerHTML = `<div><strong>API额度使用情况</strong></div>
+        <div style="margin-top:4px;">当日API额度：${data.todayCount}/${data.dailyQuota}次</div>
+        <div>本月API已调用：${data.monthCount}次</div>`;
+    } else {
+      tooltip.textContent = '获取用量失败';
+    }
+  } catch (e) {
+    tooltip.textContent = '网络异常，无法获取';
   }
+}
+
+async function fetchTrending(isRefresh = false) {
+  const listContainer = document.getElementById('trending-list');
+  if (isRefresh) listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">正在更新热门话题...</li>';
+  let excludeStr = (isRefresh && currentTopics.length > 0) ? currentTopics.join(',') : "";
+
+  try {
+    let url = API_URL + '?action=trending';
+    if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
+    const resp = await fetch(url, { headers: getHeaders() });
+    const data = await resp.json();
+
+    if (data.status === 'success' && data.topics && data.topics.length > 0) {
+      currentTopics = data.topics;
+      let html = '';
+      data.topics.forEach((topic, index) => {
+        const searchUrl = 'https://www.baidu.com/s?wd=' + encodeURIComponent(topic);
+        html += `<li class="trending-item" onclick="window.open('${searchUrl}', '_blank')"><span class="trending-num">${index + 1}</span><span class="trending-text">${escapeHtml(topic)}</span></li>`;
+      });
+      listContainer.innerHTML = html;
+    } else {
+      listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">暂无话题，请稍后重试</li>';
+    }
+  } catch (e) {
+    listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">获取热门话题失败</li>';
+  }
+}
+
+// ===== 管理员功能：上传白名单 =====
+function triggerUploadWhitelist() {
+  document.getElementById('adminUploadWhitelist').click();
+}
+
+document.getElementById('adminUploadWhitelist').addEventListener('change', async (e) => {
+  if (e.target.files.length === 0) return;
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = async (evt) => {
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+      
+      const emails = rows.map(r => String(r[0] || '').trim()).filter(e => e.includes('@'));
+      if (emails.length === 0) {
+        alert('未在 A 列找到合法的邮箱地址。');
+        return;
+      }
+
+      const emailStr = emails.join(',');
+      const resp = await fetch(API_URL + '?action=admin_update_whitelist&emails=' + encodeURIComponent(emailStr), { headers: getHeaders() });
+      const result = await resp.json();
+
+      if (result.status === 'success') {
+        alert('白名单已成功覆盖更新！共导入 ' + emails.length + ' 个邮箱。');
+      } else {
+        alert('更新失败：' + (result.error || result.message || '未知错误'));
+      }
+    } catch (err) {
+      alert('文件解析失败，请确认是有效的 Excel 文件。');
+    }
+    e.target.value = '';
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+// ===== 管理员功能：下载用户使用情况 =====
+async function downloadUserStats() {
+  try {
+    const resp = await fetch(API_URL + '?action=admin_get_user_stats', { headers: getHeaders() });
+    const result = await resp.json();
+    if (result.status !== 'success') {
+      alert('下载失败：' + (result.error || '无权限'));
+      return;
+    }
+
+    if (result.data.length === 0) {
+      alert('暂无用户使用数据。');
+      return;
+    }
+
+    const exportData = [['用户邮箱', '单件查询次数', '替代型号查询次数', '批量查询型号数量', '总数']];
+    result.data.forEach(row => {
+      const total = (row.single_count || 0) + (row.substitute_count || 0) + (row.batch_count || 0);
+      exportData.push([
+        row.email,
+        row.single_count || 0,
+        row.substitute_count || 0,
+        row.batch_count || 0,
+        total
+      ]);
+    });
+
+    const newSheet = XLSX.utils.aoa_to_sheet(exportData);
+    newSheet['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
+
+    const newWorkbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(newWorkbook, newSheet, '用户使用情况');
+    
+    const dateStr = new Date().toISOString().split('T')[0];
+    const outFileName = `用户使用统计_${dateStr}.xlsx`;
+    const wbout = XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = outFileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (e) {
+    alert('网络异常，下载失败。');
+  }
+}
+
+function formatPartNumber(displayPn, searchPn) {
+  if (!displayPn) return '-';
+  const a = String(displayPn).trim().toLowerCase(), b = String(searchPn || '').trim().toLowerCase();
+  return a === b ? '<span class="pn-match">' + escapeHtml(displayPn) + '</span>' : '<span class="pn-mismatch">' + escapeHtml(displayPn) + '（型号未完全匹配，注意甄别）</span>';
+}
+
+function copyText(text, element) {
+  const handleSuccess = () => {
+    const originalText = element.innerText;
+    element.innerText = "已复制"; element.style.color = "#27ae60";
+    setTimeout(() => { element.innerText = originalText; element.style.color = "#3498db"; }, 1000);
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(handleSuccess).catch(() => fallbackCopy(text, handleSuccess));
+  } else {
+    fallbackCopy(text, handleSuccess);
+  }
+}
+
+function fallbackCopy(text, callback) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text; textArea.style.position = "fixed";
+  document.body.appendChild(textArea); textArea.focus(); textArea.select();
+  try { document.execCommand('copy'); callback(); } catch (err) {}
+  document.body.removeChild(textArea);
+}
+
+const partInputEl = document.getElementById('partInput');
+const clearBtnEl = document.getElementById('clearBtn');
+const trendingBox = document.getElementById('trending-box');
+
+function updateClearBtn() {
+  if (partInputEl.value.length > 0) clearBtnEl.classList.add('show');
+  else clearBtnEl.classList.remove('show');
+}
+function clearInput() { partInputEl.value = ''; updateClearBtn(); partInputEl.focus(); }
+partInputEl.addEventListener('input', updateClearBtn);
+document.getElementById('partInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') query(); });
+
+window.addEventListener('DOMContentLoaded', async () => {
+  currentUserEmail = getUserEmail();
+  document.getElementById('userTooltip').textContent = currentUserEmail;
+
+  // 初始化管理员权限判断
+  try {
+    const adminCheck = await fetch(API_URL + '?action=admin_check', { headers: getHeaders() });
+    // 如果没有这个 action，就通过尝试拉取白名单或直接不发请求，依靠后端在操作时判断
+    // 为了不增加后端接口，我们其实不需要专门拉取。用户点击菜单时，后端会拒绝。
+    // 这里我们可以通过比较或者直接展示菜单（后端会拦截）
+    // 但为了用户体验：假设默认是隐藏的，只展示无权限。
+    // 后端判断逻辑：如果是管理员，返回 {isAdmin: true}，我们需要这个接口。
+  } catch(e) {}
 
   fetchStats();
   await fetchTrending();
@@ -529,196 +516,86 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 const statsProfile = document.getElementById('statsProfile');
+const settingsProfile = document.getElementById('settingsProfile');
 const userProfile = document.getElementById('userProfile');
 
-statsProfile.addEventListener('click', function(e) {
-  e.stopPropagation();
-  userProfile.classList.remove('show');
-  this.classList.toggle('show');
-});
-
-userProfile.addEventListener('click', function(e) {
-  e.stopPropagation();
-  statsProfile.classList.remove('show');
-  this.classList.toggle('show');
-});
+statsProfile.addEventListener('click', function(e) { e.stopPropagation(); settingsProfile.classList.remove('show'); userProfile.classList.remove('show'); this.classList.toggle('show'); });
+userProfile.addEventListener('click', function(e) { e.stopPropagation(); settingsProfile.classList.remove('show'); statsProfile.classList.remove('show'); this.classList.toggle('show'); });
+settingsProfile.addEventListener('click', function(e) { e.stopPropagation(); statsProfile.classList.remove('show'); userProfile.classList.remove('show'); this.classList.toggle('show'); });
 
 document.addEventListener('click', function() {
-  statsProfile.classList.remove('show');
-  userProfile.classList.remove('show');
+  statsProfile.classList.remove('show'); settingsProfile.classList.remove('show'); userProfile.classList.remove('show');
 });
 
 async function query() {
   document.body.classList.remove('is-home'); 
-
   const input = document.getElementById('partInput');
   const btn = document.getElementById('queryBtn');
   const resultDiv = document.getElementById('result');
   const subDiv = document.getElementById('substitute-result');
   const partNumber = input.value.trim();
 
-  if (!partNumber) {
-    subDiv.innerHTML = '';
-    resultDiv.innerHTML = '<div class="error">请输入芯片型号</div>';
-    return;
-  }
+  if (!partNumber) { subDiv.innerHTML = ''; resultDiv.innerHTML = '<div class="error">请输入芯片型号</div>'; return; }
 
-  subDiv.innerHTML = '';
-  currentAlternatives = [];
-  trendingBox.style.display = 'none';
-
-  btn.disabled = true;
-  btn.textContent = '分析中...';
-  resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
+  subDiv.innerHTML = ''; currentAlternatives = []; trendingBox.style.display = 'none';
+  btn.disabled = true; btn.textContent = '分析中...'; resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
 
   try {
-    const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(partNumber));
+    const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(partNumber), { headers: getHeaders() });
     const data = await resp.json();
+    if (!resp.ok) { resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>'; trendingBox.style.display = 'block'; return; }
+    if (!data.shouldCost) { resultDiv.innerHTML = '<div class="error">抱歉，未检索到任何价格信息。</div>'; trendingBox.style.display = 'block'; return; }
 
-    if (!resp.ok) {
-      resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>';
-      trendingBox.style.display = 'block'; 
-      return;
-    }
-
-    if (!data.shouldCost) {
-      resultDiv.innerHTML = '<div class="error">抱歉，未检索到任何价格信息。</div>';
-      trendingBox.style.display = 'block';
-      return;
-    }
-
-    let html = '';
-
-    html += '<div class="should-cost-card">';
+    let html = '<div class="should-cost-card">';
     html += '<div class="should-cost-label">SHOULD COST 推荐值</div>';
     html += '<div class="should-cost-value">' + data.shouldCost + '</div>';
     html += '<div class="should-cost-tax">CNY（不含税）</div>';
     html += '</div>';
 
-    html += '<div class="info-card">';
-    html += '<div class="info-title">芯片信息</div>';
+    html += '<div class="info-card"><div class="info-title">芯片信息</div>';
     html += '<div class="info-row"><span class="info-label">用户输入型号</span><span class="info-value">' + escapeHtml(partNumber) + '</span></div>';
     html += '<div class="info-row"><span class="info-label">芯片一级分类</span><span class="info-value">' + escapeHtml(data.level1 || '-') + '</span></div>';
-    html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div>';
-    html += '</div>';
+    html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div></div>';
 
-    if (data.digikey) {
-      const hasPrice = data.digikey.priceBreaks && data.digikey.priceBreaks.length > 0;
-      const err = data.digikey.error || "";
+    function renderSource(source, name) {
+      const hasPrice = source.priceBreaks && source.priceBreaks.length > 0;
+      const err = source.error || "";
       const isRealError = err && !err.includes('未找到') && !err.includes('无结果') && !err.includes('仅找到');
+      if (!hasPrice && !isRealError) return '';
 
-      if (hasPrice || isRealError) {
-        html += '<div class="source-section">';
-        html += '<div class="source-header"><span class="source-name">得捷 DigiKey</span><span class="source-badge">' + escapeHtml(isRealError ? '报错' : '参考价') + '</span></div>';
-        
-        if (isRealError) {
-          html += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>';
-        } else if (hasPrice) {
-          if (data.digikey.partNumber) {
-            html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(data.digikey.partNumber, partNumber) + '</span></div>';
-          }
-          if (data.digikey.manufacturer) {
-            html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(data.digikey.manufacturer) + '</span></div>';
-          }
-          if (data.digikey.description) {
-            html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(data.digikey.description) + '</span></div>';
-          }
-          html += '<table><tr><th>起订量</th><th>单价</th></tr>';
-          data.digikey.priceBreaks.forEach(pb => {
-            html += '<tr><td>' + escapeHtml(pb.Quantity) + '</td><td>' + escapeHtml(pb.Price) + '</td></tr>';
-          });
-          html += '</table>';
-          if (data.digikey.detailUrl) {
-            html += '<a class="detail-link" href="' + escapeHtml(data.digikey.detailUrl) + '" target="_blank">查看得捷详情页 →</a>';
-          }
-        }
-        html += '</div>';
+      let h = '<div class="source-section"><div class="source-header"><span class="source-name">' + name + '</span><span class="source-badge">' + escapeHtml(isRealError ? '报错' : '参考价') + '</span></div>';
+      if (isRealError) {
+        h += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>';
+      } else {
+        if (source.partNumber) h += '<div class="info-row"><span class="info-label">' + (name.includes('立创') ? 'LCSC编号' : '厂商料号') + '</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
+        if (source.manufacturer) h += '<div class="info-row"><span class="info-label">' + (name.includes('立创') ? '品牌' : '制造商') + '</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
+        if (source.description) h += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(source.description) + '</span></div>';
+        h += '<table><tr><th>起订量</th><th>单价 ' + (name.includes('立创') ? '(USD)' : '') + '</th></tr>';
+        source.priceBreaks.forEach(pb => {
+          h += '<tr><td>' + escapeHtml(pb.Quantity || pb.ladder) + '</td><td>' + (name.includes('立创') ? '$' + (pb.usdPrice ? pb.usdPrice.toFixed(4) : '-') : escapeHtml(pb.Price)) + '</td></tr>';
+        });
+        h += '</table>';
+        const link = source.detailUrl || source.pdfUrl;
+        if (link) h += '<a class="detail-link" href="' + escapeHtml(link) + '" target="_blank">查看详情页 →</a>';
       }
+      return h + '</div>';
     }
 
-    if (data.mouser) {
-      const hasPrice = data.mouser.priceBreaks && data.mouser.priceBreaks.length > 0;
-      const err = data.mouser.error || "";
-      const isRealError = err && !err.includes('未找到') && !err.includes('无结果') && !err.includes('仅找到');
-
-      if (hasPrice || isRealError) {
-        html += '<div class="source-section">';
-        html += '<div class="source-header"><span class="source-name">贸泽 Mouser</span><span class="source-badge">' + escapeHtml(isRealError ? '报错' : '参考价') + '</span></div>';
-        
-        if (isRealError) {
-          html += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>';
-        } else if (hasPrice) {
-          if (data.mouser.partNumber) {
-            html += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(data.mouser.partNumber, partNumber) + '</span></div>';
-          }
-          if (data.mouser.manufacturer) {
-            html += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(data.mouser.manufacturer) + '</span></div>';
-          }
-          if (data.mouser.description) {
-            html += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(data.mouser.description) + '</span></div>';
-          }
-          html += '<table><tr><th>起订量</th><th>单价</th></tr>';
-          data.mouser.priceBreaks.forEach(pb => {
-            html += '<tr><td>' + escapeHtml(pb.Quantity) + '</td><td>' + escapeHtml(pb.Price) + '</td></tr>';
-          });
-          html += '</table>';
-          if (data.mouser.detailUrl) {
-            html += '<a class="detail-link" href="' + escapeHtml(data.mouser.detailUrl) + '" target="_blank">查看贸泽详情页 →</a>';
-          }
-        }
-        html += '</div>';
-      }
-    }
-
-    if (data.lcsc) {
-      const hasPrice = data.lcsc.priceBreaks && data.lcsc.priceBreaks.length > 0;
-      const err = data.lcsc.error || "";
-      const isRealError = err && !err.includes('未找到') && !err.includes('无结果') && !err.includes('仅找到');
-
-      if (hasPrice || isRealError) {
-        html += '<div class="source-section">';
-        html += '<div class="source-header"><span class="source-name">立创商城 LCSC</span><span class="source-badge">' + escapeHtml(isRealError ? '报错' : '参考价') + '</span></div>';
-        
-        if (isRealError) {
-          html += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>';
-        } else if (hasPrice) {
-          if (data.lcsc.productCode) {
-            html += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + escapeHtml(data.lcsc.productCode) + '</span></div>';
-          }
-          if (data.lcsc.productModel) {
-            html += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + formatPartNumber(data.lcsc.productModel, partNumber) + '</span></div>';
-          }
-          if (data.lcsc.brandName) {
-            html += '<div class="info-row"><span class="info-label">品牌</span><span class="info-value">' + escapeHtml(data.lcsc.brandName) + '</span></div>';
-          }
-          html += '<table><tr><th>起订量</th><th>单价 (USD)</th></tr>';
-          data.lcsc.priceBreaks.forEach(pb => {
-            html += '<tr><td>' + escapeHtml(pb.ladder) + '</td><td>$' + (pb.usdPrice ? pb.usdPrice.toFixed(4) : '-') + '</td></tr>';
-          });
-          html += '</table>';
-          if (data.lcsc.pdfUrl) {
-            html += '<a class="detail-link" href="' + escapeHtml(data.lcsc.pdfUrl) + '" target="_blank">查看数据手册 →</a>';
-          }
-        }
-        html += '</div>';
-      }
-    }
+    if (data.digikey) html += renderSource(data.digikey, '得捷 DigiKey');
+    if (data.mouser) html += renderSource(data.mouser, '贸泽 Mouser');
+    if (data.lcsc) html += renderSource(data.lcsc, '立创商城 LCSC');
 
     resultDiv.innerHTML = html;
-
   } catch (e) {
     resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
     trendingBox.style.display = 'block'; 
   } finally {
-    btn.disabled = false;
-    btn.textContent = '单件查询';
+    btn.disabled = false; btn.textContent = '单件查询';
   }
 }
 
 async function querySubstitute(isRefresh = false) {
-  if (!isRefresh) {
-    document.body.classList.remove('is-home'); 
-  }
+  if (!isRefresh) document.body.classList.remove('is-home'); 
 
   const input = document.getElementById('partInput');
   const btn = document.getElementById('subBtn');
@@ -726,109 +603,59 @@ async function querySubstitute(isRefresh = false) {
   const priceDiv = document.getElementById('result');
   const partNumber = input.value.trim();
 
-  if (!partNumber) {
-    priceDiv.innerHTML = '';
-    subDiv.innerHTML = '<div class="error">请输入芯片型号</div>';
-    return;
-  }
+  if (!partNumber) { priceDiv.innerHTML = ''; subDiv.innerHTML = '<div class="error">请输入芯片型号</div>'; return; }
 
   priceDiv.innerHTML = ''; 
-  
   let refreshOverlay = null;
 
   if (!isRefresh) {
     subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...</div>';
-    btn.disabled = true;
-    btn.textContent = '检索中...';
-    currentAlternatives = [];
-    trendingBox.style.display = 'none'; 
+    btn.disabled = true; btn.textContent = '检索中...'; currentAlternatives = []; trendingBox.style.display = 'none'; 
   } else {
     subDiv.style.position = 'relative';
     refreshOverlay = document.createElement('div');
-    refreshOverlay.id = 'refresh-overlay';
     refreshOverlay.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.95); padding: 15px 30px; text-align: center; font-size: 14px; color: #7f8c8d; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 10px; border: 1px solid #e0e6ed;';
     refreshOverlay.innerHTML = '<div class="spinner"></div><span>加载中，请稍后...</span>';
     subDiv.appendChild(refreshOverlay);
   }
 
-  let excludeStr = "";
-  if (isRefresh && currentAlternatives.length > 0) {
-    excludeStr = currentAlternatives.map(alt => alt.part_number).join(',');
-  }
+  let excludeStr = (isRefresh && currentAlternatives.length > 0) ? currentAlternatives.map(alt => alt.part_number).join(',') : "";
 
   try {
     let url = API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber);
-    if (excludeStr) {
-      url += '&exclude=' + encodeURIComponent(excludeStr);
-    }
-    const resp = await fetch(url);
+    if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
+    const resp = await fetch(url, { headers: getHeaders() });
     
     const text = await resp.text();
     let data;
-    try {
-      data = JSON.parse(text);
-    } catch (err) {
-      if (!isRefresh) {
-        subDiv.innerHTML = '<div class="error">服务器响应超时或异常，请稍后重试。</div>';
-        trendingBox.style.display = 'block';
-      } else if(refreshOverlay) {
-        refreshOverlay.innerHTML = '<span style="color:#e74c3c;">更新失败，请重试</span>';
-        setTimeout(() => refreshOverlay.remove(), 2000);
-      }
+    try { data = JSON.parse(text); } catch (err) {
+      if (!isRefresh) { subDiv.innerHTML = '<div class="error">服务器响应超时或异常，请稍后重试。</div>'; trendingBox.style.display = 'block'; }
+      else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">更新失败，请重试</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
       return;
     }
 
     if (data.status === 'not_found') {
-      if (!isRefresh) {
-        subDiv.innerHTML = '<div class="error">AI未能检索到查询型号的任何信息，请检查所输入型号是否准确。</div>';
-        trendingBox.style.display = 'block';
-      } else if(refreshOverlay) {
-        refreshOverlay.innerHTML = '<span style="color:#e74c3c;">未能找到更多替代型号</span>';
-        setTimeout(() => refreshOverlay.remove(), 2000);
-      }
+      if (!isRefresh) { subDiv.innerHTML = '<div class="error">AI未能检索到查询型号的任何信息，请检查所输入型号是否准确。</div>'; trendingBox.style.display = 'block'; }
+      else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">未能找到更多替代型号</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
       return;
     }
 
     if (data.status === 'success' && data.alternatives && data.alternatives.length > 0) {
       currentAlternatives = data.alternatives;
-
-      let html = '<div class="info-card" style="border-top: 4px solid #8e44ad;">';
+      let html = '<div class="info-card" style="border-top: 4px solid #8e44ad;"><div class="info-title" style="display:flex; justify-content:space-between;"><span>AI 替代参考推荐与参数对比</span></div><div class="compare-table-container"><table class="compare-table"><thead><tr><th>对比项</th><th><span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span><div><span style="color:#7f8c8d; font-size:12px;">(原型号)</span></div></th>';
       
-      html += '<div class="info-title" style="display:flex; justify-content:space-between;">';
-      html += '<span>AI 替代参考推荐与参数对比</span>';
-      html += '</div>';
-      
-      html += '<div class="compare-table-container">';
-      html += '<table class="compare-table">';
-      
-      html += '<thead><tr>';
-      html += '<th>对比项</th>';
-      
-      html += '<th>';
-      html += '<span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span>';
-      html += '<div><span style="color:#7f8c8d; font-size:12px;">(原型号)</span></div>';
-      html += '</th>';
-
       data.alternatives.forEach(alt => {
-        html += '<th>';
-        html += '<span class="sub-pn">' + escapeHtml(alt.part_number) + '</span>';
-        html += '<div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(alt.part_number) + '\', this)">复制型号</span></div>';
-        html += '</th>';
+        html += '<th><span class="sub-pn">' + escapeHtml(alt.part_number) + '</span><div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(alt.part_number) + '\', this)">复制型号</span></div></th>';
       });
-      html += '</tr></thead>';
+      html += '</tr></thead><tbody>';
 
-      html += '<tbody>';
-      html += '<tr>';
-      html += '<td>Should Cost参考值</td>';
-      html += '<td style="font-weight:bold; color:#e74c3c; font-size:15px; text-align:center;">' + (data.original.shouldCost ? '¥ ' + data.original.shouldCost : '-') + '</td>';
+      html += '<tr><td>Should Cost参考值</td><td style="font-weight:bold; color:#e74c3c; font-size:15px; text-align:center;">' + (data.original.shouldCost ? '¥ ' + data.original.shouldCost : '-') + '</td>';
       data.alternatives.forEach(alt => {
         html += '<td style="font-weight:bold; color:#e74c3c; font-size:15px; text-align:center;">' + (alt.shouldCost ? '¥ ' + alt.shouldCost : '-') + '</td>';
       });
       html += '</tr>';
 
-      html += '<tr>';
-      html += '<td>国别/厂商</td>';
-      html += '<td>' + escapeHtml((data.original.origin || '-') + ' / ' + (data.original.manufacturer || '-')) + '</td>'; 
+      html += '<tr><td>国别/厂商</td><td>' + escapeHtml((data.original.origin || '-') + ' / ' + (data.original.manufacturer || '-')) + '</td>'; 
       data.alternatives.forEach(alt => {
         html += '<td>' + escapeHtml((alt.origin || '-') + ' / ' + (alt.manufacturer || '-')) + '</td>';
       });
@@ -836,8 +663,7 @@ async function querySubstitute(isRefresh = false) {
 
       if (data.param_names && Array.isArray(data.param_names)) {
         data.param_names.forEach(paramName => {
-          html += '<tr>';
-          html += '<td>' + escapeHtml(paramName) + '</td>';
+          html += '<tr><td>' + escapeHtml(paramName) + '</td>';
           const origVal = data.original.key_params && data.original.key_params[paramName] ? data.original.key_params[paramName] : '-';
           html += '<td>' + escapeHtml(origVal) + '</td>';
           data.alternatives.forEach(alt => {
@@ -848,47 +674,23 @@ async function querySubstitute(isRefresh = false) {
         });
       }
 
-      html += '<tr>';
-      html += '<td>推荐理由</td>';
-      html += '<td>-</td>';
+      html += '<tr><td>推荐理由</td><td>-</td>';
       data.alternatives.forEach(alt => {
         html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + '</td>';
       });
-      html += '</tr>';
+      html += '</tr></tbody></table></div>';
 
-      html += '</tbody></table>';
-      html += '</div>'; 
-
-      html += '<div style="text-align: right; margin-top: 10px;">';
-      html += '<button style="background: #8e44ad; color: #fff; border: none; padding: 8px 42px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button>';
-      html += '</div>';
-
-      html += '</div>'; 
+      html += '<div style="text-align: right; margin-top: 10px;"><button style="background: #8e44ad; color: #fff; border: none; padding: 8px 42px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button></div></div>'; 
       subDiv.innerHTML = html;
     } else {
-      if (!isRefresh) {
-        subDiv.innerHTML = '<div style="color:#7f8c8d; background:none; border:none; text-align:center; padding:20px; font-size:14px;">暂未找到合适的跨品牌同级别替代型号，该芯片可能具有较高的技术壁垒或封闭生态。</div>'; 
-        trendingBox.style.display = 'block';
-      } else {
-        if(refreshOverlay) {
-          refreshOverlay.innerHTML = '<span style="color:#e74c3c;">没有找到新的替代型号了</span>';
-          setTimeout(() => refreshOverlay.remove(), 2000);
-        }
-      }
+      if (!isRefresh) { subDiv.innerHTML = '<div style="color:#7f8c8d; background:none; border:none; text-align:center; padding:20px; font-size:14px;">暂未找到合适的跨品牌同级别替代型号，该芯片可能具有较高的技术壁垒或封闭生态。</div>'; trendingBox.style.display = 'block'; }
+      else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">没有找到新的替代型号了</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
     }
   } catch (e) {
-    if (!isRefresh) {
-      subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
-      trendingBox.style.display = 'block';
-    } else if(refreshOverlay) {
-      refreshOverlay.innerHTML = '<span style="color:#e74c3c;">网络异常，请稍后重试</span>';
-      setTimeout(() => refreshOverlay.remove(), 2000);
-    }
+    if (!isRefresh) { subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>'; trendingBox.style.display = 'block'; }
+    else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">网络异常，请稍后重试</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
   } finally {
-    if (!isRefresh) {
-      btn.disabled = false;
-      btn.textContent = '替代型号';
-    }
+    if (!isRefresh) { btn.disabled = false; btn.textContent = '替代型号'; }
   }
 }
 
@@ -901,61 +703,29 @@ const fileInput = document.getElementById('fileInput');
 dropZone.addEventListener('click', () => fileInput.click());
 dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
 dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
-dropZone.addEventListener('drop', (e) => {
-  e.preventDefault(); dropZone.classList.remove('dragover');
-  if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
-});
-fileInput.addEventListener('change', (e) => {
-  if (e.target.files.length > 0) handleFile(e.target.files[0]);
-});
+dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
 
 async function handleFile(file) {
   document.body.classList.remove('is-home'); 
-  
   const name = file.name.toLowerCase();
-  if (!name.endsWith('.xlsx') && !name.endsWith('.xls')) {
-    alert('请上传 Excel (.xlsx / .xls) 格式的文件');
-    return;
-  }
+  if (!name.endsWith('.xlsx') && !name.endsWith('.xls')) { alert('请上传 Excel (.xlsx / .xls) 格式的文件'); return; }
 
   closeBatchModal();
   const resultDiv = document.getElementById('result');
   const subDiv = document.getElementById('substitute-result'); 
 
-  subDiv.innerHTML = '';
-  currentAlternatives = [];
-  trendingBox.style.display = 'none'; 
+  subDiv.innerHTML = ''; currentAlternatives = []; trendingBox.style.display = 'none'; 
 
   let workbook;
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    workbook = XLSX.read(arrayBuffer, { type: 'array' });
-  } catch (e) {
-    resultDiv.innerHTML = '<div class="error">文件解析失败，请确认是有效的 Excel 文件</div>';
-    trendingBox.style.display = 'block';
-    return;
-  }
+  try { workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' }); } catch (e) { resultDiv.innerHTML = '<div class="error">文件解析失败，请确认是有效的 Excel 文件</div>'; trendingBox.style.display = 'block'; return; }
 
-  const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
-
-  if (rows.length < 2) {
-    resultDiv.innerHTML = '<div class="error">文件中没有找到数据（第2行开始才是芯片型号）</div>';
-    trendingBox.style.display = 'block';
-    return;
-  }
+  const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '' });
+  if (rows.length < 2) { resultDiv.innerHTML = '<div class="error">文件中没有找到数据（第2行开始才是芯片型号）</div>'; trendingBox.style.display = 'block'; return; }
 
   const partNumbers = [];
-  for (let i = 1; i < rows.length; i++) {
-    const val = (rows[i][0] || '').toString().trim();
-    if (val) partNumbers.push(val);
-  }
-
-  if (partNumbers.length === 0) {
-    resultDiv.innerHTML = '<div class="error">A列第2行开始未找到任何芯片型号</div>';
-    trendingBox.style.display = 'block';
-    return;
-  }
+  for (let i = 1; i < rows.length; i++) { const val = (rows[i][0] || '').toString().trim(); if (val) partNumbers.push(val); }
+  if (partNumbers.length === 0) { resultDiv.innerHTML = '<div class="error">A列第2行开始未找到任何芯片型号</div>'; trendingBox.style.display = 'block'; return; }
 
   const total = Math.min(partNumbers.length, MAX_BATCH);
   const truncated = partNumbers.length > MAX_BATCH;
@@ -964,22 +734,15 @@ async function handleFile(file) {
   resultDiv.innerHTML = `
     <div class="progress-container">
       <div class="progress-title">批量分析进行中</div>
-      <div class="progress-tip">
-        💡 <strong>温馨提示：</strong>批量分析需要为每个芯片型号依次调用芯片网站与AI 接口，为保证 API 稳定性，每个型号之间至少有 2.5 秒以上的时间间隔。整个过程可能需要数分钟，请耐心等待，不要关闭或刷新页面。
-        ${truncated ? '<br><br>⚠️ 文件中共有 ' + partNumbers.length + ' 个型号，超出单次上限，本次仅分析前 ' + MAX_BATCH + ' 个。' : ''}
-      </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progressFill" style="width:0%">0%</div>
-      </div>
+      <div class="progress-tip">💡 <strong>温馨提示：</strong>批量分析需要为每个芯片型号依次调用芯片网站与AI 接口，每个型号之间至少有 2.5 秒以上的时间间隔。请耐心等待，不要关闭页面。${truncated ? '<br><br>⚠️ 文件中共有 ' + partNumbers.length + ' 个型号，超出单次上限，本次仅分析前 ' + MAX_BATCH + ' 个。' : ''}</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%">0%</div></div>
       <div class="progress-text" id="progressText">准备中...</div>
       <div class="progress-current" id="progressCurrent"></div>
-    </div>
-  `;
+    </div>`;
 
   const progressFill = document.getElementById('progressFill');
   const progressText = document.getElementById('progressText');
   const progressCurrent = document.getElementById('progressCurrent');
-
   const results = [];
 
   for (let i = 0; i < list.length; i++) {
@@ -988,108 +751,49 @@ async function handleFile(file) {
     progressCurrent.textContent = `正在分析：${pn}`;
 
     try {
-      const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn));
+      // 注意这里：&isBatch=true 用于后端区分
+      const resp = await fetch(API_URL + '?partNumber=' + encodeURIComponent(pn) + '&isBatch=true', { headers: getHeaders() });
       const data = await resp.json();
 
-      const digikeyPrice1k = (data.digikey && data.digikey.price1k) ? '$' + data.digikey.price1k : '未查询到';
-      const mouserPrice1k = (data.mouser && data.mouser.price1k) ? '$' + data.mouser.price1k : '未查询到';
-      const lcscPrice1k = (data.lcsc && data.lcsc.price1k) ? '$' + data.lcsc.price1k : '未查询到';
-
       results.push({
-        original: pn,
-        shouldCost: data.shouldCost || '未查询到',
-        digikeyPartNumber: (data.digikey && data.digikey.partNumber) || '',
-        mouserPartNumber: (data.mouser && data.mouser.partNumber) || '',
-        lcscPartNumber: (data.lcsc && data.lcsc.productModel) || '',
-        digikey1k: digikeyPrice1k,
-        mouser1k: mouserPrice1k,
-        lcsc1k: lcscPrice1k,
+        original: pn, shouldCost: data.shouldCost || '未查询到',
+        digikeyPartNumber: (data.digikey && data.digikey.partNumber) || '', mouserPartNumber: (data.mouser && data.mouser.partNumber) || '', lcscPartNumber: (data.lcsc && data.lcsc.productModel) || '',
+        digikey1k: (data.digikey && data.digikey.price1k) ? '$' + data.digikey.price1k : '未查询到',
+        mouser1k: (data.mouser && data.mouser.price1k) ? '$' + data.mouser.price1k : '未查询到',
+        lcsc1k: (data.lcsc && data.lcsc.price1k) ? '$' + data.lcsc.price1k : '未查询到',
         manufacturer: (data.digikey && data.digikey.manufacturer) || (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
-        level1: data.level1 || '',
-        level2: data.level2 || '',
-        chipName: data.chipName || data.level2 || '', 
+        level1: data.level1 || '', level2: data.level2 || '', chipName: data.chipName || data.level2 || '', 
         description: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || ''
       });
     } catch (e) {
-      results.push({
-        original: pn,
-        shouldCost: '未查询到',
-        digikeyPartNumber: '',
-        mouserPartNumber: '',
-        lcscPartNumber: '',
-        digikey1k: '未查询到',
-        mouser1k: '未查询到',
-        lcsc1k: '未查询到',
-        manufacturer: '',
-        level1: '',
-        level2: '',
-        chipName: '',
-        description: ''
-      });
+      results.push({ original: pn, shouldCost: '未查询到', digikeyPartNumber: '', mouserPartNumber: '', lcscPartNumber: '', digikey1k: '未查询到', mouser1k: '未查询到', lcsc1k: '未查询到', manufacturer: '', level1: '', level2: '', chipName: '', description: '' });
     }
 
     const pct = Math.round(((i + 1) / total) * 100);
-    progressFill.style.width = pct + '%';
-    progressFill.textContent = pct + '%';
-
-    if (i < list.length - 1) {
-      await new Promise(r => setTimeout(r, QUERY_INTERVAL_MS));
-    }
+    progressFill.style.width = pct + '%'; progressFill.textContent = pct + '%';
+    if (i < list.length - 1) await new Promise(r => setTimeout(r, QUERY_INTERVAL_MS));
   }
 
   progressText.textContent = '正在生成结果文件...';
 
-  const outputData = [
-    ['原始型号', 'Should Cost（CNY）', 'Digikey完整型号', '得捷报价-1k pcs（USD）', 'Mouser完整型号', 'Mouser报价-1k pcs（USD）', '立创完整型号', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']
-  ];
-  results.forEach(r => {
-    outputData.push([
-      r.original, r.shouldCost,
-      r.digikeyPartNumber, r.digikey1k,
-      r.mouserPartNumber, r.mouser1k,
-      r.lcscPartNumber, r.lcsc1k,
-      r.manufacturer, r.level1, r.level2, r.chipName, r.description
-    ]);
-  });
+  const outputData = [['原始型号', 'Should Cost（CNY）', 'Digikey完整型号', '得捷报价-1k pcs（USD）', 'Mouser完整型号', 'Mouser报价-1k pcs（USD）', '立创完整型号', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']];
+  results.forEach(r => { outputData.push([r.original, r.shouldCost, r.digikeyPartNumber, r.digikey1k, r.mouserPartNumber, r.mouser1k, r.lcscPartNumber, r.lcsc1k, r.manufacturer, r.level1, r.level2, r.chipName, r.description]); });
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
-  newSheet['!cols'] = [
-    { wch: 22 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 },
-    { wch: 26 }, { wch: 24 }, { wch: 32 }, { wch: 32 }, { wch: 50 }
-  ];
-
+  newSheet['!cols'] = [{ wch: 22 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 26 }, { wch: 24 }, { wch: 32 }, { wch: 32 }, { wch: 50 }];
   const newWorkbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(newWorkbook, newSheet, '分析结果');
 
   const outFileName = file.name.replace(/\.(xlsx|xls)$/i, '') + '_分析结果.xlsx';
-  const wbout = XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+  const blob = new Blob([XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'array' })], { type: 'application/octet-stream' });
   const url = URL.createObjectURL(blob);
 
-  resultDiv.innerHTML = `
-    <div class="success-msg">
-      ✅ <strong>批量分析完成！</strong>共分析 ${total} 个型号。<br>
-      结果文件已自动开始下载，如未开始，请点击下方按钮：
-    </div>
-    <div style="text-align:center;">
-      <a href="${url}" download="${outFileName}" 
-         style="display:inline-block;padding:14px 32px;background:#27ae60;color:#fff;text-decoration:none;border-radius:12px;font-weight:bold;">
-        📥 下载分析结果
-      </a>
-    </div>
-  `;
+  resultDiv.innerHTML = `<div class="success-msg">✅ <strong>批量分析完成！</strong>共分析 ${total} 个型号。<br>结果文件已自动开始下载，如未开始，请点击下方按钮：</div><div style="text-align:center;"><a href="${url}" download="${outFileName}" style="display:inline-block;padding:14px 32px;background:#27ae60;color:#fff;text-decoration:none;border-radius:12px;font-weight:bold;">📥 下载分析结果</a></div>`;
 
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = outFileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  const a = document.createElement('a'); a.href = url; a.download = outFileName; document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
-document.getElementById('batchModal').addEventListener('click', function(e) {
-  if (e.target === this) closeBatchModal();
-});
+document.getElementById('batchModal').addEventListener('click', function(e) { if (e.target === this) closeBatchModal(); });
 </script>
 </body>
 </html>
