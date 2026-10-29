@@ -484,7 +484,7 @@ async function query() {
       const isRealError = err && !err.includes('未找到') && !err.includes('无结果') && !err.includes('仅找到');
       if (!hasPrice && !isRealError) return '';
       let h = '<div class="source-section"><div class="source-header"><span class="source-name">' + name + '</span><span class="source-badge">' + escapeHtml(isRealError ? '报错' : '参考价') + '</span></div>';
-      if (isRealError) { h += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>'; } 
+      if (isRealError) { h += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">' + escapeHtml(err) + '</div>'; } 
       else {
         if (name.includes('立创')) {
           if (source.productCode) h += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + escapeHtml(source.productCode) + '</span></div>';
