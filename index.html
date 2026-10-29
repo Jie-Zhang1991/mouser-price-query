@@ -1,9 +1,9 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230054A6'/%3E%3Ctext x='50' y='74' font-size='68' font-family='Microsoft YaHei,sans-serif' text-anchor='middle' fill='white' font-weight='bold'%3E%E8%8A%AF%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDA1NEE2Ii8+PHRleHQgeD0iNTAiIHk9Ijc0IiBmb250LXNpemU9IjY4IiBmb250LWZhbWlseT0iTWljcm9zb2Z0IFlhSGVpLHNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCI+6IqvPC90ZXh0Pjwvc3ZnPg==">
 <title>ChipCost</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -478,25 +478,18 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">芯片一级分类</span><span class="info-value">' + escapeHtml(data.level1 || '-') + '</span></div>';
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div></div>';
 
-    // 这里完全恢复为旧版逻辑，确保布局不崩
     function renderSource(source, name) {
       const hasPrice = source.priceBreaks && source.priceBreaks.length > 0;
       const err = source.error || "";
       const isRealError = err && !err.includes('未找到') && !err.includes('无结果') && !err.includes('仅找到');
-      
-      // 旧版核心恢复：如果没有价格且不是报错，直接 return ''; 不渲染空卡片
-      if (!hasPrice && !isRealError) return ''; 
-      
+      if (!hasPrice && !isRealError) return '';
       let h = '<div class="source-section"><div class="source-header"><span class="source-name">' + name + '</span><span class="source-badge">' + escapeHtml(isRealError ? '报错' : '参考价') + '</span></div>';
-      if (isRealError) { h += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">' + escapeHtml(err) + '</div>'; } 
+      if (isRealError) { h += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>'; } 
       else {
         if (name.includes('立创')) {
           if (source.productCode) h += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + escapeHtml(source.productCode) + '</span></div>';
           if (source.productModel) h += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + formatPartNumber(source.productModel, partNumber) + '</span></div>';
           if (source.brandName) h += '<div class="info-row"><span class="info-label">品牌</span><span class="info-value">' + escapeHtml(source.brandName) + '</span></div>';
-        } else if (name.includes('云汉')) {
-          if (source.partNumber) h += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
-          if (source.manufacturer) h += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
         } else {
           if (source.partNumber) h += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
           if (source.manufacturer) h += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
@@ -516,7 +509,6 @@ async function query() {
     if (data.digikey) html += renderSource(data.digikey, '得捷 DigiKey');
     if (data.mouser) html += renderSource(data.mouser, '贸泽 Mouser');
     if (data.lcsc) html += renderSource(data.lcsc, '立创商城 LCSC');
-    if (data.icky) html += renderSource(data.icky, '云汉芯城 ICKEY');
     resultDiv.innerHTML = html;
   } catch (e) {
     resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
@@ -650,13 +642,14 @@ async function handleFile(file) {
   const partNumbers = [];
   let isTruncated = false;
   
+  // 优化：遍历 A 列，跳过空行，收集满 100 个立即停止
   for (let i = 0; i < rows.length; i++) { 
       const val = (rows[i][0] || '').toString().trim(); 
       if (val) {
           partNumbers.push(val);
           if (partNumbers.length > MAX_BATCH) {
               isTruncated = true;
-              partNumbers.pop();
+              partNumbers.pop(); // 移除第 101 个，只保留 100 个
               break;
           }
       }
@@ -692,20 +685,16 @@ async function handleFile(file) {
       const data = await resp.json();
       results.push({
         original: pn, shouldCost: data.shouldCost || '未查询到',
-        digikeyPartNumber: (data.digikey && data.digikey.partNumber) || '', 
-        mouserPartNumber: (data.mouser && data.mouser.partNumber) || '', 
-        lcscPartNumber: (data.lcsc && data.lcsc.productModel) || '',
-        ickyPartNumber: (data.icky && data.icky.partNumber) || '',
+        digikeyPartNumber: (data.digikey && data.digikey.partNumber) || '', mouserPartNumber: (data.mouser && data.mouser.partNumber) || '', lcscPartNumber: (data.lcsc && data.lcsc.productModel) || '',
         digikey1k: (data.digikey && data.digikey.price1k) ? '$' + data.digikey.price1k : '未查询到',
         mouser1k: (data.mouser && data.mouser.price1k) ? '$' + data.mouser.price1k : '未查询到',
         lcsc1k: (data.lcsc && data.lcsc.price1k) ? '$' + data.lcsc.price1k : '未查询到',
-        icky1k: (data.icky && data.icky.price1k) ? '$' + data.icky.price1k : '未查询到',
-        manufacturer: (data.digikey && data.digikey.manufacturer) || (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || (data.icky && data.icky.manufacturer) || '',
+        manufacturer: (data.digikey && data.digikey.manufacturer) || (data.mouser && data.mouser.manufacturer) || (data.lcsc && data.lcsc.brandName) || '',
         level1: data.level1 || '', level2: data.level2 || '', chipName: data.chipName || data.level2 || '', 
-        description: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || (data.icky && data.icky.description) || ''
+        description: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || ''
       });
     } catch (e) {
-      results.push({ original: pn, shouldCost: '未查询到', digikeyPartNumber: '', mouserPartNumber: '', lcscPartNumber: '', ickyPartNumber: '', digikey1k: '未查询到', mouser1k: '未查询到', lcsc1k: '未查询到', icky1k: '未查询到', manufacturer: '', level1: '', level2: '', chipName: '', description: '' });
+      results.push({ original: pn, shouldCost: '未查询到', digikeyPartNumber: '', mouserPartNumber: '', lcscPartNumber: '', digikey1k: '未查询到', mouser1k: '未查询到', lcsc1k: '未查询到', manufacturer: '', level1: '', level2: '', chipName: '', description: '' });
     }
 
     const pct = Math.round(((i + 1) / total) * 100);
@@ -716,20 +705,11 @@ async function handleFile(file) {
 
   progressText.textContent = '正在生成结果文件...';
 
-  const outputData = [['原始型号', 'Should Cost（CNY）', 'Digikey完整型号', '得捷报价-1k pcs（USD）', 'Mouser完整型号', 'Mouser报价-1k pcs（USD）', '立创完整型号', '立创报价-1k pcs（USD）', '云汉完整型号', '云汉报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']];
-  results.forEach(r => { 
-    outputData.push([
-      r.original, r.shouldCost, 
-      r.digikeyPartNumber, r.digikey1k, 
-      r.mouserPartNumber, r.mouser1k, 
-      r.lcscPartNumber, r.lcsc1k, 
-      r.ickyPartNumber, r.icky1k,
-      r.manufacturer, r.level1, r.level2, r.chipName, r.description
-    ]); 
-  });
+  const outputData = [['原始型号', 'Should Cost（CNY）', 'Digikey完整型号', '得捷报价-1k pcs（USD）', 'Mouser完整型号', 'Mouser报价-1k pcs（USD）', '立创完整型号', '立创报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']];
+  results.forEach(r => { outputData.push([r.original, r.shouldCost, r.digikeyPartNumber, r.digikey1k, r.mouserPartNumber, r.mouser1k, r.lcscPartNumber, r.lcsc1k, r.manufacturer, r.level1, r.level2, r.chipName, r.description]); });
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
-  newSheet['!cols'] = [{ wch: 22 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 26 }, { wch: 24 }, { wch: 32 }, { wch: 32 }, { wch: 50 }];
+  newSheet['!cols'] = [{ wch: 22 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 26 }, { wch: 24 }, { wch: 32 }, { wch: 32 }, { wch: 50 }];
   const newWorkbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(newWorkbook, newSheet, '分析结果');
 
