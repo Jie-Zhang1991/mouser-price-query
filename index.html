@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -490,6 +490,9 @@ async function query() {
           if (source.productCode) h += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + escapeHtml(source.productCode) + '</span></div>';
           if (source.productModel) h += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + formatPartNumber(source.productModel, partNumber) + '</span></div>';
           if (source.brandName) h += '<div class="info-row"><span class="info-label">品牌</span><span class="info-value">' + escapeHtml(source.brandName) + '</span></div>';
+        } else if (name.includes('云汉')) {
+          if (source.partNumber) h += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
+          if (source.manufacturer) h += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
         } else {
           if (source.partNumber) h += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
           if (source.manufacturer) h += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
@@ -643,14 +646,13 @@ async function handleFile(file) {
   const partNumbers = [];
   let isTruncated = false;
   
-  // 优化：遍历 A 列，跳过空行，收集满 100 个立即停止
   for (let i = 0; i < rows.length; i++) { 
       const val = (rows[i][0] || '').toString().trim(); 
       if (val) {
           partNumbers.push(val);
           if (partNumbers.length > MAX_BATCH) {
               isTruncated = true;
-              partNumbers.pop(); // 移除第 101 个，只保留 100 个
+              partNumbers.pop();
               break;
           }
       }
