@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -512,7 +512,7 @@ async function query() {
     if (data.digikey) html += renderSource(data.digikey, '得捷 DigiKey');
     if (data.mouser) html += renderSource(data.mouser, '贸泽 Mouser');
     if (data.lcsc) html += renderSource(data.lcsc, '立创商城 LCSC');
-    if (data.icky) html += renderSource(data.icky, '云汉芯城 ICKEY'); // 增加云汉卡片
+    if (data.icky) html += renderSource(data.icky, '云汉芯城 ICKEY');
     resultDiv.innerHTML = html;
   } catch (e) {
     resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
@@ -688,7 +688,9 @@ async function handleFile(file) {
       const data = await resp.json();
       results.push({
         original: pn, shouldCost: data.shouldCost || '未查询到',
-        digikeyPartNumber: (data.digikey && data.digikey.partNumber) || '', mouserPartNumber: (data.mouser && data.mouser.partNumber) || '', lcscPartNumber: (data.lcsc && data.lcsc.productModel) || '',
+        digikeyPartNumber: (data.digikey && data.digikey.partNumber) || '', 
+        mouserPartNumber: (data.mouser && data.mouser.partNumber) || '', 
+        lcscPartNumber: (data.lcsc && data.lcsc.productModel) || '',
         ickyPartNumber: (data.icky && data.icky.partNumber) || '',
         digikey1k: (data.digikey && data.digikey.price1k) ? '$' + data.digikey.price1k : '未查询到',
         mouser1k: (data.mouser && data.mouser.price1k) ? '$' + data.mouser.price1k : '未查询到',
