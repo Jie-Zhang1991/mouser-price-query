@@ -480,32 +480,31 @@ async function query() {
 
     function renderSource(source, name) {
       const hasPrice = source.priceBreaks && source.priceBreaks.length > 0;
-      const err = source.error || "";
-      const isRealError = err && !err.includes('未找到') && !err.includes('无结果') && !err.includes('仅找到');
-      if (!hasPrice && !isRealError) return '';
-      let h = '<div class="source-section"><div class="source-header"><span class="source-name">' + name + '</span><span class="source-badge">' + escapeHtml(isRealError ? '报错' : '参考价') + '</span></div>';
-      if (isRealError) { h += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>'; } 
-      else {
-        if (name.includes('立创')) {
-          if (source.productCode) h += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + escapeHtml(source.productCode) + '</span></div>';
-          if (source.productModel) h += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + formatPartNumber(source.productModel, partNumber) + '</span></div>';
-          if (source.brandName) h += '<div class="info-row"><span class="info-label">品牌</span><span class="info-value">' + escapeHtml(source.brandName) + '</span></div>';
-        } else if (name.includes('云汉')) {
-          if (source.partNumber) h += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
-          if (source.manufacturer) h += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
-        } else {
-          if (source.partNumber) h += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
-          if (source.manufacturer) h += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
-        }
-        if (source.description) h += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(source.description) + '</span></div>';
-        h += '<table><tr><th>起订量</th><th>单价 ' + (name.includes('立创') ? '(USD)' : '') + '</th></tr>';
-        source.priceBreaks.forEach(pb => {
-          h += '<tr><td>' + escapeHtml(pb.Quantity || pb.ladder) + '</td><td>' + (name.includes('立创') ? '$' + (pb.usdPrice ? pb.usdPrice.toFixed(4) : '-') : escapeHtml(pb.Price)) + '</td></tr>';
-        });
-        h += '</table>';
-        const link = source.detailUrl || source.pdfUrl;
-        if (link) h += '<a class="detail-link" href="' + escapeHtml(link) + '" target="_blank">查看详情页 →</a>';
+      // 修改点：没有价格直接隐藏，无视任何报错
+      if (!hasPrice) return ''; 
+      
+      let h = '<div class="source-section"><div class="source-header"><span class="source-name">' + name + '</span><span class="source-badge">参考价</span></div>';
+      
+      if (name.includes('立创')) {
+        if (source.productCode) h += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + escapeHtml(source.productCode) + '</span></div>';
+        if (source.productModel) h += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + formatPartNumber(source.productModel, partNumber) + '</span></div>';
+        if (source.brandName) h += '<div class="info-row"><span class="info-label">品牌</span><span class="info-value">' + escapeHtml(source.brandName) + '</span></div>';
+      } else if (name.includes('云汉')) {
+        if (source.partNumber) h += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
+        if (source.manufacturer) h += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
+      } else {
+        if (source.partNumber) h += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
+        if (source.manufacturer) h += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
       }
+      if (source.description) h += '<div class="info-row"><span class="info-label">描述</span><span class="info-value">' + escapeHtml(source.description) + '</span></div>';
+      h += '<table><tr><th>起订量</th><th>单价 ' + (name.includes('立创') ? '(USD)' : '') + '</th></tr>';
+      source.priceBreaks.forEach(pb => {
+        h += '<tr><td>' + escapeHtml(pb.Quantity || pb.ladder) + '</td><td>' + (name.includes('立创') ? '$' + (pb.usdPrice ? pb.usdPrice.toFixed(4) : '-') : escapeHtml(pb.Price)) + '</td></tr>';
+      });
+      h += '</table>';
+      const link = source.detailUrl || source.pdfUrl;
+      if (link) h += '<a class="detail-link" href="' + escapeHtml(link) + '" target="_blank">查看详情页 →</a>';
+      
       return h + '</div>';
     }
 
