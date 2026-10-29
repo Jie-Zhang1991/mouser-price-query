@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -481,11 +481,11 @@ async function query() {
     function renderSource(source, name) {
       const hasPrice = source.priceBreaks && source.priceBreaks.length > 0;
       const err = source.error || "";
-      if (!hasPrice && !err) return '';
-      let h = '<div class="source-section"><div class="source-header"><span class="source-name">' + name + '</span><span class="source-badge">' + escapeHtml(hasPrice ? '参考价' : '无报价') + '</span></div>';
-      if (!hasPrice) { 
-          h += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">' + (err ? escapeHtml(err) : '该平台未查询到有效价格信息。') + '</div>'; 
-      } else {
+      const isRealError = err && !err.includes('未找到') && !err.includes('无结果') && !err.includes('仅找到');
+      if (!hasPrice && !isRealError) return '';
+      let h = '<div class="source-section"><div class="source-header"><span class="source-name">' + name + '</span><span class="source-badge">' + escapeHtml(isRealError ? '报错' : '参考价') + '</span></div>';
+      if (isRealError) { h += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">API使用次数/频率超限，暂无价格信息。</div>'; } 
+      else {
         if (name.includes('立创')) {
           if (source.productCode) h += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + escapeHtml(source.productCode) + '</span></div>';
           if (source.productModel) h += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + formatPartNumber(source.productModel, partNumber) + '</span></div>';
@@ -512,7 +512,7 @@ async function query() {
     if (data.digikey) html += renderSource(data.digikey, '得捷 DigiKey');
     if (data.mouser) html += renderSource(data.mouser, '贸泽 Mouser');
     if (data.lcsc) html += renderSource(data.lcsc, '立创商城 LCSC');
-    if (data.icky) html += renderSource(data.icky, '云汉芯城 ICKEY');
+    if (data.icky) html += renderSource(data.icky, '云汉芯城 ICKEY'); // 增加云汉卡片
     resultDiv.innerHTML = html;
   } catch (e) {
     resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
