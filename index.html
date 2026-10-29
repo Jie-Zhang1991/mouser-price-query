@@ -490,9 +490,6 @@ async function query() {
           if (source.productCode) h += '<div class="info-row"><span class="info-label">LCSC编号</span><span class="info-value">' + escapeHtml(source.productCode) + '</span></div>';
           if (source.productModel) h += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + formatPartNumber(source.productModel, partNumber) + '</span></div>';
           if (source.brandName) h += '<div class="info-row"><span class="info-label">品牌</span><span class="info-value">' + escapeHtml(source.brandName) + '</span></div>';
-        } else if (name.includes('云汉')) {
-          if (source.partNumber) h += '<div class="info-row"><span class="info-label">厂商型号</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
-          if (source.manufacturer) h += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
         } else {
           if (source.partNumber) h += '<div class="info-row"><span class="info-label">厂商料号</span><span class="info-value">' + formatPartNumber(source.partNumber, partNumber) + '</span></div>';
           if (source.manufacturer) h += '<div class="info-row"><span class="info-label">制造商</span><span class="info-value">' + escapeHtml(source.manufacturer) + '</span></div>';
@@ -646,13 +643,14 @@ async function handleFile(file) {
   const partNumbers = [];
   let isTruncated = false;
   
+  // 优化：遍历 A 列，跳过空行，收集满 100 个立即停止
   for (let i = 0; i < rows.length; i++) { 
       const val = (rows[i][0] || '').toString().trim(); 
       if (val) {
           partNumbers.push(val);
           if (partNumbers.length > MAX_BATCH) {
               isTruncated = true;
-              partNumbers.pop();
+              partNumbers.pop(); // 移除第 101 个，只保留 100 个
               break;
           }
       }
@@ -688,9 +686,7 @@ async function handleFile(file) {
       const data = await resp.json();
       results.push({
         original: pn, shouldCost: data.shouldCost || '未查询到',
-        digikeyPartNumber: (data.digikey && data.digikey.partNumber) || '', 
-        mouserPartNumber: (data.mouser && data.mouser.partNumber) || '', 
-        lcscPartNumber: (data.lcsc && data.lcsc.productModel) || '',
+        digikeyPartNumber: (data.digikey && data.digikey.partNumber) || '', mouserPartNumber: (data.mouser && data.mouser.partNumber) || '', lcscPartNumber: (data.lcsc && data.lcsc.productModel) || '',
         ickyPartNumber: (data.icky && data.icky.partNumber) || '',
         digikey1k: (data.digikey && data.digikey.price1k) ? '$' + data.digikey.price1k : '未查询到',
         mouser1k: (data.mouser && data.mouser.price1k) ? '$' + data.mouser.price1k : '未查询到',
@@ -713,16 +709,7 @@ async function handleFile(file) {
   progressText.textContent = '正在生成结果文件...';
 
   const outputData = [['原始型号', 'Should Cost（CNY）', 'Digikey完整型号', '得捷报价-1k pcs（USD）', 'Mouser完整型号', 'Mouser报价-1k pcs（USD）', '立创完整型号', '立创报价-1k pcs（USD）', '云汉完整型号', '云汉报价-1k pcs（USD）', '芯片品牌/厂商', '芯片一级分类', '芯片二级分类', '芯片名称', '描述']];
-  results.forEach(r => { 
-    outputData.push([
-      r.original, r.shouldCost, 
-      r.digikeyPartNumber, r.digikey1k, 
-      r.mouserPartNumber, r.mouser1k, 
-      r.lcscPartNumber, r.lcsc1k, 
-      r.ickyPartNumber, r.icky1k,
-      r.manufacturer, r.level1, r.level2, r.chipName, r.description
-    ]); 
-  });
+  results.forEach(r => { outputData.push([r.original, r.shouldCost, r.digikeyPartNumber, r.digikey1k, r.mouserPartNumber, r.mouser1k, r.lcscPartNumber, r.lcsc1k, r.ickyPartNumber, r.icky1k, r.manufacturer, r.level1, r.level2, r.chipName, r.description]); });
 
   const newSheet = XLSX.utils.aoa_to_sheet(outputData);
   newSheet['!cols'] = [{ wch: 22 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 28 }, { wch: 30 }, { wch: 26 }, { wch: 24 }, { wch: 32 }, { wch: 32 }, { wch: 50 }];
