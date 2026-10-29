@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDA1NEE2Ii8+PHRleHQgeD0iNTAiIHk9Ijc0IiBmb250LXNpemU9IjY4IiBmb250LWZhbWlseT0iTWljcm9zb2Z0IFlhSGVpLHNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCI+6IqvPC90ZXh0Pjwvc3ZnPg==">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230054A6'/%3E%3Ctext x='50' y='74' font-size='68' font-family='Microsoft YaHei,sans-serif' text-anchor='middle' fill='white' font-weight='bold'%3E%E8%8A%AF%3C/text%3E%3C/svg%3E">
 <title>ChipCost</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -478,11 +478,15 @@ async function query() {
     html += '<div class="info-row"><span class="info-label">芯片一级分类</span><span class="info-value">' + escapeHtml(data.level1 || '-') + '</span></div>';
     html += '<div class="info-row"><span class="info-label">芯片二级分类</span><span class="info-value">' + escapeHtml(data.level2 || '-') + '</span></div></div>';
 
+    // 这里完全恢复为旧版逻辑，确保布局不崩
     function renderSource(source, name) {
       const hasPrice = source.priceBreaks && source.priceBreaks.length > 0;
       const err = source.error || "";
       const isRealError = err && !err.includes('未找到') && !err.includes('无结果') && !err.includes('仅找到');
-      if (!hasPrice && !isRealError) return '';
+      
+      // 旧版核心恢复：如果没有价格且不是报错，直接 return ''; 不渲染空卡片
+      if (!hasPrice && !isRealError) return ''; 
+      
       let h = '<div class="source-section"><div class="source-header"><span class="source-name">' + name + '</span><span class="source-badge">' + escapeHtml(isRealError ? '报错' : '参考价') + '</span></div>';
       if (isRealError) { h += '<div style="color:#e74c3c;font-size:13px;padding:10px 0;">' + escapeHtml(err) + '</div>'; } 
       else {
