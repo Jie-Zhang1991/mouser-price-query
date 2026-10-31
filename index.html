@@ -17,7 +17,6 @@
   body:not(.is-home) .search-box { width: 100%; }
   .container { width: 100%; background: transparent; border-radius: 16px; padding: 40px; height: fit-content; transition: max-width 0.4s ease, opacity 0.4s ease; opacity: 0; visibility: hidden; }
   .container.loaded { opacity: 1; visibility: visible; }
-  /* 修改点：字号进一步增大到40px，字重加粗到900 */
   h1 { font-size: 40px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: 900; }
   .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 45px; }
   body:not(.is-home) .subtitle { margin-bottom: 22px; }
@@ -132,7 +131,6 @@
     body.is-home { padding-top: 45px; align-items: flex-start; } 
     body:not(.is-home) { padding-top: 43px; } 
     .container { padding: 20px; }
-    /* 修改点：移动端同步增大字号和加粗 */
     h1 { font-size: 32px; font-weight: 900; }
     .search-box { flex-direction: column; width: 100% !important; }
     .search-box input[type="text"], .search-box button { width: 100%; }
@@ -769,7 +767,7 @@ async function handleFile(file) {
   resultDiv.innerHTML = `
     <div class="progress-container">
       <div class="progress-title">批量分析进行中</div>
-      <div class="progress-tip">💡 <strong>温馨提示：</strong>批量分析需要为每个芯片型号依次调用芯片网站与AI 接口，每个型号之间至少有 2.5 秒以上的时间间隔。请耐心等待，不要关闭页面。${isTruncated ? '<br><br>⚠️ 文件中的型号超出单次上限，本次仅分析前 ' + MAX_BATCH + ' 个。' : ''}</div>
+      <div class="progress-tip">💡 <strong>温馨提示：</strong>批量分析需要为每个芯片型号依次调用芯片网站与AI 接口，每个型号之间至少有若干秒的时间间隔。请耐心等待，不要关闭页面。${isTruncated ? '<br><br>⚠️ 文件中的型号超出单次上限，本次仅分析前 ' + MAX_BATCH + ' 个。' : ''}</div>
       <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%">0%</div></div>
       <div class="progress-text" id="progressText">准备中...</div>
       <div class="progress-current" id="progressCurrent"></div>
@@ -782,7 +780,6 @@ async function handleFile(file) {
 
   for (let i = 0; i < list.length; i++) {
     const pn = list[i];
-    progressText.textContent = `已完成数量：${i} / ${total}`;
     progressCurrent.textContent = `正在分析：${pn}`;
 
     try {
@@ -807,6 +804,7 @@ async function handleFile(file) {
 
     const pct = Math.round(((i + 1) / total) * 100);
     progressFill.style.width = pct + '%'; progressFill.textContent = pct + '%';
+    progressText.textContent = `已完成数量：${i + 1} / ${total}`;
     fetchStats(); 
     if (i < list.length - 1) await new Promise(r => setTimeout(r, QUERY_INTERVAL_MS));
   }
