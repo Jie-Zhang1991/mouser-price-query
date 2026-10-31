@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 修改点3：确保Logo（Base64编码的芯字图标）完整保留 -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDA1NEE2Ii8+PHRleHQgeD0iNTAiIHk9Ijc0IiBmb250LXNpemU9IjY4IiBmb250LWZhbWlseT0iTWljcm9zb2Z0IFlhSGVpLHNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCI+6IqvPC90ZXh0Pjwvc3ZnPg==">
 <title>ChipCost</title>
 <style>
@@ -115,7 +116,6 @@
   .top-icon-btn:hover .user-tooltip, .top-icon-btn.show .user-tooltip { opacity: 1; visibility: visible; top: 41px; }
   .admin-menu { position: absolute; top: 46px; right: 0; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 8px 0; min-width: 170px; opacity: 0; visibility: hidden; transition: all 0.3s; border: 1px solid #e0e6ed; z-index: 1001; }
   .top-icon-btn.show .admin-menu { opacity: 1; visibility: visible; top: 41px; }
-  /* 修改点3：增加 white-space: nowrap; 确保一行显示 */
   .admin-menu-item { padding: 10px 16px; font-size: 14px; color: #2c3e50; cursor: pointer; transition: background 0.2s; text-align: left; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
   .admin-menu-item:hover { background: #f0f7ff; color: #3498db; }
   .footer { position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 11px; color: #7f8c8d; opacity: 0; visibility: hidden; transition: opacity 0.4s ease; }
@@ -160,12 +160,11 @@
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
     <div class="user-tooltip" id="settingsTooltip">该功能仅向网站管理员开放。</div>
     <div class="admin-menu" id="adminMenu" style="display: none;">
-      <!-- 修改点3：修改文本 -->
+      <!-- 修改点1：菜单文本改为“测试API接口状态” -->
       <div class="admin-menu-item" onclick="testApis()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        测试查价平台API接口
+        测试API接口状态
       </div>
-      <!-- 修改点5：增加 id 用于权限控制隐藏 -->
       <div class="admin-menu-item" id="downloadUserStatsItem" onclick="downloadUserStats()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
         下载用户使用情况
@@ -213,18 +212,18 @@
 
 <div class="modal-overlay" id="batchModal"><div class="modal"><h2>批量分析 BOM 文件</h2><div class="notice"><strong>📋 使用说明：</strong><br>1. 文件格式：仅支持 <strong>Excel (.xlsx / .xls)</strong> 或 <strong>WPS 表格</strong>；<br>2. 芯片型号存放于上传文件的 <strong>A 列</strong>，请勿填写表头等与芯片型号无关的内容；<br>3. 受 API 调用次数及时间间隔限制，批量分析的芯片数量<strong>上限暂设定为 100 个</strong>，超出部分不予分析，开发者将依据后续使用情况调整限额。</div><div class="drop-zone" id="dropZone"><div class="drop-zone-icon">📁</div><div class="drop-zone-text">点击此处选择文件，或将文件拖拽到此处</div><div class="drop-zone-hint">支持 .xlsx / .xls 格式</div><input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" /></div><div class="modal-buttons"><button style="background:#95a5a6;" onclick="closeBatchModal()">取消</button></div></div></div>
 
-<!-- 新增：API 测试结果模态框 -->
+<!-- 修改点1：标题、内边距、按钮字号整体缩小 -->
 <div class="modal-overlay" id="testApisModal">
-  <div class="modal" style="max-width: 500px;">
-    <h2>各平台 API 状态测试</h2>
-    <div id="testApisContent" style="padding: 20px 0;">
+  <div class="modal" style="max-width: 500px; padding: 24px;">
+    <h2 style="font-size: 18px; margin-bottom: 12px;">各平台/接口 API 状态测试</h2>
+    <div id="testApisContent" style="padding: 10px 0;">
       <div style="text-align: center; color: #7f8c8d;">
         <div class="spinner" style="margin: 0 auto 10px;"></div>
         <div>正在向各平台发起轻量测试...</div>
       </div>
     </div>
-    <div class="modal-buttons" style="justify-content: center; display: none;" id="testApisCloseBtnContainer">
-      <button style="background:#3498db;" onclick="closeModal('testApisModal')">关闭</button>
+    <div class="modal-buttons" style="justify-content: center; display: none; margin-top: 12px;" id="testApisCloseBtnContainer">
+      <button style="background:#3498db; padding: 10px 20px; font-size: 11px;" onclick="closeModal('testApisModal')">关闭</button>
     </div>
   </div>
 </div>
@@ -244,8 +243,6 @@ let currentTopics = [];
 let currentUserEmail = '';
 let currentAuthPayload = '';
 let currentAuthSig = '';
-// 修改点2：增加本地前端补偿变量，用于弥补后端暂未增加的 quota_count
-let localQuotaOffset = 0; 
 
 // 动态加载 XLSX 库
 let xlsxPromise = null;
@@ -311,11 +308,10 @@ async function fetchStats() {
     const resp = await fetch(url);
     const data = await resp.json();
     if (data.status === 'success') {
-      // 修改点2：使用前端补偿后的额度值
-      let displayQuota = data.todayQuota + localQuotaOffset;
+      // 撤销了前端补偿逻辑，直接使用后端最新返回的数据
+      let displayQuota = data.todayQuota;
       const quotaColor = displayQuota > 900 ? '#e74c3c' : '#3498db';
       
-      // 修改点4：移除了第三行多余的 margin-top:4px 以保持间距一致
       tooltip.innerHTML = `<div><strong>数据统计</strong></div>
         <div style="margin-top:4px;">今日芯片查询次数：<span style="color:#3498db; font-weight:bold;">${data.todayChipQuery}</span>次</div>
         <div>累计芯片查询次数：<span style="color:#3498db; font-weight:bold;">${data.totalChipQuery}</span>次</div>
@@ -359,7 +355,6 @@ async function fetchTrending(isRefresh = false) {
 }
 
 async function clearAllStats() {
-  // 修改点5：普通用户点击时的拦截提示
   if (currentUserEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
     alert('该功能仅向管理员开放。');
     return;
@@ -413,8 +408,7 @@ async function testApis() {
     </div>
   `;
 
-  // 修改点2：前端手动将本地额度补偿加 1，然后刷新统计面板
-  localQuotaOffset += 1;
+  // 撤销了前端的 +1 补偿逻辑
   fetchStats();
 
   try {
@@ -425,42 +419,58 @@ async function testApis() {
     if (data.status === 'success' && data.testResult) {
       const res = data.testResult;
       
-      // 修改点1：针对立创公网接口的误判进行强制修正
+      // 修改点1、2：自适应缩小字号、判断网络不佳状态并兼容 DeepSeek 与 汇率接口
       const renderStatus = (name, status, reason) => {
         if (name.includes('立创') && status === 'error' && (reason === 'API Key过期或封禁' || reason === '未知错误')) {
             status = 'success';
         }
         
+        let displayColor = '';
+        let displayIcon = '';
+        let displayReason = reason;
+        
         if (status === 'success') {
-          return `<div style="display:flex; justify-content:space-between; padding: 10px 0; border-bottom: 1px solid #f1f4f8;">
-            <span style="font-weight:bold; color:#2c3e50;">${name}</span>
-            <span style="color: #27ae60; font-weight:bold;">✅ 正常</span>
-          </div>`;
+          displayColor = '#27ae60';
+          displayIcon = '✅';
+          displayReason = '正常';
         } else {
-          return `<div style="display:flex; justify-content:space-between; padding: 10px 0; border-bottom: 1px solid #f1f4f8;">
-            <span style="font-weight:bold; color:#2c3e50;">${name}</span>
-            <span style="color: #e74c3c; font-weight:bold;">❌ ${reason}</span>
-          </div>`;
+          if (reason && reason.includes('网络不佳')) {
+            displayColor = '#e67e22'; // 橙色
+            displayIcon = '⚠️';
+          } else {
+            displayColor = '#e74c3c'; // 红色
+            displayIcon = '❌';
+          }
         }
+        
+        return `<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f1f4f8; font-size: 9px;">
+          <span style="font-weight:bold; color:#2c3e50;">${name}</span>
+          <span style="color: ${displayColor}; font-weight:bold;">${displayIcon} ${displayReason || '未知错误'}</span>
+        </div>`;
       };
 
-      let html = `<div style="font-size: 13px; color: #7f8c8d; margin-bottom: 10px;">测试型号: <strong>${escapeHtml(res.testedPartNumber)}</strong></div>`;
+      let html = `<div style="font-size: 9px; color: #7f8c8d; margin-bottom: 8px;">测试型号: <strong>${escapeHtml(res.testedPartNumber)}</strong></div>`;
       html += renderStatus('得捷 DigiKey', res.digikey.status, res.digikey.reason);
       html += renderStatus('贸泽 Mouser', res.mouser.status, res.mouser.reason);
       html += renderStatus('立创 LCSC', res.lcsc.status, res.lcsc.reason);
       html += renderStatus('云汉 ICKEY', res.icKey.status, res.icKey.reason);
+      
+      // 针对当前尚未更新的后端做兼容性兜底，待后端更新后会自动展示真实数据
+      const ds = res.deepseek || { status: 'error', reason: '后端未配置该探针' };
+      const er = res.exchangeRate || { status: 'error', reason: '后端未配置该探针' };
+      html += renderStatus('DeepSeek 大模型', ds.status, ds.reason);
+      html += renderStatus('汇率接口', er.status, er.reason);
 
       contentDiv.innerHTML = html;
       closeBtnContainer.style.display = 'flex';
       
-      // 刷新一下统计数据
       fetchStats();
     } else {
-      contentDiv.innerHTML = `<div class="error">测试失败：${data.error || '未知错误'}</div>`;
+      contentDiv.innerHTML = `<div class="error" style="font-size: 9px; padding: 10px;">测试失败：${data.error || '未知错误'}</div>`;
       closeBtnContainer.style.display = 'flex';
     }
   } catch (e) {
-    contentDiv.innerHTML = `<div class="error">无法连接到后端服务，请稍后重试。</div>`;
+    contentDiv.innerHTML = `<div class="error" style="font-size: 9px; padding: 10px;">无法连接到后端服务，请稍后重试。</div>`;
     closeBtnContainer.style.display = 'flex';
   }
 }
@@ -512,11 +522,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('userTooltip').innerHTML = `<div><strong>当前用户</strong></div><div style="margin-top:4px; color:#3498db; font-weight:bold;">${currentUserEmail}</div>`;
 
-  // 修改点5：权限逻辑调整，所有人均显示齿轮图标和菜单，但隐藏提示语
   document.getElementById('settingsTooltip').style.display = 'none';
   document.getElementById('adminMenu').style.display = 'block';
   
-  // 如果是普通用户，隐藏“下载用户使用情况”按钮（其他按钮保留由JS点击时做权限判断）
   if (currentUserEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
     const downloadItem = document.getElementById('downloadUserStatsItem');
     if (downloadItem) downloadItem.style.display = 'none';
