@@ -17,8 +17,8 @@
   body:not(.is-home) .search-box { width: 100%; }
   .container { width: 100%; background: transparent; border-radius: 16px; padding: 40px; height: fit-content; transition: max-width 0.4s ease, opacity 0.4s ease; opacity: 0; visibility: hidden; }
   .container.loaded { opacity: 1; visibility: visible; }
-  /* 修改点2：标题字号加大，加粗 */
-  h1 { font-size: 36px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: 800; }
+  /* 修改点：字号进一步增大到40px，字重加粗到900 */
+  h1 { font-size: 40px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: 900; }
   .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 45px; }
   body:not(.is-home) .subtitle { margin-bottom: 22px; }
   .search-box { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
@@ -132,7 +132,8 @@
     body.is-home { padding-top: 45px; align-items: flex-start; } 
     body:not(.is-home) { padding-top: 43px; } 
     .container { padding: 20px; }
-    h1 { font-size: 28px; }
+    /* 修改点：移动端同步增大字号和加粗 */
+    h1 { font-size: 32px; font-weight: 900; }
     .search-box { flex-direction: column; width: 100% !important; }
     .search-box input[type="text"], .search-box button { width: 100%; }
     .input-wrapper { flex: none; width: 100%; }
@@ -177,7 +178,6 @@
 </div>
 
 <div class="container" id="main-container">
-  <!-- 修改点2：标题文字与颜色调整 -->
   <h1><span style="color: #0054A6;">Chip</span><span style="color: #8e44ad;">Cost</span></h1>
   <p class="subtitle">输入芯片型号，获取 AI 分析的推荐成本</p>
   <div class="search-box">
@@ -222,7 +222,6 @@
       </div>
     </div>
     <div class="modal-buttons" style="justify-content: center; display: none; margin-top: 12px;" id="testApisCloseBtnContainer">
-      <!-- 修改点1：关闭按钮字体加大 -->
       <button style="background:#3498db; padding: 12px 30px; font-size: 14px;" onclick="closeModal('testApisModal')">关闭</button>
     </div>
   </div>
