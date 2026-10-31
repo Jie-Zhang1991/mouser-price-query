@@ -17,7 +17,8 @@
   body:not(.is-home) .search-box { width: 100%; }
   .container { width: 100%; background: transparent; border-radius: 16px; padding: 40px; height: fit-content; transition: max-width 0.4s ease, opacity 0.4s ease; opacity: 0; visibility: hidden; }
   .container.loaded { opacity: 1; visibility: visible; }
-  h1 { font-size: 32px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: bold; }
+  /* 修改点2：标题字号加大，加粗 */
+  h1 { font-size: 36px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: 800; }
   .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 45px; }
   body:not(.is-home) .subtitle { margin-bottom: 22px; }
   .search-box { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
@@ -131,7 +132,7 @@
     body.is-home { padding-top: 45px; align-items: flex-start; } 
     body:not(.is-home) { padding-top: 43px; } 
     .container { padding: 20px; }
-    h1 { font-size: 26px; }
+    h1 { font-size: 28px; }
     .search-box { flex-direction: column; width: 100% !important; }
     .search-box input[type="text"], .search-box button { width: 100%; }
     .input-wrapper { flex: none; width: 100%; }
@@ -176,7 +177,8 @@
 </div>
 
 <div class="container" id="main-container">
-  <h1>ChipCost 芯片成本</h1>
+  <!-- 修改点2：标题文字与颜色调整 -->
+  <h1><span style="color: #0054A6;">Chip</span><span style="color: #8e44ad;">Cost</span></h1>
   <p class="subtitle">输入芯片型号，获取 AI 分析的推荐成本</p>
   <div class="search-box">
     <div class="input-wrapper">
@@ -210,7 +212,6 @@
 
 <div class="modal-overlay" id="batchModal"><div class="modal"><h2>批量分析 BOM 文件</h2><div class="notice"><strong>📋 使用说明：</strong><br>1. 文件格式：仅支持 <strong>Excel (.xlsx / .xls)</strong> 或 <strong>WPS 表格</strong>；<br>2. 芯片型号存放于上传文件的 <strong>A 列</strong>，请勿填写表头等与芯片型号无关的内容；<br>3. 受 API 调用次数及时间间隔限制，批量分析的芯片数量<strong>上限暂设定为 100 个</strong>，超出部分不予分析，开发者将依据后续使用情况调整限额。</div><div class="drop-zone" id="dropZone"><div class="drop-zone-icon">📁</div><div class="drop-zone-text">点击此处选择文件，或将文件拖拽到此处</div><div class="drop-zone-hint">支持 .xlsx / .xls 格式</div><input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" /></div><div class="modal-buttons"><button style="background:#95a5a6;" onclick="closeBatchModal()">取消</button></div></div></div>
 
-<!-- 修改点2：字号加大 -->
 <div class="modal-overlay" id="testApisModal">
   <div class="modal" style="max-width: 500px; padding: 24px;">
     <h2 style="font-size: 18px; margin-bottom: 12px;">各平台/接口 API 状态测试</h2>
@@ -221,7 +222,8 @@
       </div>
     </div>
     <div class="modal-buttons" style="justify-content: center; display: none; margin-top: 12px;" id="testApisCloseBtnContainer">
-      <button style="background:#3498db; padding: 10px 20px; font-size: 12px;" onclick="closeModal('testApisModal')">关闭</button>
+      <!-- 修改点1：关闭按钮字体加大 -->
+      <button style="background:#3498db; padding: 12px 30px; font-size: 14px;" onclick="closeModal('testApisModal')">关闭</button>
     </div>
   </div>
 </div>
@@ -438,13 +440,13 @@ async function testApis() {
           }
         }
         
-        return `<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f1f4f8; font-size: 11px;">
+        return `<div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid #f1f4f8; font-size: 13px;">
           <span style="font-weight:bold; color:#2c3e50;">${name}</span>
           <span style="color: ${displayColor}; font-weight:bold;">${displayIcon} ${displayReason || '未知错误'}</span>
         </div>`;
       };
 
-      let html = `<div style="font-size: 11px; color: #7f8c8d; margin-bottom: 8px;">测试型号: <strong>${escapeHtml(res.testedPartNumber)}</strong></div>`;
+      let html = `<div style="font-size: 13px; color: #7f8c8d; margin-bottom: 8px;">测试型号: <strong>${escapeHtml(res.testedPartNumber)}</strong></div>`;
       html += renderStatus('得捷 DigiKey', res.digikey.status, res.digikey.reason);
       html += renderStatus('贸泽 Mouser', res.mouser.status, res.mouser.reason);
       html += renderStatus('立创 LCSC', res.lcsc.status, res.lcsc.reason);
@@ -460,11 +462,11 @@ async function testApis() {
       
       fetchStats();
     } else {
-      contentDiv.innerHTML = `<div class="error" style="font-size: 11px; padding: 10px;">测试失败：${data.error || '未知错误'}</div>`;
+      contentDiv.innerHTML = `<div class="error" style="font-size: 13px; padding: 10px;">测试失败：${data.error || '未知错误'}</div>`;
       closeBtnContainer.style.display = 'flex';
     }
   } catch (e) {
-    contentDiv.innerHTML = `<div class="error" style="font-size: 11px; padding: 10px;">无法连接到后端服务，请稍后重试。</div>`;
+    contentDiv.innerHTML = `<div class="error" style="font-size: 13px; padding: 10px;">无法连接到后端服务，请稍后重试。</div>`;
     closeBtnContainer.style.display = 'flex';
   }
 }
