@@ -159,6 +159,11 @@
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
     <div class="user-tooltip" id="settingsTooltip">该功能仅向网站管理员开放。</div>
     <div class="admin-menu" id="adminMenu" style="display: none;">
+      <!-- 【新增点】：测试各平台接口 -->
+      <div class="admin-menu-item" onclick="testApis()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        测试各平台API接口
+      </div>
       <div class="admin-menu-item" onclick="downloadUserStats()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
         下载用户使用情况
@@ -205,6 +210,22 @@
 <div class="modal-overlay" id="contactModal"><div class="modal" style="max-width: 500px;"><h2>联系我们</h2><div class="statement-content" style="text-align: center; padding: 20px 0;"><p style="font-size: 16px; margin-bottom: 20px;">如果您在使用过程中遇到任何问题，或对网站有功能建议与 Bug 反馈，欢迎随时通过以下邮箱联系我。</p><p style="font-size: 20px; font-weight: bold; color: #3498db; margin-bottom: 30px;">Jie18_Zhang@SAIC-GM.com</p><p style="color: #7f8c8d; font-size: 13px;">感谢您的支持与理解！</p></div><div class="modal-buttons" style="justify-content: center;"><button style="background:#3498db;" onclick="closeModal('contactModal')">关闭</button></div></div></div>
 
 <div class="modal-overlay" id="batchModal"><div class="modal"><h2>批量分析 BOM 文件</h2><div class="notice"><strong>📋 使用说明：</strong><br>1. 文件格式：仅支持 <strong>Excel (.xlsx / .xls)</strong> 或 <strong>WPS 表格</strong>；<br>2. 芯片型号存放于上传文件的 <strong>A 列</strong>，请勿填写表头等与芯片型号无关的内容；<br>3. 受 API 调用次数及时间间隔限制，批量分析的芯片数量<strong>上限暂设定为 100 个</strong>，超出部分不予分析，开发者将依据后续使用情况调整限额。</div><div class="drop-zone" id="dropZone"><div class="drop-zone-icon">📁</div><div class="drop-zone-text">点击此处选择文件，或将文件拖拽到此处</div><div class="drop-zone-hint">支持 .xlsx / .xls 格式</div><input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" /></div><div class="modal-buttons"><button style="background:#95a5a6;" onclick="closeBatchModal()">取消</button></div></div></div>
+
+<!-- 新增：API 测试结果模态框 -->
+<div class="modal-overlay" id="testApisModal">
+  <div class="modal" style="max-width: 500px;">
+    <h2>各平台 API 状态测试</h2>
+    <div id="testApisContent" style="padding: 20px 0;">
+      <div style="text-align: center; color: #7f8c8d;">
+        <div class="spinner" style="margin: 0 auto 10px;"></div>
+        <div>正在向各平台发起轻量测试...</div>
+      </div>
+    </div>
+    <div class="modal-buttons" style="justify-content: center; display: none;" id="testApisCloseBtnContainer">
+      <button style="background:#3498db;" onclick="closeModal('testApisModal')">关闭</button>
+    </div>
+  </div>
+</div>
 
 <script>
 if (location.hostname === 'chipcost.space') {
@@ -366,6 +387,61 @@ async function downloadUserStats() {
   } catch (e) { alert('生成或下载文件失败，请检查网络。'); }
 }
 
+// 【新增功能】：测试 API 状态
+async function testApis() {
+  openModal('testApisModal');
+  const contentDiv = document.getElementById('testApisContent');
+  const closeBtnContainer = document.getElementById('testApisCloseBtnContainer');
+  closeBtnContainer.style.display = 'none';
+  contentDiv.innerHTML = `
+    <div style="text-align: center; color: #7f8c8d;">
+      <div class="spinner" style="margin: 0 auto 10px;"></div>
+      <div>正在向各平台发起轻量测试...</div>
+    </div>
+  `;
+
+  try {
+    const url = API_URL + '?action=test_apis&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (data.status === 'success' && data.testResult) {
+      const res = data.testResult;
+      const renderStatus = (name, status, reason) => {
+        if (status === 'success') {
+          return `<div style="display:flex; justify-content:space-between; padding: 10px 0; border-bottom: 1px solid #f1f4f8;">
+            <span style="font-weight:bold; color:#2c3e50;">${name}</span>
+            <span style="color: #27ae60; font-weight:bold;">✅ 正常</span>
+          </div>`;
+        } else {
+          return `<div style="display:flex; justify-content:space-between; padding: 10px 0; border-bottom: 1px solid #f1f4f8;">
+            <span style="font-weight:bold; color:#2c3e50;">${name}</span>
+            <span style="color: #e74c3c; font-weight:bold;">❌ ${reason}</span>
+          </div>`;
+        }
+      };
+
+      let html = `<div style="font-size: 13px; color: #7f8c8d; margin-bottom: 10px;">测试型号: <strong>${escapeHtml(res.testedPartNumber)}</strong></div>`;
+      html += renderStatus('得捷 DigiKey', res.digikey.status, res.digikey.reason);
+      html += renderStatus('贸泽 Mouser', res.mouser.status, res.mouser.reason);
+      html += renderStatus('立创 LCSC', res.lcsc.status, res.lcsc.reason);
+      html += renderStatus('云汉 ICKEY', res.icKey.status, res.icKey.reason);
+
+      contentDiv.innerHTML = html;
+      closeBtnContainer.style.display = 'flex';
+      
+      // 刷新一下统计数据
+      fetchStats();
+    } else {
+      contentDiv.innerHTML = `<div class="error">测试失败：${data.error || '未知错误'}</div>`;
+      closeBtnContainer.style.display = 'flex';
+    }
+  } catch (e) {
+    contentDiv.innerHTML = `<div class="error">无法连接到后端服务，请稍后重试。</div>`;
+    closeBtnContainer.style.display = 'flex';
+  }
+}
+
 function formatPartNumber(displayPn, searchPn) {
   if (!displayPn) return '-';
   const a = String(displayPn).trim().toLowerCase(), b = String(searchPn || '').trim().toLowerCase();
@@ -480,7 +556,6 @@ async function query() {
 
     function renderSource(source, name) {
       const hasPrice = source.priceBreaks && source.priceBreaks.length > 0;
-      // 修改点：没有价格直接隐藏，无视任何报错
       if (!hasPrice) return ''; 
       
       let h = '<div class="source-section"><div class="source-header"><span class="source-name">' + name + '</span><span class="source-badge">参考价</span></div>';
