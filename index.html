@@ -112,7 +112,7 @@
   .top-icon-btn:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
   .top-icon-btn svg { stroke: #2c3e50; }
   .user-tooltip { position: absolute; top: 46px; right: 0; background: #fff; color: #2c3e50; border: 1px solid #e0e6ed; padding: 10px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap; width: max-content; opacity: 0; visibility: hidden; transition: all 0.3s; pointer-events: none; line-height: 1.8; box-shadow: 0 4px 15px rgba(0,0,0,0.15); text-align: left; }
-  .top-icon-btn:hover .user-tooltip, .top-icon-btn.show .user-tooltip { opacity: 1; visibility: visible; top: 41px; }
+  .top-icon-btn:hover .user-tooltip, .top-icon-btn.show .user-tooltip { opacity: 1; visibility: visible; top: 41px; pointer-events: auto; }
   .admin-menu { position: absolute; top: 46px; right: 0; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 8px 0; min-width: 170px; opacity: 0; visibility: hidden; transition: all 0.3s; border: 1px solid #e0e6ed; z-index: 1001; }
   .top-icon-btn.show .admin-menu { opacity: 1; visibility: visible; top: 41px; }
   .admin-menu-item { padding: 10px 16px; font-size: 14px; color: #2c3e50; cursor: pointer; transition: background 0.2s; text-align: left; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
@@ -225,6 +225,20 @@
   </div>
 </div>
 
+<!-- 新增：退出登录确认弹窗 -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal" style="max-width: 400px;">
+    <h2>退出登录</h2>
+    <div class="statement-content" style="text-align: center; padding: 20px 0;">
+      <p style="font-size: 15px;">您确定要退出当前账号吗？退出后需要重新进行邮箱验证才能继续使用 ChipCost。</p>
+    </div>
+    <div class="modal-buttons" style="justify-content: center;">
+      <button style="background:#95a5a6;" onclick="closeModal('logoutModal')">取消</button>
+      <button style="background:#e74c3c;" onclick="doLogout()">确认退出</button>
+    </div>
+  </div>
+</div>
+
 <script>
 if (location.hostname === 'chipcost.space') {
   location.replace('https://www.chipcost.space' + location.pathname + location.search + location.hash);
@@ -250,6 +264,15 @@ function goHome() {
   currentAlternatives = [];
   trendingBox.style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 新增：退出登录执行函数
+function doLogout() {
+  closeModal('logoutModal');
+  // 清除 Cloudflare Access 登录 Cookie
+  document.cookie = "CF_Authorization=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  // 跳转至 Cloudflare Access 的登出端点
+  window.location.href = "https://www.chipcost.space/cdn-cgi/access/logout";
 }
 
 // 动态加载 XLSX 库
@@ -524,7 +547,17 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  document.getElementById('userTooltip').innerHTML = `<div><strong>当前用户</strong></div><div style="margin-top:4px; color:#3498db; font-weight:bold;">${currentUserEmail}</div>`;
+  // 修改：添加退出登录按钮
+  document.getElementById('userTooltip').innerHTML = `
+    <div><strong>当前用户</strong></div>
+    <div style="margin-top:4px; color:#3498db; font-weight:bold;">${currentUserEmail}</div>
+    <div style="margin-top:8px; padding-top:8px; border-top:1px solid #f1f4f8; text-align:center;">
+      <span style="color:#7f8c8d; font-size:12px; cursor:pointer; transition: color 0.2s;" 
+            onmouseover="this.style.color='#e74c3c'" 
+            onmouseout="this.style.color='#7f8c8d'" 
+            onclick="openModal('logoutModal')">退出登录</span>
+    </div>
+  `;
 
   document.getElementById('settingsTooltip').style.display = 'none';
   document.getElementById('adminMenu').style.display = 'block';
