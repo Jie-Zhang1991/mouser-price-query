@@ -225,7 +225,6 @@
   </div>
 </div>
 
-<!-- 新增：退出登录确认弹窗 -->
 <div class="modal-overlay" id="logoutModal">
   <div class="modal" style="max-width: 400px;">
     <h2>退出登录</h2>
@@ -266,13 +265,14 @@ function goHome() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// 新增：退出登录执行函数
+// 修改：直接跳回主页，由 Cloudflare Access 拦截并重定向到登录界面
 function doLogout() {
   closeModal('logoutModal');
   // 清除 Cloudflare Access 登录 Cookie
   document.cookie = "CF_Authorization=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  // 跳转至 Cloudflare Access 的登出端点
-  window.location.href = "https://www.chipcost.space/cdn-cgi/access/logout";
+  document.cookie = "CF_Authorization=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=www.chipcost.space;";
+  // 跳转回主页
+  window.location.href = "https://www.chipcost.space/";
 }
 
 // 动态加载 XLSX 库
