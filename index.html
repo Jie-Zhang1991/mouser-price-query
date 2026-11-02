@@ -176,7 +176,7 @@
 </div>
 
 <div class="container" id="main-container">
-  <h1 onclick="goHome()" style="cursor: pointer;"><span style="color: #0054A6;">Chip</span><span style="color: #8e44ad;">Cost</span></h1>
+  <h1><span onclick="goHome()" style="color: #0054A6; cursor: pointer;">Chip</span><span onclick="goHome()" style="color: #8e44ad; cursor: pointer;">Cost</span></h1>
   <p class="subtitle">输入芯片型号，获取 AI 分析的推荐成本</p>
   <div class="search-box">
     <div class="input-wrapper">
@@ -210,7 +210,6 @@
 
 <div class="modal-overlay" id="batchModal"><div class="modal"><h2>批量分析 BOM 文件</h2><div class="notice"><strong>📋 使用说明：</strong><br>1. 文件格式：仅支持 <strong>Excel (.xlsx / .xls)</strong> 或 <strong>WPS 表格</strong>；<br>2. 芯片型号存放于上传文件的 <strong>A 列</strong>，请勿填写表头等与芯片型号无关的内容；<br>3. 受 API 调用次数及时间间隔限制，批量分析的芯片数量<strong>上限暂设定为 100 个</strong>，超出部分不予分析，开发者将依据后续使用情况调整限额。</div><div class="drop-zone" id="dropZone"><div class="drop-zone-icon">📁</div><div class="drop-zone-text">点击此处选择文件，或将文件拖拽到此处</div><div class="drop-zone-hint">支持 .xlsx / .xls 格式</div><input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" /></div><div class="modal-buttons"><button style="background:#95a5a6;" onclick="closeBatchModal()">取消</button></div></div></div>
 
-<!-- 修改点3：取消光标 -->
 <div class="modal-overlay" id="testApisModal">
   <div class="modal" style="max-width: 500px; padding: 24px; user-select: none;">
     <h2 style="font-size: 18px; margin-bottom: 12px;">各平台/接口 API 状态测试</h2>
@@ -234,7 +233,7 @@ if (location.hostname === 'chipcost.space') {
 const API_URL = 'https://chipcost.space';
 const SUPER_ADMIN_EMAIL = '878903142@qq.com';
 const MAX_BATCH = 100;
-const QUERY_INTERVAL_MS = 3200; // 修改点1：间隔改为3.2秒
+const QUERY_INTERVAL_MS = 3200; 
 
 let currentAlternatives = [];
 let currentTopics = [];
@@ -242,7 +241,6 @@ let currentUserEmail = '';
 let currentAuthPayload = '';
 let currentAuthSig = '';
 
-// 修改点2：新增回首页函数
 function goHome() {
   document.body.classList.add('is-home');
   document.getElementById('partInput').value = '';
