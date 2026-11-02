@@ -233,7 +233,7 @@
     </div>
     <div class="modal-buttons" style="justify-content: center;">
       <button style="background:#e74c3c; width: 120px;" onclick="doLogout()">确认退出</button>
-      <button style="background:#3498db; width: 120px;" onclick="closeModal('logoutModal')">取消</button>
+      <button style="background:#3498db; width: 120px;" onclick="cancelLogout()">取消</button>
     </div>
   </div>
 </div>
@@ -269,6 +269,14 @@ function goHome() {
 function doLogout() {
   closeModal('logoutModal');
   window.location.href = "https://www.chipcost.space/cdn-cgi/access/logout?redirect_url=" + encodeURIComponent("https://www.chipcost.space/");
+}
+
+// 新增：点击取消时清理 URL 上的多余参数
+function cancelLogout() {
+  closeModal('logoutModal');
+  if (window.location.search.includes('__cf_access_message')) {
+    window.history.replaceState({}, document.title, window.location.origin + window.location.pathname + window.location.hash);
+  }
 }
 
 // 动态加载 XLSX 库
