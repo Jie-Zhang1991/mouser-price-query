@@ -226,14 +226,14 @@
 </div>
 
 <div class="modal-overlay" id="logoutModal">
-  <div class="modal" style="max-width: 400px;">
+  <div class="modal" style="max-width: 420px;">
     <h2>退出登录</h2>
     <div class="statement-content" style="text-align: center; padding: 20px 0;">
-      <p style="font-size: 15px;">您确定要退出当前账号吗？退出后需要重新进行邮箱验证才能继续使用 ChipCost。</p>
+      <p style="font-size: 15px; line-height: 1.6; color: #555;">您确定要退出当前账号吗？<br>为保障账号安全，退出后该账号下关联的<strong>所有设备</strong>（如其他电脑、手机）都将同步退出登录，需要重新进行邮箱验证才能继续使用。</p>
     </div>
     <div class="modal-buttons" style="justify-content: center;">
-      <button style="background:#95a5a6;" onclick="closeModal('logoutModal')">取消</button>
-      <button style="background:#e74c3c;" onclick="doLogout()">确认退出</button>
+      <button style="background:#e74c3c; width: 120px;" onclick="doLogout()">确认退出</button>
+      <button style="background:#3498db; width: 120px;" onclick="closeModal('logoutModal')">取消</button>
     </div>
   </div>
 </div>
@@ -265,14 +265,10 @@ function goHome() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// 修改：直接跳回主页，由 Cloudflare Access 拦截并重定向到登录界面
+// 修改：执行方案一，直接跳转官方端点
 function doLogout() {
   closeModal('logoutModal');
-  // 清除 Cloudflare Access 登录 Cookie
-  document.cookie = "CF_Authorization=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie = "CF_Authorization=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=www.chipcost.space;";
-  // 跳转回主页
-  window.location.href = "https://www.chipcost.space/";
+  window.location.href = "https://www.chipcost.space/cdn-cgi/access/logout?redirect_url=" + encodeURIComponent("https://www.chipcost.space/");
 }
 
 // 动态加载 XLSX 库
