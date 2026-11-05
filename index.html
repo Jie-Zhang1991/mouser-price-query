@@ -2,7 +2,6 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<!-- 修改点2：补充 maximum-scale 和 user-scalable 防止微信端放大 -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDA1NEE2Ii8+PHRleHQgeD0iNTAiIHk9Ijc0IiBmb250LXNpemU9IjY4IiBmb250LWZhbWlseT0iTWljcm9zb2Z0IFlhSGVpLHNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCI+6IqvPC90ZXh0Pjwvc3ZnPg==">
 <title>ChipCost</title>
@@ -17,23 +16,16 @@
   body:not(.is-home) .container { max-width: 1200px; }
   body:not(.is-home) .search-box { width: 100%; }
   
-  /* 修改点1：电脑端查询后标题上移距离缩短一半 */
   body:not(.is-home) { padding-top: 0; }
   body:not(.is-home) .container { padding-top: 24px; }
 
   .container { width: 100%; background: transparent; border-radius: 16px; padding: 40px; height: fit-content; transition: max-width 0.4s ease; }
   h1 { font-size: 40px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: 900; }
-  
-  /* 修改点3：电脑端标题变粗（通过描边加粗） */
-  @media (min-width: 801px) {
-    h1 span { -webkit-text-stroke: 0.6px currentColor; }
-  }
 
   .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 45px; }
   body:not(.is-home) .subtitle { margin-bottom: 22px; }
   .search-box { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
   
-  /* 修改点2：加入 touch-action 防止微信端双击或点击放大 */
   input[type="text"] { flex: 1; padding: 16px 24px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 12px; outline: none; transition: border-color 0.3s, box-shadow 0.3s; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: text; touch-action: manipulation; }
   
   input[type="text"]:focus { border-color: #3498db; box-shadow: 0 4px 15px rgba(52,152,219,0.15); }
@@ -141,15 +133,17 @@
   .statement-content li { margin-bottom: 6px; }
   
   @media (max-width: 800px) {
-    body { padding: 20px 12px; }
-    /* 修改点1：首页和非首页状态下，顶部固定为48px，整体下移3px且保持不动 */
-    body.is-home { padding-top: 48px; align-items: flex-start; } 
-    body:not(.is-home) { padding-top: 48px; } 
-    
+    /* 修改点1：关闭移动端 body 过渡，并严格锁定内边距，确保点击时标题不跳动 */
+    body { padding: 20px 12px; transition: none; }
+    body.is-home, body:not(.is-home) { 
+      padding-top: 48px; 
+      padding-bottom: 20px; 
+      align-items: flex-start; 
+    }
+
     .container { padding: 20px; }
     h1 { font-size: 32px; font-weight: 900; }
     
-    /* 修改点2：移动端搜索框上边缘距离副标题距离缩短 */
     .subtitle { margin-bottom: 12px; }
 
     .search-box { flex-direction: column; width: 100% !important; }
