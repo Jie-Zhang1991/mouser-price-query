@@ -48,10 +48,8 @@
   #substitute-result { margin-top: 30px; }
   .loading { text-align: center; color: #7f8c8d; padding: 30px; }
   .error { color: #e74c3c; background: #fdf0ed; padding: 20px; border-radius: 12px; border-left: 4px solid #e74c3c; }
-  /* 修改点1：横幅高度缩短为85%（调整 padding） */
   .should-cost-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 27px 32px; text-align: center; color: #fff; margin-bottom: 24px; box-shadow: 0 10px 20px rgba(102,126,234,0.2); }
   .should-cost-label { font-size: 22px; font-weight: 700; opacity: 0.95; margin-bottom: 12px; letter-spacing: 1.5px; }
-  /* 修改点2：中间数字缩小3个字号（52px -> 49px） */
   .should-cost-value { font-size: 49px; font-weight: 800; margin-bottom: 6px; line-height: 1.1; }
   .should-cost-tax { font-size: 16px; opacity: 0.85; margin-top: 6px; }
   .info-card { border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
@@ -78,7 +76,8 @@
   .trending-title { font-size: 18px; font-weight: bold; color: #2c3e50; display: flex; align-items: center; gap: 6px; }
   .trending-refresh { color: #3498db; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
   .trending-refresh:hover { color: #2980b9; }
-  .trending-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px; }
+  /* 修改点1、2：固定最小高度防止跳跃，且强制按列排列（左5右5） */
+  .trending-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(5, auto); grid-auto-flow: column; gap: 12px 30px; min-height: 170px; }
   .trending-item { display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #333; transition: color 0.2s; }
   .trending-item:hover { color: #3498db; }
   .trending-num { font-size: 15px; font-weight: bold; font-style: italic; width: 24px; text-align: center; margin-right: 10px; color: #999; }
@@ -137,7 +136,7 @@
     .input-wrapper { flex: none; width: 100%; }
     .should-cost-value { font-size: 36px; }
     .should-cost-label { font-size: 18px; }
-    .trending-list { grid-template-columns: 1fr; }
+    .trending-list { grid-template-columns: 1fr; grid-template-rows: auto; grid-auto-flow: row; min-height: auto; }
   }
 </style>
 </head>
@@ -570,7 +569,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const cachedTime = localStorage.getItem('trending_time');
   const now = Date.now();
   
-  if (cachedTrending && cachedTime && (now - parseInt(cachedTime) < 4 * 60 * 60 * 1000)) {
+  // 修改点3：缓存时间改为12小时
+  if (cachedTrending && cachedTime && (now - parseInt(cachedTime) < 12 * 60 * 60 * 1000)) {
     currentTopics = JSON.parse(cachedTrending);
     renderTrendingList(currentTopics);
   } else {
