@@ -22,6 +22,13 @@
   .container { width: 100%; background: transparent; border-radius: 16px; padding: 40px; height: fit-content; transition: max-width 0.4s ease; }
   h1 { font-size: 40px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: 900; }
 
+  /* 修改点2：电脑端使用 text-shadow 四向叠加实现无毛边加粗 */
+  @media (min-width: 801px) {
+    h1 span {
+      text-shadow: 0.6px 0 0 currentColor, -0.6px 0 0 currentColor, 0 0.6px 0 currentColor, 0 -0.6px 0 currentColor;
+    }
+  }
+
   .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 45px; }
   body:not(.is-home) .subtitle { margin-bottom: 22px; }
   .search-box { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
@@ -132,19 +139,22 @@
   .statement-content ul { padding-left: 20px; margin-bottom: 10px; }
   .statement-content li { margin-bottom: 6px; }
   
+  /* 修改点1：强制锁定移动端布局，消除一切重排和间距变化 */
   @media (max-width: 800px) {
-    /* 修改点1：关闭移动端 body 过渡，并严格锁定内边距，确保点击时标题不跳动 */
-    body { padding: 20px 12px; transition: none; }
+    body { padding: 20px 12px; transition: none !important; }
     body.is-home, body:not(.is-home) { 
-      padding-top: 48px; 
-      padding-bottom: 20px; 
-      align-items: flex-start; 
+      padding-top: 48px !important; 
+      padding-bottom: 20px !important; 
+      align-items: flex-start !important; 
     }
 
     .container { padding: 20px; }
     h1 { font-size: 32px; font-weight: 900; }
     
-    .subtitle { margin-bottom: 12px; }
+    /* 强制锁定副标题下边距，防止跳回全局的 22px */
+    body.is-home .subtitle, body:not(.is-home) .subtitle { 
+      margin-bottom: 12px !important; 
+    }
 
     .search-box { flex-direction: column; width: 100% !important; }
     .search-box input[type="text"], .search-box button { width: 100%; }
