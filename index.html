@@ -22,7 +22,6 @@
   .container { width: 100%; background: transparent; border-radius: 16px; padding: 40px; height: fit-content; transition: max-width 0.4s ease; }
   h1 { font-size: 40px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: 900; }
 
-  /* 修改点2：电脑端使用 text-shadow 四向叠加实现无毛边加粗 */
   @media (min-width: 801px) {
     h1 span {
       text-shadow: 0.6px 0 0 currentColor, -0.6px 0 0 currentColor, 0 0.6px 0 currentColor, 0 -0.6px 0 currentColor;
@@ -139,8 +138,8 @@
   .statement-content ul { padding-left: 20px; margin-bottom: 10px; }
   .statement-content li { margin-bottom: 6px; }
   
-  /* 修改点1：强制锁定移动端布局，消除一切重排和间距变化 */
   @media (max-width: 800px) {
+    /* 彻底关闭全局过渡效果，防止状态切换时产生动画 */
     body { padding: 20px 12px; transition: none !important; }
     body.is-home, body:not(.is-home) { 
       padding-top: 48px !important; 
@@ -148,11 +147,14 @@
       align-items: flex-start !important; 
     }
 
-    .container { padding: 20px; }
+    /* 修复重点：强制将容器的顶部内边距锁死在 20px，防止被 PC 端的 24px 覆盖引发跳动 */
+    .container, body:not(.is-home) .container { 
+      padding: 20px !important; 
+    }
+    
     h1 { font-size: 32px; font-weight: 900; }
     
-    /* 强制锁定副标题下边距，防止跳回全局的 22px */
-    body.is-home .subtitle, body:not(.is-home) .subtitle { 
+    .subtitle, body:not(.is-home) .subtitle { 
       margin-bottom: 12px !important; 
     }
 
