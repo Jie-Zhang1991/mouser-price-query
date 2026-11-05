@@ -8,15 +8,16 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { user-select: none; }
-  body { font-family: -apple-system, "Microsoft YaHei", sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 7px 16px 40px; transition: padding 0.4s ease; position: relative; }
+  /* 修改点1：替换为淡淡的蓝灰色背景 */
+  body { font-family: -apple-system, "Microsoft YaHei", sans-serif; background: #f2f5f8; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 7px 16px 40px; transition: padding 0.4s ease; position: relative; }
   input[type="text"], #result, #substitute-result, .modal { user-select: text; }
   body.is-home { align-items: center; padding-top: 0; padding-bottom: 80px; }
   body.is-home .container { max-width: 850px; }
   body.is-home .search-box { width: 100%; margin: 0 auto 20px auto; transition: width 0.4s ease, margin 0.4s ease; }
   body:not(.is-home) .container { max-width: 1200px; }
   body:not(.is-home) .search-box { width: 100%; }
-  .container { width: 100%; background: transparent; border-radius: 16px; padding: 40px; height: fit-content; transition: max-width 0.4s ease, opacity 0.4s ease; opacity: 0; visibility: hidden; }
-  .container.loaded { opacity: 1; visibility: visible; }
+  /* 修改点2：移除 opacity 和 visibility 阻塞，让页面立刻显示 */
+  .container { width: 100%; background: transparent; border-radius: 16px; padding: 40px; height: fit-content; transition: max-width 0.4s ease; }
   h1 { font-size: 40px; text-align: center; margin-bottom: 12px; color: #2c3e50; font-weight: 900; }
   .subtitle { text-align: center; color: #5a6c7d; font-size: 15px; margin-bottom: 45px; }
   body:not(.is-home) .subtitle { margin-bottom: 22px; }
@@ -117,8 +118,8 @@
   .top-icon-btn.show .admin-menu { opacity: 1; visibility: visible; top: 41px; }
   .admin-menu-item { padding: 10px 16px; font-size: 14px; color: #2c3e50; cursor: pointer; transition: background 0.2s; text-align: left; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
   .admin-menu-item:hover { background: #f0f7ff; color: #3498db; }
-  .footer { position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 11px; color: #7f8c8d; opacity: 0; visibility: hidden; transition: opacity 0.4s ease; }
-  .footer.loaded { opacity: 1; visibility: visible; }
+  /* 修改点2：底部栏移除隐藏属性 */
+  .footer { position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 11px; color: #7f8c8d; }
   .footer span { cursor: pointer; margin: 0 10px; transition: color 0.2s; }
   .footer span:hover { color: #3498db; text-decoration: underline; }
   .statement-content { font-size: 14px; color: #333; line-height: 1.8; }
@@ -265,13 +266,11 @@ function goHome() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// 修改：执行方案一，直接跳转官方端点
 function doLogout() {
   closeModal('logoutModal');
   window.location.href = "https://www.chipcost.space/cdn-cgi/access/logout?redirect_url=" + encodeURIComponent("https://www.chipcost.space/");
 }
 
-// 新增：点击取消时清理 URL 上的多余参数
 function cancelLogout() {
   closeModal('logoutModal');
   if (window.location.search.includes('__cf_access_message')) {
@@ -279,7 +278,6 @@ function cancelLogout() {
   }
 }
 
-// 动态加载 XLSX 库
 let xlsxPromise = null;
 function loadXlsxLibrary() {
   if (window.XLSX) return Promise.resolve();
@@ -429,7 +427,6 @@ async function downloadUserStats() {
   } catch (e) { alert('生成或下载文件失败，请检查网络。'); }
 }
 
-// 测试 API 状态
 async function testApis() {
   openModal('testApisModal');
   const contentDiv = document.getElementById('testApisContent');
@@ -536,7 +533,8 @@ function clearInput() { partInputEl.value = ''; updateClearBtn(); partInputEl.fo
 partInputEl.addEventListener('input', updateClearBtn);
 document.getElementById('partInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') query(); });
 
-window.addEventListener('DOMContentLoaded', async () => {
+// 修改点2：去掉 async/await 阻塞，取消 .loaded 类的添加
+window.addEventListener('DOMContentLoaded', () => {
   currentUserEmail = getAuthToken();
   
   if (!currentAuthPayload || !currentUserEmail || currentUserEmail === 'unknown') {
@@ -546,12 +544,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('subBtn').disabled = true;
     document.querySelector('.batch-btn').disabled = true;
     document.getElementById('result').innerHTML = '<div class="error">安全警告：未检测到合法的登录凭证，请通过官方网址 (www.chipcost.space) 登录使用。</div>';
-    document.getElementById('main-container').classList.add('loaded');
-    document.getElementById('footer').classList.add('loaded');
     return;
   }
 
-  // 修改：添加退出登录按钮
   document.getElementById('userTooltip').innerHTML = `
     <div><strong>当前用户</strong></div>
     <div style="margin-top:4px; color:#3498db; font-weight:bold;">${currentUserEmail}</div>
@@ -571,6 +566,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (downloadItem) downloadItem.style.display = 'none';
   }
 
+  // 数据统计和热搜直接异步请求，不阻塞页面加载
   fetchStats();
 
   const cachedTrending = localStorage.getItem('trending_cache');
@@ -580,13 +576,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (cachedTrending && cachedTime && (now - parseInt(cachedTime) < 4 * 60 * 60 * 1000)) {
     currentTopics = JSON.parse(cachedTrending);
     renderTrendingList(currentTopics);
-    document.getElementById('main-container').classList.add('loaded');
-    document.getElementById('footer').classList.add('loaded');
   } else {
-    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 3000));
-    await Promise.race([fetchTrending(), timeoutPromise]);
-    document.getElementById('main-container').classList.add('loaded');
-    document.getElementById('footer').classList.add('loaded');
+    fetchTrending(); // 不 await
   }
 });
 
