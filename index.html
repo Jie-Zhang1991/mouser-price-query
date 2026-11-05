@@ -21,22 +21,19 @@
   body:not(.is-home) .subtitle { margin-bottom: 22px; }
   .search-box { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
   input[type="text"] { flex: 1; padding: 16px 24px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 12px; outline: none; transition: border-color 0.3s, box-shadow 0.3s; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: text; }
-  input[type="text"]:focus { border-color: #0c619e; box-shadow: 0 4px 15px rgba(12,97,158,0.15); }
+  input[type="text"]:focus { border-color: #3498db; box-shadow: 0 4px 15px rgba(52,152,219,0.15); }
   .input-wrapper { position: relative; display: flex; flex: 1 1 auto; min-width: 0; }
   .input-wrapper input[type="text"] { padding-right: 44px; }
   .clear-btn { display: none; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 50%; background: #c0c7ce; align-items: center; justify-content: center; cursor: pointer; }
   .clear-btn:hover { background: #95a5a6; }
   .clear-btn.show { display: flex; }
-  /* 修改点：单件查询按钮改为深蓝色 */
-  button { padding: 14px 20px; font-size: 15px; background: #0c619e; color: #fff; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: background 0.3s, transform 0.2s; white-space: nowrap; box-shadow: 0 4px 10px rgba(12,97,158,0.2); outline: none; }
-  button:hover { background: #084b7a; transform: translateY(-1px); }
+  button { padding: 14px 20px; font-size: 15px; background: #3498db; color: #fff; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: background 0.3s, transform 0.2s; white-space: nowrap; box-shadow: 0 4px 10px rgba(52,152,219,0.2); outline: none; }
+  button:hover { background: #2980b9; transform: translateY(-1px); }
   button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
-  /* 修改点：批量分析按钮改为深紫色 */
-  .batch-btn { background: #4b2e83; box-shadow: 0 4px 10px rgba(75,46,131,0.2); }
-  .batch-btn:hover { background: #3b2368; }
-  /* 修改点：替代型号按钮改为深绿色 */
-  .sub-btn { background: #1d8b63; box-shadow: 0 4px 10px rgba(29,139,99,0.2); }
-  .sub-btn:hover { background: #146948; }
+  .batch-btn { background: #8e44ad; box-shadow: 0 4px 10px rgba(142,68,173,0.2); }
+  .batch-btn:hover { background: #732d91; }
+  .sub-btn { background: #27ae60; box-shadow: 0 4px 10px rgba(39,174,96,0.2); }
+  .sub-btn:hover { background: #219150; }
   .compare-table-container { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e0e6ed; margin-bottom: 15px; background: #fff;}
   .compare-table { table-layout: fixed; min-width: 900px; width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
   .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
@@ -51,11 +48,11 @@
   #substitute-result { margin-top: 30px; }
   .loading { text-align: center; color: #7f8c8d; padding: 30px; }
   .error { color: #e74c3c; background: #fdf0ed; padding: 20px; border-radius: 12px; border-left: 4px solid #e74c3c; }
-  /* 修改点：紫色横条高度缩短15%（padding调小），颜色改为深紫色 */
-  .should-cost-card { background: linear-gradient(135deg, #5b3c8d 0%, #4b2e83 100%); border-radius: 16px; padding: 27px 32px; text-align: center; color: #fff; margin-bottom: 24px; box-shadow: 0 10px 20px rgba(75,46,131,0.2); }
+  /* 修改点1：横幅高度缩短为85%（调整 padding） */
+  .should-cost-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 27px 32px; text-align: center; color: #fff; margin-bottom: 24px; box-shadow: 0 10px 20px rgba(102,126,234,0.2); }
   .should-cost-label { font-size: 22px; font-weight: 700; opacity: 0.95; margin-bottom: 12px; letter-spacing: 1.5px; }
-  /* 修改点：中间数字缩小两号（52px -> 48px） */
-  .should-cost-value { font-size: 48px; font-weight: 800; margin-bottom: 6px; line-height: 1.1; }
+  /* 修改点2：中间数字缩小3个字号（52px -> 49px） */
+  .should-cost-value { font-size: 49px; font-weight: 800; margin-bottom: 6px; line-height: 1.1; }
   .should-cost-tax { font-size: 16px; opacity: 0.85; margin-top: 6px; }
   .info-card { border: 1px solid #e0e6ed; border-radius: 12px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
   .info-title { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f1f4f8; }
@@ -96,20 +93,20 @@
   .notice { background: #fff9e6; border-left: 4px solid #f39c12; padding: 14px 18px; border-radius: 8px; font-size: 13px; color: #7f5f00; line-height: 1.7; margin-bottom: 20px; }
   .notice strong { color: #d35400; }
   .drop-zone { border: 2px dashed #bdc3c7; border-radius: 12px; padding: 40px 20px; text-align: center; color: #7f8c8d; cursor: pointer; transition: all 0.3s; margin-bottom: 20px; background: #fafbfc; }
-  .drop-zone:hover, .drop-zone.dragover { border-color: #0c619e; background: #f0f7ff; color: #0c619e; }
+  .drop-zone:hover, .drop-zone.dragover { border-color: #3498db; background: #f0f7ff; color: #3498db; }
   .drop-zone-icon { font-size: 42px; margin-bottom: 10px; }
   .drop-zone-text { font-size: 15px; margin-bottom: 6px; }
   .drop-zone-hint { font-size: 12px; color: #95a5a6; }
   .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
   .progress-container { border: 1px solid #e0e6ed; border-radius: 12px; padding: 24px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
   .progress-title { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 12px; }
-  .progress-tip { background: #eaf6ff; border-left: 4px solid #0c619e; padding: 12px 16px; border-radius: 8px; font-size: 13px; color: #2c5282; line-height: 1.7; margin-bottom: 16px; }
+  .progress-tip { background: #eaf6ff; border-left: 4px solid #3498db; padding: 12px 16px; border-radius: 8px; font-size: 13px; color: #2c5282; line-height: 1.7; margin-bottom: 16px; }
   .progress-bar-bg { background: #ecf0f1; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 12px; }
-  .progress-bar-fill { background: linear-gradient(90deg, #0c619e, #2ecc71); height: 100%; width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: bold; }
+  .progress-bar-fill { background: linear-gradient(90deg, #3498db, #2ecc71); height: 100%; width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: bold; }
   .progress-text { font-size: 13px; color: #7f8c8d; text-align: center; }
   .progress-current { font-size: 12px; color: #95a5a6; text-align: center; margin-top: 8px; word-break: break-all; }
   .success-msg { background: #d4edda; border-left: 4px solid #27ae60; padding: 16px; border-radius: 8px; color: #155724; font-size: 14px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(39,174,96,0.1); }
-  .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #4b2e83; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+  .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #8e44ad; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   .top-right-actions { position: fixed; top: 20px; right: 20px; display: flex; gap: 12px; z-index: 1000; }
   .top-icon-btn { position: relative; width: 36px; height: 36px; background: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s; }
@@ -120,10 +117,10 @@
   .admin-menu { position: absolute; top: 46px; right: 0; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 8px 0; min-width: 170px; opacity: 0; visibility: hidden; transition: all 0.3s; border: 1px solid #e0e6ed; z-index: 1001; }
   .top-icon-btn.show .admin-menu { opacity: 1; visibility: visible; top: 41px; }
   .admin-menu-item { padding: 10px 16px; font-size: 14px; color: #2c3e50; cursor: pointer; transition: background 0.2s; text-align: left; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-  .admin-menu-item:hover { background: #f0f7ff; color: #0c619e; }
+  .admin-menu-item:hover { background: #f0f7ff; color: #3498db; }
   .footer { position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 11px; color: #7f8c8d; }
   .footer span { cursor: pointer; margin: 0 10px; transition: color 0.2s; }
-  .footer span:hover { color: #0c619e; text-decoration: underline; }
+  .footer span:hover { color: #3498db; text-decoration: underline; }
   .statement-content { font-size: 14px; color: #333; line-height: 1.8; }
   .statement-content h3 { font-size: 15px; color: #2c3e50; margin-top: 16px; margin-bottom: 8px; }
   .statement-content p { margin-bottom: 10px; }
@@ -179,8 +176,7 @@
 </div>
 
 <div class="container" id="main-container">
-  <!-- 修改点：标题 Chip 改为深蓝，Cost 改为深紫 -->
-  <h1><span onclick="goHome()" style="color: #0c619e; cursor: pointer;">Chip</span><span onclick="goHome()" style="color: #4b2e83; cursor: pointer;">Cost</span></h1>
+  <h1><span onclick="goHome()" style="color: #0054A6; cursor: pointer;">Chip</span><span onclick="goHome()" style="color: #8e44ad; cursor: pointer;">Cost</span></h1>
   <p class="subtitle">输入芯片型号，获取 AI 分析的推荐成本</p>
   <div class="search-box">
     <div class="input-wrapper">
@@ -206,11 +202,11 @@
   <span onclick="openModal('termsModal')">使用ChipCost前必读</span> | <span onclick="openModal('privacyModal')">隐私政策</span> | <span onclick="openModal('contactModal')">联系我们</span>
 </div>
 
-<div class="modal-overlay" id="termsModal"><div class="modal"><h2>使用ChipCost前必读</h2><div class="statement-content"><h3>一、 产品使用介绍</h3><p>ChipCost 是一款基于 AI 大模型的芯片价格预测与竞品分析工具。输入芯片型号后，系统会并发查询得捷（DigiKey）、贸泽（Mouser）、立创商城（LCSC）的 1000pcs 阶梯报价，并结合 DeepSeek 的语义分析与底层业务系数，为您计算出最终的 "Should Cost" 推荐成本。</p><h3>二、 API 额度与性能说明</h3><p>网站使用过程涉及芯片代理平台、Deepseek大模型、汇率接口等多个API，受限于底层数据供应商与大模型接口的频率限制，平台每日设置了固定的全局调用额度（每日1000次）。同时，为防止接口被封禁，单次批量分析最多支持 100 个型号，且每个型号之间设置了至少 2.5 秒的请求延迟。如遇系统提示“API超限”或“未查询到”，请稍后或次日再试。</p><h3>三、 免责声明</h3><ul><li><strong>数据来源</strong>：本平台展示的所有价格、参数、分类及 AI 推荐理由，均来源于第三方公开数据接口及大模型自动生成，仅供参考。</li><li><strong>准确性免责</strong>：由于汇率波动、供应商库存变化、AI幻觉等因素，本站不保证数据的绝对准确性、及时性与完整性。任何基于本数据做出的采购、交易或生产决策，由用户自行承担风险，本站不承担任何连带法律责任。</li><li><strong>服务中断免责</strong>：因不可抗力、第三方接口故障、云服务商宕机或网络攻击导致的服务不可用，本站不承担赔偿责任。</li><li><strong>使用规范</strong>：严禁使用爬虫脚本、自动化工具恶意刷取接口数据。一经发现，管理员有权直接封禁您的访问权限。</li></ul><p style="margin-top: 20px; font-size: 12px; color: #999; text-align: right;">更新日期：2026年10月</p></div><div class="modal-buttons"><button style="background:#0c619e;" onclick="closeModal('termsModal')">我已知晓并同意</button></div></div></div>
+<div class="modal-overlay" id="termsModal"><div class="modal"><h2>使用ChipCost前必读</h2><div class="statement-content"><h3>一、 产品使用介绍</h3><p>ChipCost 是一款基于 AI 大模型的芯片价格预测与竞品分析工具。输入芯片型号后，系统会并发查询得捷（DigiKey）、贸泽（Mouser）、立创商城（LCSC）的 1000pcs 阶梯报价，并结合 DeepSeek 的语义分析与底层业务系数，为您计算出最终的 "Should Cost" 推荐成本。</p><h3>二、 API 额度与性能说明</h3><p>网站使用过程涉及芯片代理平台、Deepseek大模型、汇率接口等多个API，受限于底层数据供应商与大模型接口的频率限制，平台每日设置了固定的全局调用额度（每日1000次）。同时，为防止接口被封禁，单次批量分析最多支持 100 个型号，且每个型号之间设置了至少 2.5 秒的请求延迟。如遇系统提示“API超限”或“未查询到”，请稍后或次日再试。</p><h3>三、 免责声明</h3><ul><li><strong>数据来源</strong>：本平台展示的所有价格、参数、分类及 AI 推荐理由，均来源于第三方公开数据接口及大模型自动生成，仅供参考。</li><li><strong>准确性免责</strong>：由于汇率波动、供应商库存变化、AI幻觉等因素，本站不保证数据的绝对准确性、及时性与完整性。任何基于本数据做出的采购、交易或生产决策，由用户自行承担风险，本站不承担任何连带法律责任。</li><li><strong>服务中断免责</strong>：因不可抗力、第三方接口故障、云服务商宕机或网络攻击导致的服务不可用，本站不承担赔偿责任。</li><li><strong>使用规范</strong>：严禁使用爬虫脚本、自动化工具恶意刷取接口数据。一经发现，管理员有权直接封禁您的访问权限。</li></ul><p style="margin-top: 20px; font-size: 12px; color: #999; text-align: right;">更新日期：2026年10月</p></div><div class="modal-buttons"><button style="background:#3498db;" onclick="closeModal('termsModal')">我已知晓并同意</button></div></div></div>
 
-<div class="modal-overlay" id="privacyModal"><div class="modal"><h2>ChipCost 用户隐私政策</h2><div class="statement-content"><p style="margin-bottom: 16px; color: #666;">更新日期：2026年10月</p><p>ChipCost（以下简称“我们”或“本站”）深知个人信息对您的重要性。我们致力于保护您的个人信息及隐私安全。在使用 ChipCost 服务前，请您仔细阅读并理解本《隐私政策》。</p><h3>一、 我们如何收集和使用您的信息</h3><p>为了向您提供芯片成本查询服务，我们会收集以下信息：</p><ul><li><strong>账户登录信息</strong>：本站依托 Cloudflare Access 提供邮箱验证登录服务。我们仅收集您的邮箱地址，用于验证您的访问权限及区分管理员身份，不收集密码等敏感信息。</li><li><strong>查询行为记录</strong>：当您使用“单件查询”、“替代型号”或“批量分析”功能时，我们会记录您查询的芯片型号、查询次数以及调用的 API 额度情况，用于生成本站全局的“数据统计”面板及为您提供历史查询依据。</li><li><strong>设备与日志信息</strong>：为保障网络安全及服务稳定，服务器可能自动记录您的 IP 地址、浏览器类型、访问时间等基础日志信息。</li></ul><h3>二、 我们如何使用 Cookie 和同类技术</h3><p>本站仅使用必要的 Cookie（如 Cloudflare 注入的 <code>CF_Authorization</code>）来维持您的登录状态，保障您的操作连贯性。我们不会使用 Cookie 进行商业广告追踪。</p><h3>三、 信息的存储与保护</h3><ul><li>您的数据存储于 Cloudflare 提供的全球边缘网络（D1 数据库与 KV 存储）中，采用严密的行业标准加密传输（HTTPS）。</li><li>我们仅将收集的信息用于优化网站性能、生成统计报表和防止恶意刷取，绝不向任何无关第三方出售或非法披露您的邮箱等个人隐私信息。</li></ul><h3>四、 第三方数据接口说明</h3><p>在您查询芯片时，系统会自动将查询指令（如芯片型号）发送至得捷（DigiKey）、贸泽（Mouser）、立创商城（LCSC）以及 DeepSeek 大模型。此过程仅传输查询关键词，不包含您的个人身份信息。第三方平台的数据处理受其各自隐私政策约束。</p><h3>五、 您的权利</h3><p>您有权联系我们查询、更正您的相关信息。网站管理员（管理员邮箱）在后台拥有清空历史统计数据的管理权限。</p></div><div class="modal-buttons"><button style="background:#0c619e;" onclick="closeModal('privacyModal')">我已知晓</button></div></div></div>
+<div class="modal-overlay" id="privacyModal"><div class="modal"><h2>ChipCost 用户隐私政策</h2><div class="statement-content"><p style="margin-bottom: 16px; color: #666;">更新日期：2026年10月</p><p>ChipCost（以下简称“我们”或“本站”）深知个人信息对您的重要性。我们致力于保护您的个人信息及隐私安全。在使用 ChipCost 服务前，请您仔细阅读并理解本《隐私政策》。</p><h3>一、 我们如何收集和使用您的信息</h3><p>为了向您提供芯片成本查询服务，我们会收集以下信息：</p><ul><li><strong>账户登录信息</strong>：本站依托 Cloudflare Access 提供邮箱验证登录服务。我们仅收集您的邮箱地址，用于验证您的访问权限及区分管理员身份，不收集密码等敏感信息。</li><li><strong>查询行为记录</strong>：当您使用“单件查询”、“替代型号”或“批量分析”功能时，我们会记录您查询的芯片型号、查询次数以及调用的 API 额度情况，用于生成本站全局的“数据统计”面板及为您提供历史查询依据。</li><li><strong>设备与日志信息</strong>：为保障网络安全及服务稳定，服务器可能自动记录您的 IP 地址、浏览器类型、访问时间等基础日志信息。</li></ul><h3>二、 我们如何使用 Cookie 和同类技术</h3><p>本站仅使用必要的 Cookie（如 Cloudflare 注入的 <code>CF_Authorization</code>）来维持您的登录状态，保障您的操作连贯性。我们不会使用 Cookie 进行商业广告追踪。</p><h3>三、 信息的存储与保护</h3><ul><li>您的数据存储于 Cloudflare 提供的全球边缘网络（D1 数据库与 KV 存储）中，采用严密的行业标准加密传输（HTTPS）。</li><li>我们仅将收集的信息用于优化网站性能、生成统计报表和防止恶意刷取，绝不向任何无关第三方出售或非法披露您的邮箱等个人隐私信息。</li></ul><h3>四、 第三方数据接口说明</h3><p>在您查询芯片时，系统会自动将查询指令（如芯片型号）发送至得捷（DigiKey）、贸泽（Mouser）、立创商城（LCSC）以及 DeepSeek 大模型。此过程仅传输查询关键词，不包含您的个人身份信息。第三方平台的数据处理受其各自隐私政策约束。</p><h3>五、 您的权利</h3><p>您有权联系我们查询、更正您的相关信息。网站管理员（管理员邮箱）在后台拥有清空历史统计数据的管理权限。</p></div><div class="modal-buttons"><button style="background:#3498db;" onclick="closeModal('privacyModal')">我已知晓</button></div></div></div>
 
-<div class="modal-overlay" id="contactModal"><div class="modal" style="max-width: 500px;"><h2>联系我们</h2><div class="statement-content" style="text-align: center; padding: 20px 0;"><p style="font-size: 16px; margin-bottom: 20px;">如果您在使用过程中遇到任何问题，或对网站有功能建议与 Bug 反馈，欢迎随时通过以下邮箱联系我。</p><p style="font-size: 20px; font-weight: bold; color: #0c619e; margin-bottom: 30px;">Jie18_Zhang@SAIC-GM.com</p><p style="color: #7f8c8d; font-size: 13px;">感谢您的支持与理解！</p></div><div class="modal-buttons" style="justify-content: center;"><button style="background:#0c619e;" onclick="closeModal('contactModal')">关闭</button></div></div></div>
+<div class="modal-overlay" id="contactModal"><div class="modal" style="max-width: 500px;"><h2>联系我们</h2><div class="statement-content" style="text-align: center; padding: 20px 0;"><p style="font-size: 16px; margin-bottom: 20px;">如果您在使用过程中遇到任何问题，或对网站有功能建议与 Bug 反馈，欢迎随时通过以下邮箱联系我。</p><p style="font-size: 20px; font-weight: bold; color: #3498db; margin-bottom: 30px;">Jie18_Zhang@SAIC-GM.com</p><p style="color: #7f8c8d; font-size: 13px;">感谢您的支持与理解！</p></div><div class="modal-buttons" style="justify-content: center;"><button style="background:#3498db;" onclick="closeModal('contactModal')">关闭</button></div></div></div>
 
 <div class="modal-overlay" id="batchModal"><div class="modal"><h2>批量分析 BOM 文件</h2><div class="notice"><strong>📋 使用说明：</strong><br>1. 文件格式：仅支持 <strong>Excel (.xlsx / .xls)</strong> 或 <strong>WPS 表格</strong>；<br>2. 芯片型号存放于上传文件的 <strong>A 列</strong>，请勿填写表头等与芯片型号无关的内容；<br>3. 受 API 调用次数及时间间隔限制，批量分析的芯片数量<strong>上限暂设定为 100 个</strong>，超出部分不予分析，开发者将依据后续使用情况调整限额。</div><div class="drop-zone" id="dropZone"><div class="drop-zone-icon">📁</div><div class="drop-zone-text">点击此处选择文件，或将文件拖拽到此处</div><div class="drop-zone-hint">支持 .xlsx / .xls 格式</div><input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" /></div><div class="modal-buttons"><button style="background:#95a5a6;" onclick="closeBatchModal()">取消</button></div></div></div>
 
@@ -224,7 +220,7 @@
       </div>
     </div>
     <div class="modal-buttons" style="justify-content: center; display: none; margin-top: 12px;" id="testApisCloseBtnContainer">
-      <button style="background:#0c619e; padding: 12px 30px; font-size: 14px;" onclick="closeModal('testApisModal')">关闭</button>
+      <button style="background:#3498db; padding: 12px 30px; font-size: 14px;" onclick="closeModal('testApisModal')">关闭</button>
     </div>
   </div>
 </div>
@@ -237,7 +233,7 @@
     </div>
     <div class="modal-buttons" style="justify-content: center;">
       <button style="background:#e74c3c; width: 120px;" onclick="doLogout()">确认退出</button>
-      <button style="background:#0c619e; width: 120px;" onclick="cancelLogout()">取消</button>
+      <button style="background:#3498db; width: 120px;" onclick="cancelLogout()">取消</button>
     </div>
   </div>
 </div>
@@ -345,13 +341,13 @@ async function fetchStats() {
     const data = await resp.json();
     if (data.status === 'success') {
       let displayQuota = data.todayQuota;
-      const quotaColor = displayQuota > 900 ? '#e74c3c' : '#0c619e';
+      const quotaColor = displayQuota > 900 ? '#e74c3c' : '#3498db';
       
       tooltip.innerHTML = `<div><strong>数据统计</strong></div>
-        <div style="margin-top:4px;">今日芯片查询次数：<span style="color:#0c619e; font-weight:bold;">${data.todayChipQuery}</span>次</div>
-        <div>累计芯片查询次数：<span style="color:#0c619e; font-weight:bold;">${data.totalChipQuery}</span>次</div>
+        <div style="margin-top:4px;">今日芯片查询次数：<span style="color:#3498db; font-weight:bold;">${data.todayChipQuery}</span>次</div>
+        <div>累计芯片查询次数：<span style="color:#3498db; font-weight:bold;">${data.totalChipQuery}</span>次</div>
         <div>今日芯片代理平台API已用额度：<span style="color:${quotaColor}; font-weight:bold;">${displayQuota}</span><span style="color:#2c3e50; font-weight:bold;">/1000</span></div>
-        <div>累计API调用次数：<span style="color:#0c619e; font-weight:bold;">${data.totalApiCall}</span>次</div>`;
+        <div>累计API调用次数：<span style="color:#3498db; font-weight:bold;">${data.totalApiCall}</span>次</div>`;
     } else { tooltip.textContent = data.error || '获取用量失败'; }
   } catch (e) { tooltip.textContent = '网络异常，无法获取'; }
 }
@@ -515,7 +511,7 @@ function formatPartNumber(displayPn, searchPn) {
 function copyText(text, element) {
   const handleSuccess = () => {
     const originalText = element.innerText; element.innerText = "已复制"; element.style.color = "#27ae60";
-    setTimeout(() => { element.innerText = originalText; element.style.color = "#0c619e"; }, 1000);
+    setTimeout(() => { element.innerText = originalText; element.style.color = "#3498db"; }, 1000);
   };
   if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(handleSuccess).catch(() => fallbackCopy(text, handleSuccess)); } 
   else { fallbackCopy(text, handleSuccess); }
@@ -551,7 +547,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('userTooltip').innerHTML = `
     <div><strong>当前用户</strong></div>
-    <div style="margin-top:4px; color:#0c619e; font-weight:bold;">${currentUserEmail}</div>
+    <div style="margin-top:4px; color:#3498db; font-weight:bold;">${currentUserEmail}</div>
     <div style="margin-top:8px; padding-top:8px; border-top:1px solid #f1f4f8; text-align:center;">
       <span style="color:#7f8c8d; font-size:12px; cursor:pointer; transition: color 0.2s;" 
             onmouseover="this.style.color='#e74c3c'" 
@@ -709,7 +705,7 @@ async function querySubstitute(isRefresh = false) {
 
     if (data.status === 'success' && data.alternatives && data.alternatives.length > 0) {
       currentAlternatives = data.alternatives;
-      let html = '<div class="info-card" style="border-top: 4px solid #4b2e83;"><div class="info-title" style="display:flex; justify-content:space-between;"><span>AI 替代参考推荐与参数对比</span></div><div class="compare-table-container"><table class="compare-table"><thead><tr><th>对比项</th><th><span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span><div><span style="color:#7f8c8d; font-size:12px;">(原型号)</span></div></th>';
+      let html = '<div class="info-card" style="border-top: 4px solid #8e44ad;"><div class="info-title" style="display:flex; justify-content:space-between;"><span>AI 替代参考推荐与参数对比</span></div><div class="compare-table-container"><table class="compare-table"><thead><tr><th>对比项</th><th><span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span><div><span style="color:#7f8c8d; font-size:12px;">(原型号)</span></div></th>';
       data.alternatives.forEach(alt => {
         html += '<th><span class="sub-pn">' + escapeHtml(alt.part_number) + '</span><div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(alt.part_number) + '\', this)">复制型号</span></div></th>';
       });
@@ -735,7 +731,7 @@ async function querySubstitute(isRefresh = false) {
       html += '<tr><td>推荐理由</td><td>-</td>';
       data.alternatives.forEach(alt => { html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + '</td>'; });
       html += '</tr></tbody></table></div>';
-      html += '<div style="text-align: right; margin-top: 10px;"><button style="background: #4b2e83; color: #fff; border: none; padding: 8px 42px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button></div></div>'; 
+      html += '<div style="text-align: right; margin-top: 10px;"><button style="background: #8e44ad; color: #fff; border: none; padding: 8px 42px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button></div></div>'; 
       subDiv.innerHTML = html;
     } else {
       if (!isRefresh) { subDiv.innerHTML = '<div style="color:#7f8c8d; background:none; border:none; text-align:center; padding:20px; font-size:14px;">暂未找到合适的跨品牌同级别替代型号，该芯片可能具有较高的技术壁垒或封闭生态。</div>'; trendingBox.style.display = 'block'; }
