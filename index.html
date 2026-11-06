@@ -164,10 +164,10 @@
     .should-cost-value { font-size: 36px; }
     .should-cost-label { font-size: 18px; }
     .trending-list { grid-template-columns: 1fr; grid-template-rows: auto; grid-auto-flow: row; min-height: auto; }
-    
-    /* 唯一的修改点：仅在手机端首页状态下，增加 body 的底部内边距，完美拉开与底部固定 footer 的间距为 10px，且完全不影响其他状态 */
+
+    /* 核心修正：仅在手机端首页状态下，将底部内边距从原本的 20px 增加到 30px，完美拉开 10px 的间距，且不影响其他状态 */
     body.is-home {
-      padding-bottom: 26px !important;
+      padding-bottom: 30px !important;
     }
   }
 </style>
