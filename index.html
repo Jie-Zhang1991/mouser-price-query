@@ -150,6 +150,11 @@
       padding: 20px !important; 
     }
     
+    /* 修复重点：查询后彻底消除容器的底部内边距，让间距绝对是 12px */
+    body:not(.is-home) .container {
+      padding-bottom: 0 !important;
+    }
+    
     h1 { font-size: 32px; font-weight: 900; }
     
     .subtitle, body:not(.is-home) .subtitle { 
@@ -163,9 +168,9 @@
     .should-cost-label { font-size: 18px; }
     .trending-list { grid-template-columns: 1fr; grid-template-rows: auto; grid-auto-flow: row; min-height: auto; }
     
-    /* 修改点：精准控制首页及查询页底部距离 */
     body.is-home .footer { position: relative; bottom: auto; margin-top: 10px !important; width: 100%; }
     body:not(.is-home) .footer { position: relative; bottom: auto; margin-top: 12px !important; width: 100%; }
+    
     body:not(.is-home) #result > :last-child, body:not(.is-home) #substitute-result > :last-child { margin-bottom: 0 !important; }
   }
 </style>
