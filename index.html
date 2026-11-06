@@ -152,8 +152,10 @@
   @media (max-width: 800px) {
     /* 彻底关闭全局过渡效果，防止状态切换时产生动画 */
     body { padding: 20px 12px; transition: none !important; }
+    
+    /* 【修改点】：将 padding-top 由 48px 修改为 28px，配合 container 的 20px，总留白刚好为 48px */
     body.is-home, body:not(.is-home) { 
-      padding-top: 48px !important; 
+      padding-top: 28px !important; 
       padding-bottom: 20px !important; 
       align-items: flex-start !important; 
     }
