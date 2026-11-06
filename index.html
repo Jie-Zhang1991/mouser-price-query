@@ -139,7 +139,8 @@
   .statement-content li { margin-bottom: 6px; }
   
   @media (max-width: 800px) {
-    body { padding: 20px 12px; transition: none !important; }
+    /* 修改点：强制 body 为纵向排布，防止 footer 被挤到右侧 */
+    body { padding: 20px 12px; transition: none !important; flex-direction: column !important; }
     body.is-home, body:not(.is-home) { 
       padding-top: 48px !important; 
       padding-bottom: 20px !important; 
@@ -163,8 +164,7 @@
     .should-cost-label { font-size: 18px; }
     .trending-list { grid-template-columns: 1fr; grid-template-rows: auto; grid-auto-flow: row; min-height: auto; }
     
-    /* 修改点：手机端底部小字改为相对定位，并拉开与上方话题的间距 */
-    .footer { position: relative; bottom: auto; margin-top: 20px; }
+    .footer { position: relative; bottom: auto; margin-top: 20px; width: 100%; }
   }
 </style>
 </head>
