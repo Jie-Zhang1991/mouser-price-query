@@ -153,7 +153,7 @@
     /* 彻底关闭全局过渡效果，防止状态切换时产生动画 */
     body { padding: 20px 12px; transition: none !important; }
     
-    /* 【修改点】：将 padding-top 由 48px 修改为 28px，配合 container 的 20px，总留白刚好为 48px */
+    /* 将 padding-top 由 48px 修改为 28px，配合 container 的 20px，总留白刚好为 48px */
     body.is-home, body:not(.is-home) { 
       padding-top: 28px !important; 
       padding-bottom: 20px !important; 
@@ -178,9 +178,9 @@
     .should-cost-label { font-size: 18px; }
     .trending-list { grid-template-columns: 1fr; grid-template-rows: auto; grid-auto-flow: row; min-height: auto; }
 
-    /* 【核心修改点3】：仅在手机端首页状态下，将热门话题下方间距增加 10px，完美隔开底部的隐私政策，不影响其他页面 */
-    body.is-home #trending-box {
-      margin-bottom: 10px;
+    /* 【核心修改点】：统一调整为 16px，涵盖了首页和未输入型号时的报错页，同时不影响其他界面 */
+    #trending-box {
+      margin-bottom: 16px;
     }
   }
 </style>
