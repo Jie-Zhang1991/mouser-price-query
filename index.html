@@ -8,9 +8,13 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { user-select: none; }
-  body { font-family: -apple-system, "Microsoft YaHei", sans-serif; background: #f2f5f8; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 7px 16px 40px; transition: padding 0.4s ease; position: relative; }
-  input[type="text"], #result, #substitute-result, .modal { user-select: text; }
-  body.is-home { align-items: center; padding-top: 0; padding-bottom: 80px; }
+  
+  /* 【核心修复1】：修正 body 的 flex 布局，增加纵向排列和正确的居中方式，彻底杜绝长页面下 footer 定位错误的 Bug */
+  body { font-family: -apple-system, "Microsoft YaHei", sans-serif; background: #f2f5f8; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 7px 16px 40px; transition: padding 0.4s ease; position: relative; }
+  
+  /* 【核心修复2】：在首页状态下，使用 justify-content 确保垂直居中 */
+  body.is-home { justify-content: center; padding-top: 0; padding-bottom: 80px; }
+  
   body.is-home .container { max-width: 850px; }
   body.is-home .search-box { width: 100%; margin: 0 auto 20px auto; transition: width 0.4s ease, margin 0.4s ease; }
   body:not(.is-home) .container { max-width: 1200px; }
@@ -165,9 +169,9 @@
     .should-cost-label { font-size: 18px; }
     .trending-list { grid-template-columns: 1fr; grid-template-rows: auto; grid-auto-flow: row; min-height: auto; }
 
-    /* 核心修正：仅在手机端首页状态下，将底部内边距从原本的 20px 增加到 30px，完美拉开 10px 的间距，且不影响其他状态 */
-    body.is-home {
-      padding-bottom: 30px !important;
+    /* 【核心修改点3】：仅在手机端首页状态下，将热门话题下方间距增加 10px，完美隔开底部的隐私政策，不影响其他页面 */
+    body.is-home #trending-box {
+      margin-bottom: 10px;
     }
   }
 </style>
