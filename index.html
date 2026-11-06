@@ -163,11 +163,9 @@
     .should-cost-label { font-size: 18px; }
     .trending-list { grid-template-columns: 1fr; grid-template-rows: auto; grid-auto-flow: row; min-height: auto; }
     
-    /* 修改点1：将替代型号卡片的底部间距与单件查询保持一致 (20px -> 16px) */
-    .info-card { margin-bottom: 16px !important; }
-
-    /* 修改点2：底部间距保持10px */
-    .footer { position: relative; bottom: auto; margin-top: 10px; width: 100%; }
+    /* 修改点：精准锁定底部小字距离上方卡片的下边缘为 12px */
+    .source-section:last-child, .info-card:last-child { margin-bottom: 0 !important; }
+    .footer { position: relative; bottom: auto; margin-top: 12px !important; width: 100%; }
   }
 </style>
 </head>
@@ -238,13 +236,7 @@
 
 <div class="modal-overlay" id="contactModal"><div class="modal" style="max-width: 500px;"><h2>联系我们</h2><div class="statement-content" style="text-align: center; padding: 20px 0;"><p style="font-size: 16px; margin-bottom: 20px;">如果您在使用过程中遇到任何问题，或对网站有功能建议与 Bug 反馈，欢迎随时通过以下邮箱联系我。</p><p style="font-size: 20px; font-weight: bold; color: #3498db; margin-bottom: 30px;">Jie18_Zhang@SAIC-GM.com</p><p style="color: #7f8c8d; font-size: 13px;">感谢您的支持与理解！</p></div><div class="modal-buttons" style="justify-content: center;"><button style="background:#3498db;" onclick="closeModal('contactModal')">关闭</button></div></div></div>
 
-<div class="modal-overlay" id="batchModal"><div class="modal"><h2>批量分析 BOM 文件</h2><div class="notice"><strong>📋 使用说明：</strong><br>1. 文件格式：仅支持 <strong>Excel (.xlsx / .xls)</strong> 或 <strong>WPS 表格</strong>；<br>2. 芯片型号存放于上传文件的 <strong>A 列</strong>，请勿填写表头等与芯片型号无关的内容；<br>3. 受 API 调用次数及时间间隔限制，批量分析的芯片数量<strong>上限暂设定为 100 个</strong>，超出部分不予分析，开发者将依据后续使用情况调整限额。</div>
-<div class="drop-zone" id="dropZone">
-  <!-- 修改点2：替换为黄色 SVG 文件夹图标 -->
-  <div class="drop-zone-icon">
-    <svg viewBox="0 0 24 24" width="42" height="42" fill="#FFC107" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-  </div>
-  <div class="drop-zone-text">点击此处选择文件，或将文件拖拽到此处</div><div class="drop-zone-hint">支持 .xlsx / .xls 格式</div><input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" /></div><div class="modal-buttons">
+<div class="modal-overlay" id="batchModal"><div class="modal"><h2>批量分析 BOM 文件</h2><div class="notice"><strong>📋 使用说明：</strong><br>1. 文件格式：仅支持 <strong>Excel (.xlsx / .xls)</strong> 或 <strong>WPS 表格</strong>；<br>2. 芯片型号存放于上传文件的 <strong>A 列</strong>，请勿填写表头等与芯片型号无关的内容；<br>3. 受 API 调用次数及时间间隔限制，批量分析的芯片数量<strong>上限暂设定为 100 个</strong>，超出部分不予分析，开发者将依据后续使用情况调整限额。</div><div class="drop-zone" id="dropZone"><div class="drop-zone-icon">📁</div><div class="drop-zone-text">点击此处选择文件，或将文件拖拽到此处</div><div class="drop-zone-hint">支持 .xlsx / .xls 格式</div><input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" /></div><div class="modal-buttons">
       <button style="background:#3498db;" onclick="closeBatchModal()">取消</button>
     </div></div></div>
 
