@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -164,6 +164,11 @@
     .should-cost-value { font-size: 36px; }
     .should-cost-label { font-size: 18px; }
     .trending-list { grid-template-columns: 1fr; grid-template-rows: auto; grid-auto-flow: row; min-height: auto; }
+    
+    /* 核心修改点：仅针对手机端、首页状态下，将热门话题容器下方撑开 23px，配合底部的 padding 完美形成 10px 视觉间距，且不影响其它状态 */
+    body.is-home #trending-box {
+      margin-bottom: 23px !important;
+    }
   }
 </style>
 </head>
