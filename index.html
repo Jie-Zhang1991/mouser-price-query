@@ -7,6 +7,13 @@
 <title>ChipCost</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  /* 【新增修复点】：强制隐藏全局横向溢出，禁止页面左右拖动，同时保持宽度 100% */
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
   body { user-select: none; }
   
   /* 【核心修复1】：修正 body 的 flex 布局，增加纵向排列和正确的居中方式，彻底杜绝长页面下 footer 定位错误的 Bug */
