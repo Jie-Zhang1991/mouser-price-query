@@ -139,8 +139,8 @@
   .statement-content li { margin-bottom: 6px; }
   
   @media (max-width: 800px) {
-    /* 修改点：强制 body 为纵向排布，防止 footer 被挤到右侧 */
-    body { padding: 20px 12px; transition: none !important; flex-direction: column !important; }
+    /* 修复点：加上 justify-content: flex-start !important; 强制顶部对齐 */
+    body { padding: 20px 12px; transition: none !important; flex-direction: column !important; justify-content: flex-start !important; }
     body.is-home, body:not(.is-home) { 
       padding-top: 48px !important; 
       padding-bottom: 20px !important; 
