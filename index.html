@@ -139,7 +139,6 @@
   .statement-content li { margin-bottom: 6px; }
   
   @media (max-width: 800px) {
-    /* 彻底关闭全局过渡效果，防止状态切换时产生动画 */
     body { padding: 20px 12px; transition: none !important; }
     body.is-home, body:not(.is-home) { 
       padding-top: 48px !important; 
@@ -147,7 +146,6 @@
       align-items: flex-start !important; 
     }
 
-    /* 修复重点：强制将容器的顶部内边距锁死在 20px，防止被 PC 端的 24px 覆盖引发跳动 */
     .container, body:not(.is-home) .container { 
       padding: 20px !important; 
     }
@@ -164,6 +162,9 @@
     .should-cost-value { font-size: 36px; }
     .should-cost-label { font-size: 18px; }
     .trending-list { grid-template-columns: 1fr; grid-template-rows: auto; grid-auto-flow: row; min-height: auto; }
+    
+    /* 修改点：手机端底部小字改为相对定位，并拉开与上方话题的间距 */
+    .footer { position: relative; bottom: auto; margin-top: 20px; }
   }
 </style>
 </head>
