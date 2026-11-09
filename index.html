@@ -202,7 +202,7 @@
   </div>
   <div class="top-icon-btn" id="settingsProfile">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-    <div class="user-tooltip" id="settingsTooltip">该功能仅向网站管理员开放。</div>
+    <div class="user-tooltip" id="settingsTooltip">加载中...</div>
     <div class="admin-menu" id="adminMenu" style="display: none;">
       <div class="admin-menu-item" onclick="testApis()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -505,12 +505,12 @@ async function testApis() {
   slowTipTimeout = setTimeout(() => {
     const tip = document.getElementById('slow-net-tip');
     if (tip) tip.style.display = 'block';
-  }, 7000); // 修改为7秒
+  }, 7000); // 7秒
 
   abortTimeout = setTimeout(() => {
     controller.abort();
     clearTimeout(slowTipTimeout);
-  }, 13000); // 修改为13秒
+  }, 13000); // 13秒
 
   fetchStats();
 
@@ -573,11 +573,12 @@ async function testApis() {
   } catch (e) {
     if (e.name === 'AbortError') {
       if (isManualCancel) {
-        contentDiv.innerHTML = `<div style="text-align: center; color: #7f8c8d; padding: 20px;">测试已取消</div>`;
+        closeModal('testApisModal');
+        contentDiv.innerHTML = ''; // 静默清空
       } else {
         contentDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 13px; line-height: 1.6; text-align: left;">
-          <strong style="font-size: 14px;">⚠️ 网络请求已超时</strong><br><br>
-          检测到您的网络环境（如公司内网防火墙限制）响应极慢，未能完成测试。请检查网络状况，或尝试切换网络（如手机热点）后重试。
+          <strong style="font-size: 14px;">⚠️ 网络连接超时</strong><br><br>
+          检测到您的网络环境（如公司内网防火墙限制）响应较慢，未能在预期时间内完成测试。请检查网络，或尝试切换网络（如手机热点）后重试。
         </div>`;
       }
     } else {
@@ -651,6 +652,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (currentUserEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
     const downloadItem = document.getElementById('downloadUserStatsItem');
     if (downloadItem) downloadItem.style.display = 'none';
+    document.getElementById('settingsTooltip').textContent = '该功能仅向网站管理员开放。';
   }
 
   fetchStats();
@@ -686,43 +688,11 @@ async function query() {
 
   if (!partNumber) { subDiv.innerHTML = ''; resultDiv.innerHTML = '<div class="error">请输入芯片型号</div>'; return; }
   subDiv.innerHTML = ''; currentAlternatives = []; trendingBox.style.display = 'none';
-  btn.disabled = true; btn.textContent = '分析中...'; 
-  
-  // 【前端超时与取消机制】
-  const controller = new AbortController();
-  let slowTipTimeout, abortTimeout;
-  let isManualCancel = false; // 标记是否为用户手动取消
-
-  const cancelWait = () => {
-    isManualCancel = true;
-    controller.abort();
-    clearTimeout(slowTipTimeout);
-    clearTimeout(abortTimeout);
-  };
-  window.cancelCurrentQuery = cancelWait;
-
-  resultDiv.innerHTML = `
-    <div class="loading">
-      正在查询价格并调用 AI 分析...
-      <div id="slow-net-tip" style="display: none; margin-top: 12px; font-size: 12px; color: #7f8c8d;">
-        网络似乎有些慢？<span style="font-size: 14px; font-weight: bold; color: #3498db; cursor: pointer; margin-left: 4px;" onclick="window.cancelCurrentQuery()">取消等待</span>
-      </div>
-    </div>
-  `;
-
-  slowTipTimeout = setTimeout(() => {
-    const tip = document.getElementById('slow-net-tip');
-    if (tip) tip.style.display = 'block';
-  }, 7000); // 修改为7秒
-
-  abortTimeout = setTimeout(() => {
-    controller.abort();
-    clearTimeout(slowTipTimeout);
-  }, 13000); // 修改为13秒
+  btn.disabled = true; btn.textContent = '分析中...'; resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
 
   try {
     const url = API_URL + '?partNumber=' + encodeURIComponent(partNumber) + '&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
-    const resp = await fetch(url, { signal: controller.signal });
+    const resp = await fetch(url);
     const data = await resp.json();
     if (!resp.ok || data.error) { resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>'; trendingBox.style.display = 'block'; return; }
     if (!data.shouldCost) { resultDiv.innerHTML = '<div class="error">抱歉，未检索到任何价格信息。</div>'; trendingBox.style.display = 'block'; return; }
@@ -773,23 +743,9 @@ async function query() {
     if (data.icky) html += renderSource(data.icky, '云汉芯城 ICKEY');
     resultDiv.innerHTML = html;
   } catch (e) {
-    if (e.name === 'AbortError') {
-      if (isManualCancel) {
-        resultDiv.innerHTML = ''; // 静默清空
-      } else {
-        resultDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 14px; line-height: 1.6;">
-          <strong style="font-size: 15px;">⚠️ 网络请求已超时</strong><br><br>
-          检测到您的网络环境（如公司内网防火墙限制）响应极慢。请检查网络，或尝试切换网络（如手机热点）后重试。
-        </div>`;
-      }
-    } else {
-      resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
-    }
+    resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
     trendingBox.style.display = 'block'; 
   } finally {
-    clearTimeout(slowTipTimeout);
-    clearTimeout(abortTimeout);
-    window.cancelCurrentQuery = null;
     btn.disabled = false; btn.textContent = '单件查询';
     fetchStats();
   }
@@ -806,40 +762,8 @@ async function querySubstitute(isRefresh = false) {
   if (!partNumber) { priceDiv.innerHTML = ''; subDiv.innerHTML = '<div class="error">请输入芯片型号</div>'; return; }
   priceDiv.innerHTML = ''; let refreshOverlay = null;
 
-  // 【前端超时与取消机制】
-  let controller, slowTipTimeout, abortTimeout;
-  let isManualCancel = false;
-
   if (!isRefresh) {
-    controller = new AbortController();
-    
-    const cancelWait = () => {
-      isManualCancel = true;
-      controller.abort();
-      clearTimeout(slowTipTimeout);
-      clearTimeout(abortTimeout);
-    };
-    window.cancelCurrentSubstitute = cancelWait;
-
-    subDiv.innerHTML = `
-      <div class="loading">
-        正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...
-        <div id="slow-net-tip" style="display: none; margin-top: 12px; font-size: 12px; color: #7f8c8d;">
-          网络似乎有些慢？<span style="font-size: 14px; font-weight: bold; color: #3498db; cursor: pointer; margin-left: 4px;" onclick="window.cancelCurrentSubstitute()">取消等待</span>
-        </div>
-      </div>
-    `;
-
-    slowTipTimeout = setTimeout(() => {
-      const tip = document.getElementById('slow-net-tip');
-      if (tip) tip.style.display = 'block';
-    }, 7000); // 修改为7秒
-
-    abortTimeout = setTimeout(() => {
-      controller.abort();
-      clearTimeout(slowTipTimeout);
-    }, 13000); // 修改为13秒
-
+    subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...</div>';
     btn.disabled = true; btn.textContent = '检索中...'; currentAlternatives = []; trendingBox.style.display = 'none'; 
   } else {
     subDiv.style.position = 'relative';
@@ -854,10 +778,7 @@ async function querySubstitute(isRefresh = false) {
   try {
     let url = API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber) + '&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
     if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
-    
-    // 使用 controller.signal（如果是刷新状态，则没有绑定超时逻辑，保持原样）
-    const fetchOptions = !isRefresh ? { signal: controller.signal } : {};
-    const resp = await fetch(url, fetchOptions);
+    const resp = await fetch(url);
     const text = await resp.text();
     let data;
     try { data = JSON.parse(text); } catch (err) {
@@ -908,27 +829,10 @@ async function querySubstitute(isRefresh = false) {
       else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">没有找到新的替代型号了</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
     }
   } catch (e) {
-    if (e.name === 'AbortError') {
-      if (isManualCancel) {
-        subDiv.innerHTML = ''; // 静默清空
-      } else {
-        subDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 14px; line-height: 1.6;">
-          <strong style="font-size: 15px;">⚠️ 网络请求已超时</strong><br><br>
-          检测到您的网络环境（如公司内网防火墙限制）响应极慢。请检查网络，或尝试切换网络（如手机热点）后重试。
-        </div>`;
-      }
-      trendingBox.style.display = 'block';
-    } else {
-      if (!isRefresh) { subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>'; trendingBox.style.display = 'block'; }
-      else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">网络异常，请稍后重试</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
-    }
+    if (!isRefresh) { subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>'; trendingBox.style.display = 'block'; }
+    else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">网络异常，请稍后重试</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
   } finally {
-    if (!isRefresh) { 
-      clearTimeout(slowTipTimeout);
-      clearTimeout(abortTimeout);
-      window.cancelCurrentSubstitute = null;
-      btn.disabled = false; btn.textContent = '替代型号'; 
-    }
+    if (!isRefresh) { btn.disabled = false; btn.textContent = '替代型号'; }
     fetchStats();
   }
 }
