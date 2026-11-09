@@ -482,8 +482,10 @@ async function testApis() {
   // 【前端超时与取消机制】
   const controller = new AbortController();
   let slowTipTimeout, abortTimeout;
+  let isManualCancel = false; // 标记是否为用户手动取消
 
   const cancelWait = () => {
+    isManualCancel = true;
     controller.abort();
     clearTimeout(slowTipTimeout);
     clearTimeout(abortTimeout);
@@ -503,12 +505,12 @@ async function testApis() {
   slowTipTimeout = setTimeout(() => {
     const tip = document.getElementById('slow-net-tip');
     if (tip) tip.style.display = 'block';
-  }, 5000);
+  }, 7000); // 修改为7秒
 
   abortTimeout = setTimeout(() => {
     controller.abort();
     clearTimeout(slowTipTimeout);
-  }, 10000);
+  }, 13000); // 修改为13秒
 
   fetchStats();
 
@@ -570,10 +572,14 @@ async function testApis() {
     }
   } catch (e) {
     if (e.name === 'AbortError') {
-      contentDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 13px; line-height: 1.6; text-align: left;">
-        <strong style="font-size: 14px;">⚠️ 网络请求已取消或超时</strong><br><br>
-        检测到您的网络环境（如公司内网防火墙限制）响应极慢，未能完成测试。请检查网络状况，或尝试切换网络（如手机热点）后重试。
-      </div>`;
+      if (isManualCancel) {
+        contentDiv.innerHTML = `<div style="text-align: center; color: #7f8c8d; padding: 20px;">测试已取消</div>`;
+      } else {
+        contentDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 13px; line-height: 1.6; text-align: left;">
+          <strong style="font-size: 14px;">⚠️ 网络请求已超时</strong><br><br>
+          检测到您的网络环境（如公司内网防火墙限制）响应极慢，未能完成测试。请检查网络状况，或尝试切换网络（如手机热点）后重试。
+        </div>`;
+      }
     } else {
       contentDiv.innerHTML = `<div class="error" style="font-size: 13px; padding: 10px;">无法连接到后端服务，请稍后重试。</div>`;
     }
@@ -685,8 +691,10 @@ async function query() {
   // 【前端超时与取消机制】
   const controller = new AbortController();
   let slowTipTimeout, abortTimeout;
+  let isManualCancel = false; // 标记是否为用户手动取消
 
   const cancelWait = () => {
+    isManualCancel = true;
     controller.abort();
     clearTimeout(slowTipTimeout);
     clearTimeout(abortTimeout);
@@ -705,12 +713,12 @@ async function query() {
   slowTipTimeout = setTimeout(() => {
     const tip = document.getElementById('slow-net-tip');
     if (tip) tip.style.display = 'block';
-  }, 5000);
+  }, 7000); // 修改为7秒
 
   abortTimeout = setTimeout(() => {
     controller.abort();
     clearTimeout(slowTipTimeout);
-  }, 10000);
+  }, 13000); // 修改为13秒
 
   try {
     const url = API_URL + '?partNumber=' + encodeURIComponent(partNumber) + '&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
@@ -766,10 +774,14 @@ async function query() {
     resultDiv.innerHTML = html;
   } catch (e) {
     if (e.name === 'AbortError') {
-      resultDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 14px; line-height: 1.6;">
-        <strong style="font-size: 15px;">⚠️ 网络请求已取消或超时</strong><br><br>
-        检测到您的网络环境（如公司内网防火墙限制）响应极慢。请检查网络，或尝试切换网络（如手机热点）后重试。
-      </div>`;
+      if (isManualCancel) {
+        resultDiv.innerHTML = ''; // 静默清空
+      } else {
+        resultDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 14px; line-height: 1.6;">
+          <strong style="font-size: 15px;">⚠️ 网络请求已超时</strong><br><br>
+          检测到您的网络环境（如公司内网防火墙限制）响应极慢。请检查网络，或尝试切换网络（如手机热点）后重试。
+        </div>`;
+      }
     } else {
       resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
     }
@@ -796,11 +808,13 @@ async function querySubstitute(isRefresh = false) {
 
   // 【前端超时与取消机制】
   let controller, slowTipTimeout, abortTimeout;
+  let isManualCancel = false;
 
   if (!isRefresh) {
     controller = new AbortController();
     
     const cancelWait = () => {
+      isManualCancel = true;
       controller.abort();
       clearTimeout(slowTipTimeout);
       clearTimeout(abortTimeout);
@@ -819,12 +833,12 @@ async function querySubstitute(isRefresh = false) {
     slowTipTimeout = setTimeout(() => {
       const tip = document.getElementById('slow-net-tip');
       if (tip) tip.style.display = 'block';
-    }, 5000);
+    }, 7000); // 修改为7秒
 
     abortTimeout = setTimeout(() => {
       controller.abort();
       clearTimeout(slowTipTimeout);
-    }, 10000);
+    }, 13000); // 修改为13秒
 
     btn.disabled = true; btn.textContent = '检索中...'; currentAlternatives = []; trendingBox.style.display = 'none'; 
   } else {
@@ -895,10 +909,14 @@ async function querySubstitute(isRefresh = false) {
     }
   } catch (e) {
     if (e.name === 'AbortError') {
-      subDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 14px; line-height: 1.6;">
-        <strong style="font-size: 15px;">⚠️ 网络请求已取消或超时</strong><br><br>
-        检测到您的网络环境（如公司内网防火墙限制）响应极慢。请检查网络，或尝试切换网络（如手机热点）后重试。
-      </div>`;
+      if (isManualCancel) {
+        subDiv.innerHTML = ''; // 静默清空
+      } else {
+        subDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 14px; line-height: 1.6;">
+          <strong style="font-size: 15px;">⚠️ 网络请求已超时</strong><br><br>
+          检测到您的网络环境（如公司内网防火墙限制）响应极慢。请检查网络，或尝试切换网络（如手机热点）后重试。
+        </div>`;
+      }
       trendingBox.style.display = 'block';
     } else {
       if (!isRefresh) { subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>'; trendingBox.style.display = 'block'; }
