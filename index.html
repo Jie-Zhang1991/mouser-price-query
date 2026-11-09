@@ -158,6 +158,7 @@
       padding-top: 28px !important; 
       padding-bottom: 20px !important; 
       align-items: flex-start !important; 
+      justify-content: flex-start !important; /* 【核心修改点】：强制顶部对齐，解决热门话题加载出来后的闪跳问题 */
     }
 
     /* 修复重点：强制将容器的顶部内边距锁死在 20px，防止被 PC 端的 24px 覆盖引发跳动 */
