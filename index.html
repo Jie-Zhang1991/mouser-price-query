@@ -478,18 +478,43 @@ async function testApis() {
   const contentDiv = document.getElementById('testApisContent');
   const closeBtnContainer = document.getElementById('testApisCloseBtnContainer');
   closeBtnContainer.style.display = 'none';
+  
+  // 【前端超时与取消机制】
+  const controller = new AbortController();
+  let slowTipTimeout, abortTimeout;
+
+  const cancelWait = () => {
+    controller.abort();
+    clearTimeout(slowTipTimeout);
+    clearTimeout(abortTimeout);
+  };
+  window.cancelCurrentTestApis = cancelWait;
+
   contentDiv.innerHTML = `
     <div style="text-align: center; color: #7f8c8d;">
       <div class="spinner" style="margin: 0 auto 10px;"></div>
       <div>正在向各平台发起轻量测试...</div>
+      <div id="slow-net-tip" style="display: none; margin-top: 12px; font-size: 12px; color: #7f8c8d;">
+        网络似乎有些慢？<span style="font-size: 14px; font-weight: bold; color: #3498db; cursor: pointer; margin-left: 4px;" onclick="window.cancelCurrentTestApis()">取消等待</span>
+      </div>
     </div>
   `;
+
+  slowTipTimeout = setTimeout(() => {
+    const tip = document.getElementById('slow-net-tip');
+    if (tip) tip.style.display = 'block';
+  }, 5000);
+
+  abortTimeout = setTimeout(() => {
+    controller.abort();
+    clearTimeout(slowTipTimeout);
+  }, 10000);
 
   fetchStats();
 
   try {
     const url = API_URL + '?action=test_apis&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
-    const resp = await fetch(url);
+    const resp = await fetch(url, { signal: controller.signal });
     const data = await resp.json();
 
     if (data.status === 'success' && data.testResult) {
@@ -544,8 +569,19 @@ async function testApis() {
       closeBtnContainer.style.display = 'flex';
     }
   } catch (e) {
-    contentDiv.innerHTML = `<div class="error" style="font-size: 13px; padding: 10px;">无法连接到后端服务，请稍后重试。</div>`;
+    if (e.name === 'AbortError') {
+      contentDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 13px; line-height: 1.6; text-align: left;">
+        <strong style="font-size: 14px;">⚠️ 网络请求已取消或超时</strong><br><br>
+        检测到您的网络环境（如公司内网防火墙限制）响应极慢，未能完成测试。请检查网络状况，或尝试切换网络（如手机热点）后重试。
+      </div>`;
+    } else {
+      contentDiv.innerHTML = `<div class="error" style="font-size: 13px; padding: 10px;">无法连接到后端服务，请稍后重试。</div>`;
+    }
     closeBtnContainer.style.display = 'flex';
+  } finally {
+    clearTimeout(slowTipTimeout);
+    clearTimeout(abortTimeout);
+    window.cancelCurrentTestApis = null;
   }
 }
 
@@ -644,11 +680,41 @@ async function query() {
 
   if (!partNumber) { subDiv.innerHTML = ''; resultDiv.innerHTML = '<div class="error">请输入芯片型号</div>'; return; }
   subDiv.innerHTML = ''; currentAlternatives = []; trendingBox.style.display = 'none';
-  btn.disabled = true; btn.textContent = '分析中...'; resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
+  btn.disabled = true; btn.textContent = '分析中...'; 
+  
+  // 【前端超时与取消机制】
+  const controller = new AbortController();
+  let slowTipTimeout, abortTimeout;
+
+  const cancelWait = () => {
+    controller.abort();
+    clearTimeout(slowTipTimeout);
+    clearTimeout(abortTimeout);
+  };
+  window.cancelCurrentQuery = cancelWait;
+
+  resultDiv.innerHTML = `
+    <div class="loading">
+      正在查询价格并调用 AI 分析...
+      <div id="slow-net-tip" style="display: none; margin-top: 12px; font-size: 12px; color: #7f8c8d;">
+        网络似乎有些慢？<span style="font-size: 14px; font-weight: bold; color: #3498db; cursor: pointer; margin-left: 4px;" onclick="window.cancelCurrentQuery()">取消等待</span>
+      </div>
+    </div>
+  `;
+
+  slowTipTimeout = setTimeout(() => {
+    const tip = document.getElementById('slow-net-tip');
+    if (tip) tip.style.display = 'block';
+  }, 5000);
+
+  abortTimeout = setTimeout(() => {
+    controller.abort();
+    clearTimeout(slowTipTimeout);
+  }, 10000);
 
   try {
     const url = API_URL + '?partNumber=' + encodeURIComponent(partNumber) + '&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
-    const resp = await fetch(url);
+    const resp = await fetch(url, { signal: controller.signal });
     const data = await resp.json();
     if (!resp.ok || data.error) { resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>'; trendingBox.style.display = 'block'; return; }
     if (!data.shouldCost) { resultDiv.innerHTML = '<div class="error">抱歉，未检索到任何价格信息。</div>'; trendingBox.style.display = 'block'; return; }
@@ -699,9 +765,19 @@ async function query() {
     if (data.icky) html += renderSource(data.icky, '云汉芯城 ICKEY');
     resultDiv.innerHTML = html;
   } catch (e) {
-    resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
+    if (e.name === 'AbortError') {
+      resultDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 14px; line-height: 1.6;">
+        <strong style="font-size: 15px;">⚠️ 网络请求已取消或超时</strong><br><br>
+        检测到您的网络环境（如公司内网防火墙限制）响应极慢。请检查网络，或尝试切换网络（如手机热点）后重试。
+      </div>`;
+    } else {
+      resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
+    }
     trendingBox.style.display = 'block'; 
   } finally {
+    clearTimeout(slowTipTimeout);
+    clearTimeout(abortTimeout);
+    window.cancelCurrentQuery = null;
     btn.disabled = false; btn.textContent = '单件查询';
     fetchStats();
   }
@@ -718,8 +794,38 @@ async function querySubstitute(isRefresh = false) {
   if (!partNumber) { priceDiv.innerHTML = ''; subDiv.innerHTML = '<div class="error">请输入芯片型号</div>'; return; }
   priceDiv.innerHTML = ''; let refreshOverlay = null;
 
+  // 【前端超时与取消机制】
+  let controller, slowTipTimeout, abortTimeout;
+
   if (!isRefresh) {
-    subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...</div>';
+    controller = new AbortController();
+    
+    const cancelWait = () => {
+      controller.abort();
+      clearTimeout(slowTipTimeout);
+      clearTimeout(abortTimeout);
+    };
+    window.cancelCurrentSubstitute = cancelWait;
+
+    subDiv.innerHTML = `
+      <div class="loading">
+        正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...
+        <div id="slow-net-tip" style="display: none; margin-top: 12px; font-size: 12px; color: #7f8c8d;">
+          网络似乎有些慢？<span style="font-size: 14px; font-weight: bold; color: #3498db; cursor: pointer; margin-left: 4px;" onclick="window.cancelCurrentSubstitute()">取消等待</span>
+        </div>
+      </div>
+    `;
+
+    slowTipTimeout = setTimeout(() => {
+      const tip = document.getElementById('slow-net-tip');
+      if (tip) tip.style.display = 'block';
+    }, 5000);
+
+    abortTimeout = setTimeout(() => {
+      controller.abort();
+      clearTimeout(slowTipTimeout);
+    }, 10000);
+
     btn.disabled = true; btn.textContent = '检索中...'; currentAlternatives = []; trendingBox.style.display = 'none'; 
   } else {
     subDiv.style.position = 'relative';
@@ -734,7 +840,10 @@ async function querySubstitute(isRefresh = false) {
   try {
     let url = API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber) + '&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
     if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
-    const resp = await fetch(url);
+    
+    // 使用 controller.signal（如果是刷新状态，则没有绑定超时逻辑，保持原样）
+    const fetchOptions = !isRefresh ? { signal: controller.signal } : {};
+    const resp = await fetch(url, fetchOptions);
     const text = await resp.text();
     let data;
     try { data = JSON.parse(text); } catch (err) {
@@ -785,10 +894,23 @@ async function querySubstitute(isRefresh = false) {
       else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">没有找到新的替代型号了</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
     }
   } catch (e) {
-    if (!isRefresh) { subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>'; trendingBox.style.display = 'block'; }
-    else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">网络异常，请稍后重试</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
+    if (e.name === 'AbortError') {
+      subDiv.innerHTML = `<div style="background: #fff9e6; border-left: 4px solid #f39c12; padding: 16px; border-radius: 8px; color: #7f5f00; font-size: 14px; line-height: 1.6;">
+        <strong style="font-size: 15px;">⚠️ 网络请求已取消或超时</strong><br><br>
+        检测到您的网络环境（如公司内网防火墙限制）响应极慢。请检查网络，或尝试切换网络（如手机热点）后重试。
+      </div>`;
+      trendingBox.style.display = 'block';
+    } else {
+      if (!isRefresh) { subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>'; trendingBox.style.display = 'block'; }
+      else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">网络异常，请稍后重试</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
+    }
   } finally {
-    if (!isRefresh) { btn.disabled = false; btn.textContent = '替代型号'; }
+    if (!isRefresh) { 
+      clearTimeout(slowTipTimeout);
+      clearTimeout(abortTimeout);
+      window.cancelCurrentSubstitute = null;
+      btn.disabled = false; btn.textContent = '替代型号'; 
+    }
     fetchStats();
   }
 }
