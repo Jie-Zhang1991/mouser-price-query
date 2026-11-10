@@ -153,9 +153,9 @@
     /* 彻底关闭全局过渡效果，防止状态切换时产生动画 */
     body { padding: 20px 12px; transition: none !important; }
     
-    /* 将 padding-top 由 48px 修改为 28px，配合 container 的 20px，总留白刚好为 48px */
+    /* 将 padding-top 由 28px 修改为 48px，配合 container 的 20px，总留白刚好为 68px */
     body.is-home, body:not(.is-home) { 
-      padding-top: 28px !important; 
+      padding-top: 48px !important; 
       padding-bottom: 20px !important; 
       align-items: flex-start !important; 
       justify-content: flex-start !important; /* 【核心修改点】：强制顶部对齐，解决热门话题加载出来后的闪跳问题 */
