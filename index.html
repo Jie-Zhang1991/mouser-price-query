@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -688,11 +688,47 @@ async function query() {
 
   if (!partNumber) { subDiv.innerHTML = ''; resultDiv.innerHTML = '<div class="error">请输入芯片型号</div>'; return; }
   subDiv.innerHTML = ''; currentAlternatives = []; trendingBox.style.display = 'none';
-  btn.disabled = true; btn.textContent = '分析中...'; resultDiv.innerHTML = '<div class="loading">正在查询价格并调用 AI 分析...</div>';
+  btn.disabled = true; btn.textContent = '分析中...'; 
+  
+  // 【前端超时与取消机制】
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort('timeout'), 30000); // 30秒超时
+  let isManualCancel = false;
+  let progressInterval;
+
+  const cancelQuery = () => {
+    isManualCancel = true;
+    controller.abort();
+  };
+  window.cancelCurrentQuery = cancelQuery;
+
+  resultDiv.innerHTML = `
+    <div class="loading">
+      <div id="query-progress-text">正在查询价格并调用 AI 分析...</div>
+      <div style="margin-top: 15px;">
+        <button style="background: transparent; color: #3498db; border: 1px solid #3498db; padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: normal;" onclick="window.cancelCurrentQuery()">取消查询</button>
+      </div>
+    </div>
+  `;
+
+  const progressTexts = [
+    "正在查询价格并调用 AI 分析...",
+    "正在并发查询得捷、贸泽、立创、云汉的价格...",
+    "正在调用 AI 进行交叉验证和分类...",
+    "正在计算最终 Should Cost 推荐值..."
+  ];
+  let step = 0;
+  progressInterval = setInterval(() => {
+    step++;
+    if (step < progressTexts.length) {
+      const el = document.getElementById('query-progress-text');
+      if (el) el.textContent = progressTexts[step];
+    }
+  }, 7000);
 
   try {
     const url = API_URL + '?partNumber=' + encodeURIComponent(partNumber) + '&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
-    const resp = await fetch(url);
+    const resp = await fetch(url, { signal: controller.signal });
     const data = await resp.json();
     if (!resp.ok || data.error) { resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>'; trendingBox.style.display = 'block'; return; }
     if (!data.shouldCost) { resultDiv.innerHTML = '<div class="error">抱歉，未检索到任何价格信息。</div>'; trendingBox.style.display = 'block'; return; }
@@ -743,9 +779,22 @@ async function query() {
     if (data.icky) html += renderSource(data.icky, '云汉芯城 ICKEY');
     resultDiv.innerHTML = html;
   } catch (e) {
-    resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
-    trendingBox.style.display = 'block'; 
+    if (e.name === 'AbortError') {
+      if (isManualCancel) {
+        resultDiv.innerHTML = ''; // 静默取消，直接复原
+        trendingBox.style.display = 'block';
+      } else {
+        resultDiv.innerHTML = '<div class="error">查询超时（超过30秒），请检查网络或稍后重试。</div>';
+        trendingBox.style.display = 'block';
+      }
+    } else {
+      resultDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>';
+      trendingBox.style.display = 'block'; 
+    }
   } finally {
+    clearTimeout(timeoutId);
+    clearInterval(progressInterval);
+    window.cancelCurrentQuery = null;
     btn.disabled = false; btn.textContent = '单件查询';
     fetchStats();
   }
@@ -762,10 +811,51 @@ async function querySubstitute(isRefresh = false) {
   if (!partNumber) { priceDiv.innerHTML = ''; subDiv.innerHTML = '<div class="error">请输入芯片型号</div>'; return; }
   priceDiv.innerHTML = ''; let refreshOverlay = null;
 
+  let controller = null;
+  let timeoutId = null;
+  let progressInterval = null;
+  let isManualCancel = false;
+
   if (!isRefresh) {
-    subDiv.innerHTML = '<div class="loading">正在全网检索同类竞品并计算参考价格，AI 深度分析中，请稍候...</div>';
+    controller = new AbortController();
+    timeoutId = setTimeout(() => controller.abort('timeout'), 45000); // 45秒超时
+
+    const cancelWait = () => {
+      isManualCancel = true;
+      controller.abort();
+    };
+    window.cancelCurrentSubstitute = cancelWait;
+
+    subDiv.innerHTML = `
+      <div class="loading">
+        <div id="sub-progress-text">正在全网检索同类竞品并计算参考价格，AI 深度分析中...</div>
+        <div style="margin-top: 15px;">
+          <button style="background: transparent; color: #3498db; border: 1px solid #3498db; padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: normal;" onclick="window.cancelCurrentSubstitute()">取消查询</button>
+        </div>
+      </div>
+    `;
+
+    const progressTexts = [
+      "正在全网检索同类竞品并计算参考价格，AI 深度分析中...",
+      "正在调用 Deepseek 联网搜索 API 进行全网信息检索...",
+      "正在匹配参数相同或最为相近的替代型号...",
+      "正在核实平替型号的库存与价格...",
+      "仍在努力核实更多型号，请稍候..."
+    ];
+    let step = 0;
+    progressInterval = setInterval(() => {
+      step++;
+      if (step < progressTexts.length) {
+        const el = document.getElementById('sub-progress-text');
+        if (el) el.textContent = progressTexts[step];
+      }
+    }, 8000); // 每8秒换一次，应对长耗时
+
     btn.disabled = true; btn.textContent = '检索中...'; currentAlternatives = []; trendingBox.style.display = 'none'; 
   } else {
+    controller = new AbortController();
+    timeoutId = setTimeout(() => controller.abort('timeout'), 45000); // 换一批也设定 45秒超时
+
     subDiv.style.position = 'relative';
     refreshOverlay = document.createElement('div');
     refreshOverlay.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.95); padding: 15px 30px; text-align: center; font-size: 14px; color: #7f8c8d; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 10px; border: 1px solid #e0e6ed;';
@@ -778,7 +868,8 @@ async function querySubstitute(isRefresh = false) {
   try {
     let url = API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber) + '&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
     if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
-    const resp = await fetch(url);
+    
+    const resp = await fetch(url, { signal: controller.signal });
     const text = await resp.text();
     let data;
     try { data = JSON.parse(text); } catch (err) {
@@ -829,10 +920,30 @@ async function querySubstitute(isRefresh = false) {
       else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">没有找到新的替代型号了</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
     }
   } catch (e) {
-    if (!isRefresh) { subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>'; trendingBox.style.display = 'block'; }
-    else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">网络异常，请稍后重试</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
+    if (e.name === 'AbortError') {
+      if (!isRefresh) {
+        if (isManualCancel) {
+          subDiv.innerHTML = ''; // 静默复原
+          trendingBox.style.display = 'block';
+        } else {
+          subDiv.innerHTML = '<div class="error">查询超时（超过45秒），建议切换网络或稍后重试。</div>';
+          trendingBox.style.display = 'block';
+        }
+      } else if (refreshOverlay) {
+        refreshOverlay.innerHTML = '<span style="color:#e74c3c;">查询超时或网络异常</span>';
+        setTimeout(() => refreshOverlay.remove(), 2000);
+      }
+    } else {
+      if (!isRefresh) { subDiv.innerHTML = '<div class="error">无法连接到后端服务，请稍后重试</div>'; trendingBox.style.display = 'block'; }
+      else if(refreshOverlay) { refreshOverlay.innerHTML = '<span style="color:#e74c3c;">网络异常，请稍后重试</span>'; setTimeout(() => refreshOverlay.remove(), 2000); }
+    }
   } finally {
-    if (!isRefresh) { btn.disabled = false; btn.textContent = '替代型号'; }
+    if (timeoutId) clearTimeout(timeoutId);
+    if (progressInterval) clearInterval(progressInterval);
+    if (!isRefresh) { 
+      window.cancelCurrentSubstitute = null;
+      btn.disabled = false; btn.textContent = '替代型号'; 
+    }
     fetchStats();
   }
 }
@@ -909,9 +1020,13 @@ async function handleFile(file) {
     const pn = list[i];
     progressCurrent.textContent = `正在分析：${pn}`;
 
+    // 批量分析的每次请求同样应用 30秒 超时
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort('timeout'), 30000);
+
     try {
       const url = API_URL + '?partNumber=' + encodeURIComponent(pn) + '&isBatch=true&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
-      const resp = await fetch(url);
+      const resp = await fetch(url, { signal: controller.signal });
       const data = await resp.json();
       results.push({
         original: pn, shouldCost: data.shouldCost || '未查询到',
@@ -926,7 +1041,10 @@ async function handleFile(file) {
         description: (data.digikey && data.digikey.description) || (data.mouser && data.mouser.description) || (data.lcsc && data.lcsc.description) || (data.icky && data.icky.description) || ''
       });
     } catch (e) {
-      results.push({ original: pn, shouldCost: '未查询到', digikeyPartNumber: '', mouserPartNumber: '', lcscPartNumber: '', ickyPartNumber: '', digikey1k: '未查询到', mouser1k: '未查询到', lcsc1k: '未查询到', icky1k: '未查询到', manufacturer: '', level1: '', level2: '', chipName: '', description: '' });
+      // 超时或者网络断开，记录未查询到
+      results.push({ original: pn, shouldCost: '超时/失败', digikeyPartNumber: '', mouserPartNumber: '', lcscPartNumber: '', ickyPartNumber: '', digikey1k: '未查询到', mouser1k: '未查询到', lcsc1k: '未查询到', icky1k: '未查询到', manufacturer: '', level1: '', level2: '', chipName: '', description: '' });
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     const pct = Math.round(((i + 1) / total) * 100);
