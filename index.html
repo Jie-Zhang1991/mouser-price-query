@@ -23,7 +23,7 @@
   body.is-home { justify-content: center; padding-top: 0; padding-bottom: 80px; }
   
   body.is-home .container { max-width: 850px; }
-  body.is-home .search-box { width: 100%; margin: 0 auto 20px auto; transition: width 0.4s ease, margin 0.4s ease; }
+  body.is-home .search-box { width: 120%; margin: 0 -10% 20px -10%; transition: width 0.4s ease, margin 0.4s ease; }
   body:not(.is-home) .container { max-width: 1200px; }
   body:not(.is-home) .search-box { width: 100%; }
   
@@ -639,7 +639,7 @@ window.addEventListener('DOMContentLoaded', () => {
     <div><strong>当前用户</strong></div>
     <div style="margin-top:4px; color:#3498db; font-weight:bold;">${currentUserEmail}</div>
     <div style="margin-top:8px; padding-top:8px; border-top:1px solid #f1f4f8; text-align:center;">
-      <span style="color:#7f8c8d; font-size:14px; cursor:pointer; transition: color 0.2s;" 
+      <span style="color:#7f8c8d; font-size:13px; cursor:pointer; transition: color 0.2s;" 
             onmouseover="this.style.color='#e74c3c'" 
             onmouseout="this.style.color='#7f8c8d'" 
             onclick="openModal('logoutModal')">退出登录</span>
