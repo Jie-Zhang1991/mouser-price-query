@@ -153,9 +153,9 @@
     /* 彻底关闭全局过渡效果，防止状态切换时产生动画 */
     body { padding: 20px 12px; transition: none !important; }
     
-    /* 将 padding-top 由 28px 修改为 44px，配合 container 的 20px，总留白刚好为 64px */
+    /* 将 padding-top 由 44px 修改为 28px，配合 container 的 20px，总留白刚好为 64px */
     body.is-home, body:not(.is-home) { 
-      padding-top: 44px !important; 
+      padding-top: 28px !important; 
       padding-bottom: 20px !important; 
       align-items: flex-start !important; 
       justify-content: flex-start !important; /* 【核心修改点】：强制顶部对齐，解决热门话题加载出来后的闪跳问题 */
@@ -639,7 +639,7 @@ window.addEventListener('DOMContentLoaded', () => {
     <div><strong>当前用户</strong></div>
     <div style="margin-top:4px; color:#3498db; font-weight:bold;">${currentUserEmail}</div>
     <div style="margin-top:8px; padding-top:8px; border-top:1px solid #f1f4f8; text-align:center;">
-      <span style="color:#7f8c8d; font-size:12px; cursor:pointer; transition: color 0.2s;" 
+      <span style="color:#7f8c8d; font-size:14px; cursor:pointer; transition: color 0.2s;" 
             onmouseover="this.style.color='#e74c3c'" 
             onmouseout="this.style.color='#7f8c8d'" 
             onclick="openModal('logoutModal')">退出登录</span>
