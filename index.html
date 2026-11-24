@@ -907,9 +907,15 @@ async function querySubstitute(isRefresh = false) {
 
     if (data.status === 'success' && data.alternatives && data.alternatives.length > 0) {
       currentAlternatives = data.alternatives;
-      let html = '<div class="info-card" style="border-top: 4px solid #8e44ad;"><div class="info-title" style="display:flex; justify-content:space-between;"><span>AI 替代参考推荐与参数对比</span></div><div class="compare-table-container"><table class="compare-table"><thead><tr><th>对比项</th><th><span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span><div><span style="color:#7f8c8d; font-size:12px;">(原型号)</span></div></th>';
+      const basisText = data.match_basis === 'close'
+        ? '本次未找到「核心参数完全等同」且有报价的型号，以下为参数接近、需微调的方案。'
+        : '以下按「核心参数等同优先」展示，均为其他品牌且符合车规级要求。';
+      let html = '<div class="info-card" style="border-top: 4px solid #8e44ad;"><div class="info-title" style="display:flex; justify-content:space-between;"><span>AI 替代参考推荐与参数对比</span></div><div style="font-size:12px;color:#7f8c8d;line-height:1.6;margin:-2px 0 6px;">' + basisText + '参数值标注「待确认」表示暂无权威来源，请以 datasheet 复核。</div><div class="compare-table-container"><table class="compare-table"><thead><tr><th>对比项</th><th><span class="sub-pn">' + escapeHtml(data.original.part_number || partNumber) + '</span><div><span style="color:#7f8c8d; font-size:12px;">(原型号)</span></div></th>';
       data.alternatives.forEach(alt => {
-        html += '<th><span class="sub-pn">' + escapeHtml(alt.part_number) + '</span><div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(alt.part_number) + '\', this)">复制型号</span></div></th>';
+        const tierBadge = alt.match_type === 'same'
+          ? '<span style="display:inline-block;margin-top:6px;padding:1px 8px;border-radius:10px;background:#e8f8ef;color:#1e8e5a;font-size:11px;font-weight:normal;">核心参数等同</span>'
+          : '<span style="display:inline-block;margin-top:6px;padding:1px 8px;border-radius:10px;background:#fff5e6;color:#b9770e;font-size:11px;font-weight:normal;">参数接近·需微调</span>';
+        html += '<th><span class="sub-pn">' + escapeHtml(alt.part_number) + '</span>' + tierBadge + '<div><span class="copy-btn" onclick="copyText(\'' + escapeHtml(alt.part_number) + '\', this)">复制型号</span></div></th>';
       });
       html += '</tr></thead><tbody>';
       html += '<tr><td>Should Cost参考值</td><td style="font-weight:bold; color:#e74c3c; font-size:15px; text-align:center;">' + (data.original.shouldCost ? '¥ ' + data.original.shouldCost : '-') + '</td>';
@@ -917,6 +923,9 @@ async function querySubstitute(isRefresh = false) {
       html += '</tr>';
       html += '<tr><td>国别/厂商</td><td>' + escapeHtml((data.original.origin || '-') + ' / ' + (data.original.manufacturer || '-')) + '</td>'; 
       data.alternatives.forEach(alt => { html += '<td>' + escapeHtml((alt.origin || '-') + ' / ' + (alt.manufacturer || '-')) + '</td>'; });
+      html += '</tr>';
+      html += '<tr><td>平台实测描述</td><td style="font-size:12px;color:#555;line-height:1.5;">' + escapeHtml(data.original.platformDesc || '-') + '</td>';
+      data.alternatives.forEach(alt => { html += '<td style="font-size:12px;color:#555;line-height:1.5;">' + escapeHtml(alt.platformDesc || '-') + '</td>'; });
       html += '</tr>';
       if (data.param_names && Array.isArray(data.param_names)) {
         data.param_names.forEach(paramName => {
@@ -933,6 +942,12 @@ async function querySubstitute(isRefresh = false) {
       html += '<tr><td>推荐理由</td><td>-</td>';
       data.alternatives.forEach(alt => { html += '<td style="font-size:12px;color:#555;line-height:1.4;">' + escapeHtml(alt.reason) + '</td>'; });
       html += '</tr></tbody></table></div>';
+      const pricedNums = data.alternatives.map(a => parseFloat(a.shouldCost)).filter(n => !isNaN(n));
+      if (pricedNums.length > 0) {
+        const loP = Math.min.apply(null, pricedNums).toFixed(2);
+        const hiP = Math.max.apply(null, pricedNums).toFixed(2);
+        html += '<div style="margin-top:2px;font-size:12.5px;color:#34495e;background:#f7f9fc;border-left:3px solid #8e44ad;padding:8px 12px;border-radius:6px;">替代型号参考区间：<b style="color:#e74c3c;">¥ ' + loP + ' ~ ¥ ' + hiP + '</b>（1000pcs，已含平台系数与汇率）。' + (data.original.shouldCost ? '' : '原型号四平台均无有效报价，可用该区间反推其价格范围。') + '</div>';
+      }
       html += '<div style="text-align: right; margin-top: 10px;"><button style="background: #8e44ad; color: #fff; border: none; padding: 8px 42px; font-size: 13px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="querySubstitute(true)">换一批</button></div></div>'; 
       subDiv.innerHTML = html;
     } else {
