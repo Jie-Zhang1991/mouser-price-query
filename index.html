@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMDA1NEE2Ii8+PHRleHQgeD0iNTAiIHk9Ijc0IiBmb250LXNpemU9IjY4IiBmb250LWZhbWlseT0iTWljcm9zb2Z0IFlhSGVpLHNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCI+6IqvPC90ZXh0Pjwvc3ZnPg==">
+<link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMDA1NEE2Ii8+PHBhdGggZD0iTTY4IDMyIEEyNSAyNSAwIDEgMCA2OCA2OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjEzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cmVjdCB4PSI2NiIgeT0iNDYiIHdpZHRoPSIxNiIgaGVpZ2h0PSI4IiByeD0iMyIgZmlsbD0iIzRGQzNGNyIvPjwvc3ZnPg==">
 <title>ChipCost</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -63,13 +63,18 @@
   .compare-table th, .compare-table td { padding: 12px; border-bottom: 1px solid #f1f4f8; vertical-align: top; word-break: break-word; }
   .compare-table th { background: #f8f9fa; color: #2c3e50; font-weight: 600; text-align: center; vertical-align: middle; }
   .compare-table tr:last-child td { border-bottom: none; }
-  .compare-table th:first-child, .compare-table td:first-child { width: 196px; background: #fafbfc; color: #7f8c8d; font-weight: bold; text-align: left; }
+  .compare-table th:first-child, .compare-table td:first-child { width: 196px; background: #fafbfc; color: #7f8c8d; font-weight: bold; vertical-align: middle; }
+  .compare-table th:first-child { text-align: center; }
+  .compare-table td:first-child { text-align: left; }
   .compare-table td:not(:first-child) { text-align: left; }
   .sub-pn { font-size: 15px; font-weight: bold; color: #2c3e50; display: block; }
   .copy-btn { display: inline-block; color: #3498db; cursor: pointer; font-size: 12px; font-weight: normal; margin-top: 6px; text-decoration: none; transition: color 0.2s;}
   .copy-btn:hover { text-decoration: underline; }
   #result { margin-top: 30px; }
   #substitute-result { margin-top: 30px; }
+  #result, #substitute-result, #result *, #substitute-result * { user-select: text; -webkit-user-select: text; }
+  #result, #substitute-result { caret-color: transparent; }
+  #result button, #result .copy-btn, #substitute-result button, #substitute-result .copy-btn { user-select: none; -webkit-user-select: none; }
   .loading { text-align: center; color: #7f8c8d; padding: 30px; }
   .error { color: #e74c3c; background: #fdf0ed; padding: 20px; border-radius: 12px; border-left: 4px solid #e74c3c; }
   .should-cost-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 27px 32px; text-align: center; color: #fff; margin-bottom: 24px; box-shadow: 0 10px 20px rgba(102,126,234,0.2); }
@@ -918,9 +923,6 @@ async function querySubstitute(isRefresh = false) {
       html += '<tr><td>国别/厂商</td><td>' + escapeHtml((data.original.origin || '-') + ' / ' + (data.original.manufacturer || '-')) + '</td>'; 
       data.alternatives.forEach(alt => { html += '<td>' + escapeHtml((alt.origin || '-') + ' / ' + (alt.manufacturer || '-')) + '</td>'; });
       html += '</tr>';
-      html += '<tr><td>平台实测描述</td><td style="font-size:12px;color:#555;line-height:1.5;">' + escapeHtml(data.original.platformDesc || '-') + '</td>';
-      data.alternatives.forEach(alt => { html += '<td style="font-size:12px;color:#555;line-height:1.5;">' + escapeHtml(alt.platformDesc || '-') + '</td>'; });
-      html += '</tr>';
       if (data.param_names && Array.isArray(data.param_names)) {
         data.param_names.forEach(paramName => {
           html += '<tr><td>' + escapeHtml(paramName) + '</td>';
@@ -933,6 +935,9 @@ async function querySubstitute(isRefresh = false) {
           html += '</tr>';
         });
       }
+      html += '<tr><td>平台实测描述</td><td style="font-size:12px;color:#555;line-height:1.5;">' + escapeHtml(data.original.platformDesc || '-') + '</td>';
+      data.alternatives.forEach(alt => { html += '<td style="font-size:12px;color:#555;line-height:1.5;">' + escapeHtml(alt.platformDesc || '-') + '</td>'; });
+      html += '</tr>';
       html += '<tr><td>推荐理由</td><td>-</td>';
       data.alternatives.forEach(alt => {
         const tierTag = alt.match_type === 'same'
