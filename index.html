@@ -383,7 +383,7 @@ async function fetchStats() {
   const tooltip = document.getElementById('statsTooltip');
   if (!currentAuthPayload) { tooltip.textContent = '无权限访问'; return; }
   try {
-    const url = API_URL + '?action=stats&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
+    const url = API_URL + '?action=stats';
     const resp = await fetch(url);
     const data = await resp.json();
     if (data.status === 'success') {
@@ -415,7 +415,7 @@ async function fetchTrending(isRefresh = false) {
   if (isRefresh) listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">正在更新热门话题...</li>';
   let excludeStr = (isRefresh && currentTopics.length > 0) ? currentTopics.join(',') : "";
   try {
-    let url = API_URL + '?action=trending&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
+    let url = API_URL + '?action=trending';
     if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
     const resp = await fetch(url);
     const data = await resp.json();
@@ -439,7 +439,7 @@ async function clearAllStats() {
   }
   if (!confirm('确定要清空所有数据统计吗？此操作不可恢复！')) return;
   try {
-    const url = API_URL + '?action=admin_clear_stats&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
+    const url = API_URL + '?action=admin_clear_stats';
     const resp = await fetch(url);
     const result = await resp.json();
     if (result.status === 'success') { alert('数据统计已成功清空！'); fetchStats(); } 
@@ -450,7 +450,7 @@ async function clearAllStats() {
 async function downloadUserStats() {
   try {
     await loadXlsxLibrary();
-    const url = API_URL + '?action=admin_get_user_stats&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
+    const url = API_URL + '?action=admin_get_user_stats';
     const resp = await fetch(url);
     const result = await resp.json();
     if (result.status !== 'success') { alert('下载失败：' + (result.error || '无权限')); return; }
@@ -515,7 +515,7 @@ async function testApis() {
   fetchStats();
 
   try {
-    const url = API_URL + '?action=test_apis&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
+    const url = API_URL + '?action=test_apis';
     const resp = await fetch(url, { signal: controller.signal });
     const data = await resp.json();
 
@@ -729,7 +729,7 @@ async function query() {
   }, 4000); // 每4秒换一次
 
   try {
-    const url = API_URL + '?partNumber=' + encodeURIComponent(partNumber) + '&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
+    const url = API_URL + '?partNumber=' + encodeURIComponent(partNumber);
     const resp = await fetch(url, { signal: controller.signal });
     const data = await resp.json();
     if (!resp.ok || data.error) { resultDiv.innerHTML = '<div class="error">' + (data.error || '查询失败') + '</div>'; trendingBox.style.display = 'block'; return; }
@@ -886,7 +886,7 @@ async function querySubstitute(isRefresh = false) {
   let excludeStr = (isRefresh && currentAlternatives.length > 0) ? currentAlternatives.map(alt => alt.part_number).join(',') : "";
 
   try {
-    let url = API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber) + '&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
+    let url = API_URL + '?action=substitute&partNumber=' + encodeURIComponent(partNumber);
     if (excludeStr) url += '&exclude=' + encodeURIComponent(excludeStr);
     
     const resp = await fetch(url, { signal: controller.signal });
@@ -1073,7 +1073,7 @@ async function handleFile(file) {
     const timeoutId = setTimeout(() => controller.abort('timeout'), 30000);
 
     try {
-      const url = API_URL + '?partNumber=' + encodeURIComponent(pn) + '&isBatch=true&authPayload=' + encodeURIComponent(currentAuthPayload) + '&authSig=' + encodeURIComponent(currentAuthSig);
+      const url = API_URL + '?partNumber=' + encodeURIComponent(pn) + '&isBatch=true';
       const resp = await fetch(url, { signal: controller.signal });
       const data = await resp.json();
       results.push({
