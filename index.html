@@ -3,7 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMDA1NEE2Ii8+PHBhdGggZD0iTTY4IDMyIEEyNSAyNSAwIDEgMCA2OCA2OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjEzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cmVjdCB4PSI2NiIgeT0iNDYiIHdpZHRoPSIxNiIgaGVpZ2h0PSI4IiByeD0iMyIgZmlsbD0iIzRGQzNGNyIvPjwvc3ZnPg==">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMDA1NEE2Ii8+PHBhdGggZD0iTTY4IDMyIEEyNSAyNSAwIDEgMCA2OCA2OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjEzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cmVjdCB4PSI2NiIgeT0iNDYiIHdpZHRoPSIxNiIgaGVpZ2h0PSI4IiByeD0iMyIgZmlsbD0iIzRGQzNGNyIvPjwvc3ZnPg==">
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADgUlEQVR4nMSXW0gUURjH/zPulmLlqq1m9GB5CU1REy8raIqhlUGaJlhhNwUDCySKHoos6CGieogoFEElI1S8FJVRQlJhXlLDlCJNH9bVvKy3NV233enMiJcxd2YkXX9wZpjvfJzvP9+5y7CQI8V2MBougKaCwDB+oCgXrAQM00va+gIG9TDa3ENFwshsFTXnlPQ0Bowxf8WCmkcDmNJQevzVvIDEolgSuAoWxXSAFUEhrsge1mizwJ8vRgNK5iuDDXWCfFg6OMtWmIzJNBkgoVgzmFAZeS5LwP4AF4R4bIa/qwKBOxygsF2Hxk4tmn5qUfdjCC+aejChN0psjYmkkPSEkeK6RWGNx+fDEO3rLOinHvqNjJwGIkQDKUgSkBC8DXlnQ2C/YR2kUlGvxpmHddDqpgX9aIgQ67cFZRfDlxWcJZ6Ivp7sK+onE6q0t5UjP1P1j72mvR951Z1cnw+MTUHlqcTBwK3IiPEgs3neT7VzM/5LwIO0IK7vZzH8MSEzrxG5bzuxsN9eNmu4UljThcJzKni4bOTstyraIYbZMcAG7s1N4NlulHzFteJWCGEtp5G6ZztauodR36GFGGYzELYofZ19Otwsa4MYUwYTckiGpCIgQMn7fv65B9OkCyQ1ul4OhdJuXtSEHrrh8aV9zTWi8uRnoKVrGFJRHVLBwcWRZ6sueAPdiA6SBdAU/5uisCqYFdDSPYLQBVnwd7Unzy5I4VNlLewWd8ESf89CmxfAT/nRcFdstBactXMY9AYMqgfnirn+FxTQ3MWfQspN63E1yQdisNMwPdoNwe4OkIIVvBOzl6rQaCcR6eMMV6XtnC3Y3RGD43pu91uKUA9HVF2JwqmoHUjf64529SgpYxBCcDPa5mCD1rtxZMuV8+zv2vrJathBFpohDBFB5pbiZjJzdl8SPukJdqqaZCH1fi2eXY7g2SN3OXFFjA/fBkR9RHdDdgE6fPu96La6mKrmXmSLLNsskg8kTmQQFpCdcV+A8PGRFZqV38RtTFJgBfSRtzMk4ua8ARHeTgj3UiLCy4k7J9R+H+TS/ZEUdlzoJS7ZhF8UuRNUkZETi7WAYV6TUzFasFaQ2DRM9COiZASWho1JYtOoSOkGQ5+GpaFwko09Mw3LUsq5uxp3cVxl2Jsy6FiUHquc0bGQ+HIFrCaziDV4Va7nJqYBVvI7KEkena36CwAA//9a/WP7AAAABklEQVQDABaiSHKfRz8+AAAAAElFTkSuQmCC">
+<script>
+(function () {
+  // 修复：经 Cloudflare Access 跳转后，浏览器可能把登录页的图标记到本站，这里在页面加载完成后重新声明一次本站图标
+  function resetIcon() {
+    var links = document.querySelectorAll('link[rel="icon"' + ',link[rel="shortcut icon"]');
+    if (!links.length) return;
+    var specs = [];
+    for (var i = 0; i < links.length; i++) {
+      specs.push({ type: links[i].type, sizes: links[i].getAttribute("sizes"), href: links[i].getAttribute("href") });
+    }
+    for (var j = links.length - 1; j >= 0; j--) { links[j].parentNode.removeChild(links[j]); }
+    for (var k = 0; k < specs.length; k++) {
+      var l = document.createElement("link");
+      l.rel = "icon";
+      if (specs[k].type) l.type = specs[k].type;
+      if (specs[k].sizes) l.setAttribute("sizes", specs[k].sizes);
+      l.setAttribute("href", specs[k].href);
+      document.head.appendChild(l);
+    }
+  }
+  window.addEventListener("load", function () { resetIcon(); setTimeout(resetIcon, 1200); });
+})();
+</script>
 <title>ChipCost</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
