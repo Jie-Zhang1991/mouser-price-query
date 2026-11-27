@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="icon" type="image/svg+xml" sizes="any" href="https://www.chipcost.space/favicon.svg/v2">
 <link rel="apple-touch-icon" sizes="180x180" href="https://www.chipcost.space/favicon.svg/apple-touch-icon.png">
+<link rel="manifest" href="https://www.chipcost.space/favicon.svg/manifest.json">
 <title>ChipCost</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -52,6 +53,12 @@
   .clear-btn { display: none; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 50%; background: #c0c7ce; align-items: center; justify-content: center; cursor: pointer; }
   .clear-btn:hover { background: #95a5a6; }
   .clear-btn.show { display: flex; }
+  .history-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 500; background: #f8f9fa; border: 1px solid #dfe4e8; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.10); max-height: 320px; overflow-y: auto; padding: 4px 0; }
+  .history-dropdown.show { display: block; }
+  .history-item { padding: 10px 18px; font-size: 15px; color: #5a6c7d; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history-item:hover { background: #eef2f6; color: #2980b9; }
+  .history-clear { padding: 9px 18px; font-size: 13px; color: #95a5a6; text-align: center; cursor: pointer; border-top: 1px solid #e6eaee; margin-top: 4px; }
+  .history-clear:hover { color: #e74c3c; }
   button { padding: 14px 20px; font-size: 15px; background: #3498db; color: #fff; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: background 0.3s, transform 0.2s; white-space: nowrap; box-shadow: 0 4px 10px rgba(52,152,219,0.2); outline: none; }
   button:hover { background: #2980b9; transform: translateY(-1px); }
   button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
@@ -231,7 +238,8 @@
   <p class="subtitle">输入芯片型号，获取 AI 分析的推荐成本</p>
   <div class="search-box">
     <div class="input-wrapper">
-      <input type="text" id="partInput" placeholder="例如：STM32F103C8T6" />
+      <input type="text" id="partInput" name="chipcost_part_query" placeholder="例如：STM32F103C8T6" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+      <div class="history-dropdown" id="historyDropdown"></div>
       <span class="clear-btn" id="clearBtn" onclick="clearInput()" title="清空"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>
     </div>
     <button id="queryBtn" onclick="query()">单件查询</button>
@@ -316,6 +324,7 @@ function goHome() {
   currentAlternatives = [];
   trendingBox.style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  pushViewSnapshot();
 }
 
 function doLogout() {
@@ -405,7 +414,81 @@ async function fetchStats() {
   } catch (e) { tooltip.textContent = '网络异常，无法获取'; }
 }
 
+// ===== 热搜固定 10 条：用历史话题池补齐，不额外消耗联网搜索 =====
+const TRENDING_SIZE = 10;
+const TRENDING_POOL_KEY = 'trending_pool';
+
+function loadTopicPool() {
+  const out = [];
+  const seen = new Set();
+  const add = t => { const v = String(t == null ? '' : t).trim(); if (v && !seen.has(v)) { seen.add(v); out.push(v); } };
+  try {
+    const rawPool = localStorage.getItem(TRENDING_POOL_KEY);
+    if (rawPool) { const a = JSON.parse(rawPool); if (Array.isArray(a)) a.forEach(add); }
+  } catch (e) {}
+  try {
+    const cached = localStorage.getItem('trending_cache');
+    if (cached) { const a = JSON.parse(cached); if (Array.isArray(a)) a.forEach(add); }
+  } catch (e) {}
+  return out;
+}
+function saveTopicPool(pool) {
+  try { localStorage.setItem(TRENDING_POOL_KEY, JSON.stringify(pool.slice(0, 60))); } catch (e) {}
+}
+function normalizeTopics(fresh) {
+  const clean = s => String(s == null ? '' : s).trim();
+  const seen = new Set();
+  const merged = [];
+  const add = t => { const v = clean(t); if (v && !seen.has(v)) { seen.add(v); merged.push(v); } };
+  (Array.isArray(fresh) ? fresh : []).forEach(add);
+  loadTopicPool().forEach(add);
+  saveTopicPool(merged);
+  return merged.slice(0, TRENDING_SIZE);
+}
+
+// ===== 浏览器后退/前进：页面快照恢复，不重新调用任何 API =====
+let viewRestoring = false;
+function captureViewSnapshot() {
+  const snap = { __chipcost: true, home: false, part: '', resultHTML: '', subHTML: '', trendingDisplay: 'block', alts: [], topics: [], scrollY: 0 };
+  try {
+    snap.home = document.body.classList.contains('is-home');
+    snap.part = (document.getElementById('partInput') || {}).value || '';
+    snap.resultHTML = (document.getElementById('result') || {}).innerHTML || '';
+    snap.subHTML = (document.getElementById('substitute-result') || {}).innerHTML || '';
+    snap.trendingDisplay = trendingBox.style.display || 'block';
+    snap.alts = Array.isArray(currentAlternatives) ? currentAlternatives.slice() : [];
+    snap.topics = Array.isArray(currentTopics) ? currentTopics.slice() : [];
+    snap.scrollY = window.scrollY || 0;
+  } catch (e) {}
+  return snap;
+}
+function applyViewSnapshot(s) {
+  if (!s || !s.__chipcost) return;
+  viewRestoring = true;
+  try {
+    const r = document.getElementById('result'); if (r) r.innerHTML = s.resultHTML || '';
+    const sub = document.getElementById('substitute-result'); if (sub) sub.innerHTML = s.subHTML || '';
+    const input = document.getElementById('partInput'); if (input) input.value = s.part || '';
+    updateClearBtn();
+    if (s.home) document.body.classList.add('is-home'); else document.body.classList.remove('is-home');
+    trendingBox.style.display = s.trendingDisplay || 'block';
+    currentAlternatives = Array.isArray(s.alts) ? s.alts.slice() : [];
+    currentTopics = Array.isArray(s.topics) ? s.topics.slice() : [];
+    const qb = document.getElementById('queryBtn'); if (qb) { qb.disabled = false; qb.textContent = '单件查询'; }
+    const sb = document.getElementById('subBtn'); if (sb) { sb.disabled = false; sb.textContent = '替代型号'; }
+    renderTrendingList(Array.isArray(s.topics) ? s.topics : []);
+    window.scrollTo(0, s.scrollY || 0);
+  } catch (e) {}
+  viewRestoring = false;
+}
+function pushViewSnapshot() {
+  if (viewRestoring) return;
+  try { window.history.pushState(captureViewSnapshot(), ''); } catch (e) {}
+}
+
 function renderTrendingList(topics) {
+  topics = normalizeTopics(topics);
+  currentTopics = topics;
   const listContainer = document.getElementById('trending-list');
   let html = '';
   topics.forEach((topic, index) => {
@@ -426,16 +509,21 @@ async function fetchTrending(isRefresh = false) {
     const resp = await fetch(url);
     const data = await resp.json();
     if (data.status === 'success' && data.topics && data.topics.length > 0) {
-      currentTopics = data.topics;
-      renderTrendingList(currentTopics);
+      renderTrendingList(data.topics);
       
       // 无论是否刷新，只要获取成功就更新缓存和时间戳
       localStorage.setItem('trending_cache', JSON.stringify(currentTopics));
       localStorage.setItem('trending_time', Date.now().toString());
     } else {
-      listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">暂无话题，请稍后重试</li>';
+      const pool = loadTopicPool();
+      if (pool.length > 0) { renderTrendingList(pool); }
+      else { listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">暂无话题，请稍后重试</li>'; }
     }
-  } catch (e) { listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">获取热门话题失败</li>'; }
+  } catch (e) {
+    const pool = loadTopicPool();
+    if (pool.length > 0) { renderTrendingList(pool); }
+    else { listContainer.innerHTML = '<li style="text-align:center; color:#999; grid-column: 1/-1;">获取热门话题失败</li>'; }
+  }
 }
 
 async function clearAllStats() {
@@ -628,6 +716,67 @@ function clearInput() { partInputEl.value = ''; updateClearBtn(); partInputEl.fo
 partInputEl.addEventListener('input', updateClearBtn);
 document.getElementById('partInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') query(); });
 
+// ===== V2.20：自建查询历史下拉（替代浏览器表单自动填充，完全可控）=====
+const QUERY_HISTORY_KEY = 'chipcost_query_history';
+const QUERY_HISTORY_MAX = 10;
+const historyDropdownEl = document.getElementById('historyDropdown');
+
+function loadQueryHistory() {
+  try {
+    const raw = localStorage.getItem(QUERY_HISTORY_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr.filter(x => typeof x === 'string' && x.trim()).slice(0, QUERY_HISTORY_MAX) : [];
+  } catch (e) { return []; }
+}
+function saveQueryHistory(part) {
+  const p = (part || '').trim();
+  if (!p) return;
+  try {
+    const list = loadQueryHistory().filter(x => x.toLowerCase() !== p.toLowerCase());
+    list.unshift(p);
+    localStorage.setItem(QUERY_HISTORY_KEY, JSON.stringify(list.slice(0, QUERY_HISTORY_MAX)));
+  } catch (e) {}
+}
+function hideHistoryDropdown() { if (historyDropdownEl) historyDropdownEl.classList.remove('show'); }
+function renderHistoryDropdown() {
+  if (!historyDropdownEl) return;
+  const list = loadQueryHistory();
+  const kw = (partInputEl.value || '').trim().toLowerCase();
+  const matched = kw ? list.filter(x => x.toLowerCase().indexOf(kw) !== -1) : list;
+  if (!matched.length) { hideHistoryDropdown(); return; }
+  let html = '';
+  for (const it of matched) {
+    html += '<div class="history-item" data-part="' + escapeHtml(it) + '">' + escapeHtml(it) + '</div>';
+  }
+  html += '<div class="history-clear" id="historyClear">清除历史</div>';
+  historyDropdownEl.innerHTML = html;
+  historyDropdownEl.classList.add('show');
+}
+if (historyDropdownEl) {
+  partInputEl.addEventListener('focus', renderHistoryDropdown);
+  partInputEl.addEventListener('input', renderHistoryDropdown);
+  partInputEl.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideHistoryDropdown(); });
+  historyDropdownEl.addEventListener('mousedown', function (e) { e.preventDefault(); });
+  historyDropdownEl.addEventListener('click', function (e) {
+    const clr = e.target && e.target.closest && e.target.closest('#historyClear');
+    if (clr) {
+      try { localStorage.removeItem(QUERY_HISTORY_KEY); } catch (err) {}
+      hideHistoryDropdown();
+      return;
+    }
+    const item = e.target && e.target.closest && e.target.closest('.history-item');
+    if (item) {
+      partInputEl.value = item.getAttribute('data-part') || '';
+      updateClearBtn();
+      hideHistoryDropdown();
+    }
+  });
+  document.addEventListener('click', function (e) {
+    const inWrap = e.target && e.target.closest && e.target.closest('.input-wrapper');
+    if (!inWrap) hideHistoryDropdown();
+  });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   currentUserEmail = getAuthToken();
   
@@ -673,6 +822,11 @@ window.addEventListener('DOMContentLoaded', () => {
   } else {
     fetchTrending();
   }
+
+  history.replaceState(captureViewSnapshot(), '');
+  window.addEventListener('popstate', function (e) {
+    if (e.state && e.state.__chipcost) applyViewSnapshot(e.state);
+  });
 });
 
 const statsProfile = document.getElementById('statsProfile');
@@ -693,6 +847,7 @@ async function query() {
   const partNumber = input.value.trim();
 
   if (!partNumber) { subDiv.innerHTML = ''; resultDiv.innerHTML = '<div class="error">请输入芯片型号</div>'; return; }
+  saveQueryHistory(partNumber);
   subDiv.innerHTML = ''; currentAlternatives = []; trendingBox.style.display = 'none';
   btn.disabled = true; btn.textContent = '分析中...'; 
   
@@ -805,6 +960,7 @@ async function query() {
     window.cancelCurrentQuery = null;
     btn.disabled = false; btn.textContent = '单件查询';
     fetchStats();
+    pushViewSnapshot();
   }
 }
 
@@ -817,6 +973,7 @@ async function querySubstitute(isRefresh = false) {
   const partNumber = input.value.trim();
 
   if (!partNumber) { priceDiv.innerHTML = ''; subDiv.innerHTML = '<div class="error">请输入芯片型号</div>'; return; }
+  if (!isRefresh) saveQueryHistory(partNumber);
   priceDiv.innerHTML = ''; let refreshOverlay = null;
 
   let controller = null;
@@ -985,6 +1142,7 @@ async function querySubstitute(isRefresh = false) {
       window.cancelCurrentRefresh = null;
     }
     fetchStats();
+    pushViewSnapshot();
   }
 }
 
@@ -1112,6 +1270,7 @@ async function handleFile(file) {
     resultDiv.innerHTML = '<div class="error">批量查询已取消。</div>';
     trendingBox.style.display = 'block';
     window.cancelCurrentBatch = null;
+    pushViewSnapshot();
     return;
   }
 
@@ -1134,6 +1293,7 @@ async function handleFile(file) {
   const a = document.createElement('a'); a.href = url; a.download = outFileName; document.body.appendChild(a); a.click(); document.body.removeChild(a);
   
   window.cancelCurrentBatch = null;
+  pushViewSnapshot();
 }
 document.getElementById('batchModal').addEventListener('click', function(e) { if (e.target === this) closeBatchModal(); });
 </script>
